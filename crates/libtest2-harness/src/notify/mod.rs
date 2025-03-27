@@ -3,6 +3,7 @@ mod json;
 #[cfg(feature = "junit")]
 mod junit;
 mod pretty;
+mod style;
 mod summary;
 mod terse;
 
@@ -11,6 +12,7 @@ pub(crate) use json::*;
 #[cfg(feature = "junit")]
 pub(crate) use junit::*;
 pub(crate) use pretty::*;
+pub(crate) use style::*;
 pub(crate) use summary::*;
 pub(crate) use terse::*;
 
@@ -96,10 +98,3 @@ impl From<Elapsed> for String {
         elapsed.0.as_secs_f64().to_string()
     }
 }
-
-const FAILED: anstyle::Style =
-    anstyle::Style::new().fg_color(Some(anstyle::Color::Ansi(anstyle::AnsiColor::Red)));
-const OK: anstyle::Style =
-    anstyle::Style::new().fg_color(Some(anstyle::Color::Ansi(anstyle::AnsiColor::Green)));
-const IGNORED: anstyle::Style =
-    anstyle::Style::new().fg_color(Some(anstyle::Color::Ansi(anstyle::AnsiColor::Yellow)));
