@@ -57,7 +57,7 @@ impl<W: std::io::Write> super::Notifier for PrettyRunNotifier<W> {
                 if self.is_multithreaded {
                     write!(self.writer, "test {: <1$} ... ", name, self.name_width)?;
                 }
-                writeln!(self.writer, "{}{s}{}", style.render(), style.render_reset())?;
+                writeln!(self.writer, "{style}{s}{style:#}")?;
             }
             Event::SuiteComplete { .. } => {
                 self.summary.write_complete(&mut self.writer)?;

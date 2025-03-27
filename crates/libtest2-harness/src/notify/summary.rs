@@ -75,10 +75,8 @@ impl Summary {
         writeln!(writer)?;
         writeln!(
                     writer,
-                    "test result: {}{summary}{}. {num_passed} passed; {num_failed} failed; {num_ignored} ignored; \
+                    "test result: {summary_style}{summary}{summary_style:#}. {num_passed} passed; {num_failed} failed; {num_ignored} ignored; \
                         {num_filtered_out} filtered out; finished in {elapsed_s}",
-                    summary_style.render(),
-                    summary_style.render_reset()
                 )?;
         writeln!(writer)?;
 
