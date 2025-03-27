@@ -37,6 +37,7 @@ impl Harness {
             std::process::exit(1)
         });
 
+        #[cfg(feature = "color")]
         match opts.color {
             libtest_lexarg::ColorConfig::AutoColor => anstream::ColorChoice::Auto,
             libtest_lexarg::ColorConfig::AlwaysColor => anstream::ColorChoice::Always,
@@ -131,7 +132,10 @@ fn parse<'p>(
 }
 
 fn notifier(opts: &libtest_lexarg::TestOpts) -> std::io::Result<Box<dyn notify::Notifier>> {
+    #[cfg(feature = "color")]
     let stdout = anstream::stdout();
+    #[cfg(not(feature = "color"))]
+    let stdout = std::io::stdout();
     let notifier: Box<dyn notify::Notifier> = match opts.format {
         #[cfg(feature = "json")]
         OutputFormat::Json => Box::new(notify::JsonNotifier::new(stdout)),

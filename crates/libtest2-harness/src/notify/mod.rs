@@ -2,7 +2,10 @@
 mod json;
 #[cfg(feature = "junit")]
 mod junit;
+#[cfg(not(feature = "color"))]
+mod no_style;
 mod pretty;
+#[cfg(feature = "color")]
 mod style;
 mod summary;
 mod terse;
@@ -11,7 +14,10 @@ mod terse;
 pub(crate) use json::*;
 #[cfg(feature = "junit")]
 pub(crate) use junit::*;
+#[cfg(not(feature = "color"))]
+pub(crate) use no_style::*;
 pub(crate) use pretty::*;
+#[cfg(feature = "color")]
 pub(crate) use style::*;
 pub(crate) use summary::*;
 pub(crate) use terse::*;

@@ -24,7 +24,8 @@ pre-release-replacements = [
 ]
 
 [features]
-default = ["json", "junit", "threads"]
+default = ["color", "json", "junit", "threads"]
+color = ["libtest2-harness/color"]
 json = ["libtest2-harness/json"]
 junit = ["libtest2-harness/junit"]
 threads = ["libtest2-harness/threads"]
