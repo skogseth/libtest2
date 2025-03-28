@@ -1,4 +1,5 @@
 #[derive(Clone, Debug)]
+#[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "kebab-case"))]
 #[cfg_attr(feature = "serde", serde(tag = "event"))]
@@ -33,6 +34,7 @@ pub enum Event {
 }
 
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "kebab-case"))]
 pub enum RunMode {
@@ -51,6 +53,7 @@ impl RunMode {
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "kebab-case"))]
 pub enum RunStatus {
@@ -59,6 +62,7 @@ pub enum RunStatus {
 }
 
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
 #[cfg_attr(feature = "serde", serde(into = "String"))]
 pub struct Elapsed(pub std::time::Duration);
@@ -73,4 +77,12 @@ impl From<Elapsed> for String {
     fn from(elapsed: Elapsed) -> Self {
         elapsed.0.as_secs_f64().to_string()
     }
+}
+
+#[cfg(feature = "unstable-schema")]
+#[test]
+fn dump_event_schema() {
+    let schema = schemars::schema_for!(Event);
+    let dump = serde_json::to_string_pretty(&schema).unwrap();
+    snapbox::assert_data_eq!(dump, snapbox::file!("../event.schema.json").raw());
 }
