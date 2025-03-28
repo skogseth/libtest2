@@ -106,6 +106,13 @@ name = "lexarg-parser"
 version = "0.1.0"
 
 [[package]]
+name = "libtest-json"
+version = "0.1.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "libtest-lexarg"
 version = "0.1.0"
 dependencies = [
@@ -133,6 +140,7 @@ dependencies = [
  "anstyle",
  "lexarg-error",
  "lexarg-parser",
+ "libtest-json",
  "libtest-lexarg",
  "serde",
  "serde_json",
