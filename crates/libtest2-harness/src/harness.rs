@@ -224,9 +224,6 @@ fn run(
     if opts.nocapture {
         todo!("`--nocapture` is not yet supported");
     }
-    if opts.time_options.is_some() {
-        todo!("`--report-time` / `--ensure-time` are not yet supported");
-    }
     if opts.options.display_output {
         todo!("`--show-output` is not yet supported");
     }

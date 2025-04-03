@@ -34,7 +34,6 @@ pub struct TestOpts {
     pub shuffle_seed: Option<u64>,
     pub test_threads: Option<std::num::NonZeroUsize>,
     pub skip: Vec<String>,
-    pub time_options: Option<TestTimeOptions>,
     /// Stop at first failing test.
     /// May run a few more tests due to threading, but will
     /// abort as soon as possible.
@@ -88,90 +87,6 @@ pub enum OutputFormat {
 impl Default for OutputFormat {
     fn default() -> Self {
         Self::Pretty
-    }
-}
-
-/// Structure with parameters for calculating test execution time (see [`TestOpts::time_options`])
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub struct TestTimeOptions {
-    /// Denotes if the test critical execution time limit excess should be considered
-    /// a test failure.
-    pub error_on_excess: bool,
-    pub unit_threshold: TimeThreshold,
-    pub integration_threshold: TimeThreshold,
-    pub doctest_threshold: TimeThreshold,
-}
-
-impl Default for TestTimeOptions {
-    fn default() -> Self {
-        Self {
-            error_on_excess: false,
-            unit_threshold: TimeThreshold {
-                warn: std::time::Duration::from_millis(50),
-                critical: std::time::Duration::from_millis(100),
-            },
-            integration_threshold: TimeThreshold {
-                warn: std::time::Duration::from_millis(50),
-                critical: std::time::Duration::from_millis(100),
-            },
-            doctest_threshold: TimeThreshold {
-                warn: std::time::Duration::from_millis(50),
-                critical: std::time::Duration::from_millis(100),
-            },
-        }
-    }
-}
-
-/// Structure denoting time limits for test execution (see [`TestTimeOptions`])
-#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
-pub struct TimeThreshold {
-    pub warn: std::time::Duration,
-    pub critical: std::time::Duration,
-}
-
-impl TimeThreshold {
-    /// Attempts to create a `TimeThreshold` instance with values obtained
-    /// from the environment variable, and returns `None` if the variable
-    /// is not set.
-    /// Environment variable format is expected to match `\d+,\d+`.
-    ///
-    /// # Panics
-    ///
-    /// Panics if variable with provided name is set but contains inappropriate
-    /// value.
-    fn from_env_var(env_var_name: &str) -> Result<Option<Self>, ErrorContext<'static>> {
-        use std::str::FromStr;
-
-        let durations_str = match std::env::var(env_var_name) {
-            Ok(value) => value,
-            Err(_) => {
-                return Ok(None);
-            }
-        };
-        let (warn_str, critical_str) = durations_str.split_once(',').ok_or_else(|| {
-            ErrorContext::msg(format_args!(
-                "Duration variable {env_var_name} expected to have 2 numbers separated by comma, but got {durations_str}"
-            ))
-        })?;
-
-        let parse_u64 = |v| {
-            u64::from_str(v).map_err(|_err| {
-                ErrorContext::msg(format_args!(
-                    "Duration value in variable {env_var_name} is expected to be a number, but got {v}"
-                ))
-            })
-        };
-
-        let warn = parse_u64(warn_str)?;
-        let critical = parse_u64(critical_str)?;
-        if warn > critical {
-            panic!("Test execution warn time should be less or equal to the critical time");
-        }
-
-        Ok(Some(Self {
-            warn: std::time::Duration::from_millis(warn),
-            critical: std::time::Duration::from_millis(critical),
-        }))
     }
 }
 
@@ -389,23 +304,6 @@ impl TestOptsBuilder {
                 }
                 // Don't validate `feature` as other parsers might provide values
                 self.opts.allowed_unstable.push(feature.to_owned());
-            }
-            Long("report-time") => {
-                self.opts.time_options.get_or_insert_with(Default::default);
-            }
-            Long("ensure-time") => {
-                let time = self.opts.time_options.get_or_insert_with(Default::default);
-                time.error_on_excess = true;
-                if let Some(threshold) = TimeThreshold::from_env_var("RUST_TEST_TIME_UNIT")? {
-                    time.unit_threshold = threshold;
-                }
-                if let Some(threshold) = TimeThreshold::from_env_var("RUST_TEST_TIME_INTEGRATION")?
-                {
-                    time.integration_threshold = threshold;
-                }
-                if let Some(threshold) = TimeThreshold::from_env_var("RUST_TEST_TIME_DOCTEST")? {
-                    time.doctest_threshold = threshold;
-                }
             }
             Long("shuffle") => {
                 self.opts.shuffle = true;
