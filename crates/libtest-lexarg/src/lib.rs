@@ -24,7 +24,6 @@ pub struct TestOpts {
     pub list: bool,
     pub filters: Vec<String>,
     pub filter_exact: bool,
-    pub force_run_in_process: bool,
     pub run_ignored: RunIgnored,
     pub run_tests: bool,
     pub bench_benchmarks: bool,
@@ -193,8 +192,6 @@ Options:
         --include-ignored 
                         Run ignored and not ignored tests
         --ignored       Run only ignored tests
-        --force-run-in-process 
-                        Forces tests to run in-process when panic=abort
         --test          Run tests and not benchmarks
         --bench         Run benchmarks instead of tests
         --list          List all tests and benchmarks
@@ -315,9 +312,6 @@ impl TestOptsBuilder {
                 self.include_ignored = true;
             }
             Long("ignored") => self.ignored = true,
-            Long("force-run-in-process") => {
-                self.opts.force_run_in_process = true;
-            }
             Long("test") => {
                 self.opts.run_tests = true;
             }
@@ -442,12 +436,6 @@ impl TestOptsBuilder {
             .allowed_unstable
             .iter()
             .any(|f| f == UNSTABLE_OPTIONS);
-
-        if self.opts.force_run_in_process && !allow_unstable_options {
-            return Err(ErrorContext::msg(
-                "`--force-run-in-process` requires `-Zunstable-options`",
-            ));
-        }
 
         if self.opts.shuffle && !allow_unstable_options {
             return Err(ErrorContext::msg(
