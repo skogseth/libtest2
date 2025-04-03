@@ -224,9 +224,6 @@ fn run(
     if opts.force_run_in_process {
         todo!("`--force-run-in-process` is not yet supported");
     }
-    if opts.exclude_should_panic {
-        todo!("`--exclude-should-panic` is not yet supported");
-    }
     if opts.nocapture {
         todo!("`--nocapture` is not yet supported");
     }
