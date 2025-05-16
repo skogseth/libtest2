@@ -245,8 +245,7 @@ fn run(
     };
     let mode = match (opts.run_tests, opts.bench_benchmarks) {
         (true, true) => {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
+            return Err(std::io::Error::other(
                 "`--test` and `-bench` are mutually exclusive",
             ));
         }
