@@ -1,8 +1,9 @@
 fn test_cmd() -> snapbox::cmd::Command {
-    static BIN: once_cell::sync::Lazy<(std::path::PathBuf, std::path::PathBuf)> =
-        once_cell::sync::Lazy::new(|| {
-            let package_root = crate::util::new_test(
-                r#"
+    static BIN: once_cell::sync::OnceCell<(std::path::PathBuf, std::path::PathBuf)> =
+        once_cell::sync::OnceCell::new();
+    let (bin, current_dir) = BIN.get_or_init(|| {
+        let package_root = crate::util::new_test(
+            r#"
 fn main() {
     use libtest2_mimic::Trial;
     use libtest2_mimic::RunError;
@@ -35,12 +36,12 @@ fn main() {
         .main();
 }
 "#,
-                false,
-            );
-            let bin = crate::util::compile_test(&package_root);
-            (bin, package_root)
-        });
-    snapbox::cmd::Command::new(&BIN.0).current_dir(&BIN.1)
+            false,
+        );
+        let bin = crate::util::compile_test(&package_root);
+        (bin, package_root)
+    });
+    snapbox::cmd::Command::new(bin).current_dir(current_dir)
 }
 
 fn check(args: &[&str], code: i32, single: &str, parallel: &str) {
