@@ -57,12 +57,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "cmd"
-version = "0.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1a6a4220010c2610b633aff5c23c8c3aa6c91d0e6fd655a0beea419fbec0a8d"
-
-[[package]]
 name = "colorchoice"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -123,7 +117,6 @@ dependencies = [
 name = "libtest2"
 version = "0.1.0"
 dependencies = [
- "cmd",
  "dunce",
  "escargot",
  "libtest2-harness",
@@ -149,7 +142,6 @@ dependencies = [
 name = "libtest2-mimic"
 version = "0.1.0"
 dependencies = [
- "cmd",
  "dunce",
  "escargot",
  "libtest2-harness",

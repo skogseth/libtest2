@@ -33,7 +33,6 @@ threads = ["libtest2-harness/threads"]
 libtest2-harness = { version = "0.1.0", path = "../libtest2-harness" }
 
 [dev-dependencies]
-cmd = "0.0.0"
 dunce = "1.0.4"
 escargot = "0.5.8"
 once_cell_polyfill = "1.56.0"
