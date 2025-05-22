@@ -1,6 +1,6 @@
 fn test_cmd() -> snapbox::cmd::Command {
-    static BIN: once_cell::sync::OnceCell<(std::path::PathBuf, std::path::PathBuf)> =
-        once_cell::sync::OnceCell::new();
+    static BIN: once_cell_polyfill::sync::OnceLock<(std::path::PathBuf, std::path::PathBuf)> =
+        once_cell_polyfill::sync::OnceLock::new();
     let (bin, current_dir) = BIN.get_or_init(|| {
         let package_root = crate::util::new_test(
             r#"
