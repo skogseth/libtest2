@@ -50,12 +50,12 @@ fn check(args: &[&str], code: i32, single: &str, parallel: &str) {
         .args(["--test-threads", "1"])
         .assert()
         .code(code)
-        .stdout_matches(single);
+        .stdout_eq(single);
     test_cmd()
         .args(args)
         .assert()
         .code(code)
-        .stdout_matches(parallel);
+        .stdout_eq(parallel);
 }
 
 #[test]

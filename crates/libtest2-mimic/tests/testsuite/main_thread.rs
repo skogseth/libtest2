@@ -22,7 +22,7 @@ fn main() {
         .current_dir(package_root)
         .assert()
         .success()
-        .stdout_matches(
+        .stdout_eq(
             "
 running 1 test
 ...",
