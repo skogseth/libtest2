@@ -15,10 +15,6 @@
 #![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 
-#[doc = include_str!("../README.md")]
-#[cfg(doctest)]
-pub struct ReadmeDoctests;
-
 /// Collect context for creating an error
 #[derive(Debug)]
 pub struct ErrorContext<'a> {
@@ -96,3 +92,7 @@ impl std::fmt::Display for ErrorContext<'_> {
         Ok(())
     }
 }
+
+#[doc = include_str!("../README.md")]
+#[cfg(doctest)]
+pub struct ReadmeDoctests;

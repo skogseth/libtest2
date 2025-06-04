@@ -16,10 +16,6 @@
 #![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 
-#[doc = include_str!("../README.md")]
-#[cfg(doctest)]
-pub struct ReadmeDoctests;
-
 /// Simplify parsing of arguments
 pub mod prelude {
     pub use crate::Arg::*;
@@ -190,3 +186,7 @@ impl<T> OptionContextExt<T> for Option<T> {
         })
     }
 }
+
+#[doc = include_str!("../README.md")]
+#[cfg(doctest)]
+pub struct ReadmeDoctests;

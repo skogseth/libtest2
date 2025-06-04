@@ -16,10 +16,6 @@
 #![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 
-#[doc = include_str!("../README.md")]
-#[cfg(doctest)]
-pub struct ReadmeDoctests;
-
 mod ext;
 
 use std::ffi::OsStr;
@@ -417,6 +413,7 @@ fn ceil_char_boundary(s: &str, curr_boundary: usize) -> Option<usize> {
 mod private {
     use super::OsStr;
 
+    #[allow(unnameable_types)]
     pub trait Sealed {}
     impl<const C: usize, S> Sealed for [S; C] where S: AsRef<OsStr> + std::fmt::Debug {}
     impl<S> Sealed for &'_ [S] where S: AsRef<OsStr> + std::fmt::Debug {}
@@ -873,3 +870,7 @@ mod tests {
         }
     }
 }
+
+#[doc = include_str!("../README.md")]
+#[cfg(doctest)]
+pub struct ReadmeDoctests;

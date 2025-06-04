@@ -25,10 +25,6 @@
 // #![warn(clippy::print_stdout)]
 #![allow(clippy::todo)]
 
-#[doc = include_str!("../README.md")]
-#[cfg(doctest)]
-pub struct ReadmeDoctests;
-
 mod case;
 mod harness;
 mod notify;
@@ -41,3 +37,7 @@ pub use case::*;
 pub use harness::*;
 pub use notify::RunMode;
 pub use state::*;
+
+#[doc = include_str!("../README.md")]
+#[cfg(doctest)]
+pub struct ReadmeDoctests;

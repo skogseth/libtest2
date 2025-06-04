@@ -550,3 +550,7 @@ fn is_nightly() -> bool {
 
     bootstrap || !disable_unstable_features
 }
+
+#[doc = include_str!("../README.md")]
+#[cfg(doctest)]
+pub struct ReadmeDoctests;
