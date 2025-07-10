@@ -318,6 +318,34 @@ cat: test
 }
 
 #[test]
+fn list_with_specified_order() {
+    check(
+        &["--list", "--exact", "owl", "fox", "bunny", "frog"],
+        0,
+        str![[r#"
+bunny: test
+fox: test
+frog: test
+owl: test
+
+4 tests
+
+
+"#]],
+        str![[r#"
+bunny: test
+fox: test
+frog: test
+owl: test
+
+4 tests
+
+
+"#]],
+    );
+}
+
+#[test]
 fn filter_c() {
     check(
         &["a"],
