@@ -1,6 +1,6 @@
 use libtest_lexarg::OutputFormat;
 
-use crate::{cli, notify, shuffle, Case, RunError, RunMode, State};
+use crate::{cli, notify, Case, RunError, RunMode, State};
 
 pub struct Harness {
     raw: Vec<std::ffi::OsString>,
@@ -172,10 +172,6 @@ fn discover(
 
     // Do this first so it applies to both discover and running
     cases.sort_unstable_by_key(|case| case.name().to_owned());
-    let seed = shuffle::get_shuffle_seed(opts);
-    if let Some(seed) = seed {
-        shuffle::shuffle_tests(seed, cases);
-    }
 
     let matches_filter = |case: &dyn Case, filter: &str| {
         let test_name = case.name();
@@ -207,7 +203,6 @@ fn discover(
 
     notifier.notify(notify::Event::DiscoverComplete {
         elapsed_s: notify::Elapsed(timer.elapsed()),
-        seed,
     })?;
 
     Ok(())

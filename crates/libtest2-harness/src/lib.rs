@@ -28,7 +28,6 @@
 mod case;
 mod harness;
 mod notify;
-mod shuffle;
 mod state;
 
 pub mod cli;

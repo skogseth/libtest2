@@ -636,7 +636,7 @@ fn list_json() {
 {"event":"discover-case","name":"fox","mode":"test","run":false}
 {"event":"discover-case","name":"frog","mode":"test","run":false}
 {"event":"discover-case","name":"owl","mode":"test","run":false}
-{"event":"discover-complete","elapsed_s":"[..]","seed":null}
+{"event":"discover-complete","elapsed_s":"[..]"}
 "#,
         r#"{"event":"discover-start"}
 {"event":"discover-case","name":"bear","mode":"test","run":true}
@@ -647,7 +647,7 @@ fn list_json() {
 {"event":"discover-case","name":"fox","mode":"test","run":false}
 {"event":"discover-case","name":"frog","mode":"test","run":false}
 {"event":"discover-case","name":"owl","mode":"test","run":false}
-{"event":"discover-complete","elapsed_s":"[..]","seed":null}
+{"event":"discover-complete","elapsed_s":"[..]"}
 "#,
     );
 }
@@ -667,7 +667,7 @@ fn test_json() {
 {"event":"discover-case","name":"fox","mode":"test","run":false}
 {"event":"discover-case","name":"frog","mode":"test","run":false}
 {"event":"discover-case","name":"owl","mode":"test","run":false}
-{"event":"discover-complete","elapsed_s":"[..]","seed":null}
+{"event":"discover-complete","elapsed_s":"[..]"}
 {"event":"suite-start"}
 {"event":"case-start","name":"bear"}
 {"event":"case-complete","name":"bear","mode":"test","status":"ignored","message":"fails","elapsed_s":"[..]"}
@@ -684,7 +684,7 @@ fn test_json() {
 {"event":"discover-case","name":"fox","mode":"test","run":false}
 {"event":"discover-case","name":"frog","mode":"test","run":false}
 {"event":"discover-case","name":"owl","mode":"test","run":false}
-{"event":"discover-complete","elapsed_s":"[..]","seed":null}
+{"event":"discover-complete","elapsed_s":"[..]"}
 {"event":"suite-start"}
 [..]
 [..]
@@ -776,66 +776,6 @@ failures:
     dog
 
 test result: FAILED. 2 passed; 1 failed; 5 ignored; 0 filtered out; finished in [..]s
-
-"#,
-    );
-}
-
-#[test]
-fn shuffle() {
-    check(
-        &["-Zunstable-options", "--list", "--shuffle-seed=1"],
-        0,
-        r#"fox: test
-cat: test
-fly: test
-bear: test
-owl: test
-frog: test
-bunny: test
-dog: test
-
-8 tests
-
-"#,
-        r#"fox: test
-cat: test
-fly: test
-bear: test
-owl: test
-frog: test
-bunny: test
-dog: test
-
-8 tests
-
-"#,
-    );
-    check(
-        &["-Zunstable-options", "--list", "--shuffle-seed=2"],
-        0,
-        r#"owl: test
-dog: test
-fox: test
-frog: test
-bear: test
-fly: test
-bunny: test
-cat: test
-
-8 tests
-
-"#,
-        r#"owl: test
-dog: test
-fox: test
-frog: test
-bear: test
-fly: test
-bunny: test
-cat: test
-
-8 tests
 
 "#,
     );

@@ -30,8 +30,6 @@ pub struct TestOpts {
     pub nocapture: bool,
     pub color: ColorConfig,
     pub format: OutputFormat,
-    pub shuffle: bool,
-    pub shuffle_seed: Option<u64>,
     pub test_threads: Option<std::num::NonZeroUsize>,
     pub skip: Vec<String>,
     /// Stop at first failing test.
@@ -156,10 +154,6 @@ Options:
                         `VARIABLE=WARN_TIME,CRITICAL_TIME`.
                         `CRITICAL_TIME` here means the limit that should not
                         be exceeded by test.
-        --shuffle       Run tests in random order
-        --shuffle-seed SEED
-                        Run tests in random order; seed the random number
-                        generator with SEED
 "#;
 
 pub const AFTER_HELP: &str = r#"
@@ -170,12 +164,6 @@ be passed, which will run all tests matching any of the filters.
 By default, all tests are run in parallel. This can be altered with the
 --test-threads flag or the RUST_TEST_THREADS environment variable when running
 tests (set it to 1).
-
-By default, the tests are run in alphabetical order. Use --shuffle or set
-RUST_TEST_SHUFFLE to run the tests in random order. Pass the generated
-"shuffle seed" to --shuffle-seed (or set RUST_TEST_SHUFFLE_SEED) to run the
-tests in the same order again. Note that --shuffle and --shuffle-seed do not
-affect whether the tests are run in parallel.
 
 All tests have their standard output and standard error captured by default.
 This can be overridden with the --nocapture flag or setting RUST_TEST_NOCAPTURE
@@ -305,17 +293,6 @@ impl TestOptsBuilder {
                 // Don't validate `feature` as other parsers might provide values
                 self.opts.allowed_unstable.push(feature.to_owned());
             }
-            Long("shuffle") => {
-                self.opts.shuffle = true;
-            }
-            Long("shuffle-seed") => {
-                let seed = parser
-                    .next_flag_value()
-                    .ok_or_missing(Value(std::ffi::OsStr::new("SEED")))
-                    .parse()
-                    .within(arg)?;
-                self.opts.shuffle_seed = Some(seed);
-            }
             Value(filter) => {
                 let filter = filter.string("FILTER")?;
                 self.opts.filters.push(filter.to_owned());
@@ -334,37 +311,6 @@ impl TestOptsBuilder {
             .allowed_unstable
             .iter()
             .any(|f| f == UNSTABLE_OPTIONS);
-
-        if self.opts.shuffle && !allow_unstable_options {
-            return Err(ErrorContext::msg(
-                "`--shuffle` requires `-Zunstable-options`",
-            ));
-        }
-        if !self.opts.shuffle && allow_unstable_options {
-            self.opts.shuffle = match std::env::var("RUST_TEST_SHUFFLE") {
-                Ok(val) => &val != "0",
-                Err(_) => false,
-            };
-        }
-
-        if self.opts.shuffle_seed.is_some() && !allow_unstable_options {
-            return Err(ErrorContext::msg(
-                "`--shuffle-seed` requires `-Zunstable-options`",
-            ));
-        }
-        if self.opts.shuffle_seed.is_none() && allow_unstable_options {
-            self.opts.shuffle_seed = match std::env::var("RUST_TEST_SHUFFLE_SEED") {
-                Ok(val) => match val.parse::<u64>() {
-                    Ok(n) => Some(n),
-                    Err(_) => {
-                        return Err(ErrorContext::msg(
-                            "RUST_TEST_SHUFFLE_SEED is `{val}`, should be a number.",
-                        ));
-                    }
-                },
-                Err(_) => None,
-            };
-        }
 
         if !self.opts.nocapture {
             self.opts.nocapture = match std::env::var("RUST_TEST_NOCAPTURE") {
