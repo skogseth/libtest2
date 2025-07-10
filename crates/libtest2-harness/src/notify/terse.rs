@@ -73,7 +73,7 @@ impl<W: std::io::Write> super::Notifier for TerseRunNotifier<W> {
                     Some(RunStatus::Failed) => ('F', FAILED),
                     None => ('.', OK),
                 };
-                write!(self.writer, "{}{c}{}", style.render(), style.render_reset())?;
+                write!(self.writer, "{style}{c}{style:#}")?;
                 self.writer.flush()?;
             }
             Event::SuiteComplete { .. } => {

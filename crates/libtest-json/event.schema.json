@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Event",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "string",
+          "const": "discover-start"
+        }
+      },
+      "required": [
+        "event"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "mode": {
+          "$ref": "#/$defs/RunMode"
+        },
+        "run": {
+          "type": "boolean"
+        },
+        "event": {
+          "type": "string",
+          "const": "discover-case"
+        }
+      },
+      "required": [
+        "event",
+        "name",
+        "mode",
+        "run"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "elapsed_s": {
+          "$ref": "#/$defs/Elapsed"
+        },
+        "seed": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        },
+        "event": {
+          "type": "string",
+          "const": "discover-complete"
+        }
+      },
+      "required": [
+        "event",
+        "elapsed_s"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "string",
+          "const": "suite-start"
+        }
+      },
+      "required": [
+        "event"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "event": {
+          "type": "string",
+          "const": "case-start"
+        }
+      },
+      "required": [
+        "event",
+        "name"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "mode": {
+          "$ref": "#/$defs/RunMode"
+        },
+        "status": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RunStatus"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "elapsed_s": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Elapsed"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "event": {
+          "type": "string",
+          "const": "case-complete"
+        }
+      },
+      "required": [
+        "event",
+        "name",
+        "mode"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "elapsed_s": {
+          "$ref": "#/$defs/Elapsed"
+        },
+        "event": {
+          "type": "string",
+          "const": "suite-complete"
+        }
+      },
+      "required": [
+        "event",
+        "elapsed_s"
+      ]
+    }
+  ],
+  "$defs": {
+    "RunMode": {
+      "type": "string",
+      "enum": [
+        "test",
+        "bench"
+      ]
+    },
+    "Elapsed": {
+      "$ref": "#/$defs/Duration"
+    },
+    "Duration": {
+      "type": "object",
+      "properties": {
+        "secs": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "nanos": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "secs",
+        "nanos"
+      ]
+    },
+    "RunStatus": {
+      "type": "string",
+      "enum": [
+        "ignored",
+        "failed"
+      ]
+    }
+  }
+}

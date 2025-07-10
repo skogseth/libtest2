@@ -25,18 +25,20 @@ pre-release-replacements = [
 
 [features]
 default = []
-json = ["dep:serde", "dep:serde_json"]
+color = ["dep:anstream", "dep:anstyle"]
+json = ["libtest-json/serde", "dep:serde", "dep:serde_json"]
 junit = []
 threads = []
 
 [dependencies]
-anstream = "0.6.4"
-anstyle = "1.0.0"
 lexarg-parser = { version = "0.1.0", path = "../lexarg-parser" }
 lexarg-error = { version = "0.1.0", path = "../lexarg-error" }
 libtest-lexarg = { version = "0.1.0", path = "../libtest-lexarg" }
+anstream = { version = "0.6.4", optional = true }
+anstyle = { version = "1.0.10", optional = true }
 serde = { version = "1.0.160", features = ["derive"], optional = true }
 serde_json = { version = "1.0.96", optional = true }
+libtest-json = { version = "0.1.0", path = "../libtest-json" }
 
 [dev-dependencies]
 

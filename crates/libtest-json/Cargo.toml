@@ -1,7 +1,7 @@
 [package]
-name = "libtest2"
+name = "libtest-json"
 version = "0.1.0"
-description = "An experimental replacement for libtest"
+description = "Definition of the json output for libtest"
 categories = ["development-tools::testing"]
 keywords = ["libtest"]
 repository.workspace = true
@@ -24,21 +24,17 @@ pre-release-replacements = [
 ]
 
 [features]
-default = ["color", "json", "junit", "threads"]
-color = ["libtest2-harness/color"]
-json = ["libtest2-harness/json"]
-junit = ["libtest2-harness/junit"]
-threads = ["libtest2-harness/threads"]
+default = []
+serde = ["dep:serde"]
+unstable-schema = ["serde", "dep:schemars", "dep:serde_json"]
 
 [dependencies]
-libtest2-harness = { version = "0.1.0", path = "../libtest2-harness" }
+serde = { version = "1.0.160", features = ["derive"], optional = true }
+serde_json = { version = "1.0.96", optional = true }
+schemars = { version = "1.0.0-alpha.17", features = ["preserve_order", "semver1"], optional = true }
 
 [dev-dependencies]
-dunce = "1.0.4"
-escargot = "0.5.8"
-once_cell_polyfill = "1.56.0"
-pathdiff = "0.2.1"
-snapbox = "0.6.0"
+snapbox = "0.6.21"
 
 [lints]
 workspace = true
