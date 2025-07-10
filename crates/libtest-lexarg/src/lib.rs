@@ -78,8 +78,6 @@ pub enum OutputFormat {
     Terse,
     /// JSON output
     Json,
-    /// JUnit output
-    Junit,
 }
 
 impl Default for OutputFormat {
@@ -123,12 +121,11 @@ Options:
                         on serially (default);
                         always = always colorize output;
                         never = never colorize output;
-        --format pretty|terse|json|junit
+        --format pretty|terse|json
                         Configure formatting of output:
                         pretty = Print verbose output;
                         terse = Display one character per test;
                         json = Output a json document;
-                        junit = Output a JUnit document
         --show-output   Show captured stdout of successful tests
     -Z unstable-options Enable nightly-only flags:
                         unstable-options = Allow use of experimental features
@@ -268,13 +265,12 @@ impl TestOptsBuilder {
                 let format = parser
                     .next_flag_value()
                     .ok_or_missing(Value(std::ffi::OsStr::new("FORMAT")))
-                    .one_of(&["pretty", "terse", "json", "junit"])
+                    .one_of(&["pretty", "terse", "json"])
                     .within(arg)?;
                 self.format = Some(match format {
                     "pretty" => OutputFormat::Pretty,
                     "terse" => OutputFormat::Terse,
                     "json" => OutputFormat::Json,
-                    "junit" => OutputFormat::Junit,
                     _ => unreachable!("`one_of` should prevent this"),
                 });
             }

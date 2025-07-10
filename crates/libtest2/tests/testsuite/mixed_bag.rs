@@ -696,54 +696,6 @@ fn test_json() {
 }
 
 #[test]
-#[cfg(feature = "junit")]
-fn list_junit() {
-    check(
-        &["-Zunstable-options", "--format=junit", "--list", "a"],
-        0,
-        r#"bear: test
-cat: test
-
-2 tests
-
-"#,
-        r#"bear: test
-cat: test
-
-2 tests
-
-"#,
-    );
-}
-
-#[test]
-#[cfg(feature = "junit")]
-fn test_junit() {
-    check(
-        &["-Zunstable-options", "--format=junit", "a"],
-        0,
-        r#"<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-<testsuite name="test" package="test" id="0" tests="2" errors="0" failures="0" skipped="1" >
-<testcase classname="crate" name="cat" time="0.000s"/>
-<system-out/>
-<system-err/>
-</testsuite>
-</testsuites>
-"#,
-        r#"<?xml version="1.0" encoding="UTF-8"?>
-<testsuites>
-<testsuite name="test" package="test" id="0" tests="2" errors="0" failures="0" skipped="1" >
-<testcase classname="crate" name="cat" time="0.000s"/>
-<system-out/>
-<system-err/>
-</testsuite>
-</testsuites>
-"#,
-    );
-}
-
-#[test]
 fn terse_output() {
     check(
         &["--quiet"],

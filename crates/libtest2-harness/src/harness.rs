@@ -149,15 +149,6 @@ fn notifier(opts: &libtest_lexarg::TestOpts) -> std::io::Result<Box<dyn notify::
         _ if opts.list => Box::new(notify::TerseListNotifier::new(stdout)),
         OutputFormat::Pretty => Box::new(notify::PrettyRunNotifier::new(stdout)),
         OutputFormat::Terse => Box::new(notify::TerseRunNotifier::new(stdout)),
-        #[cfg(feature = "junit")]
-        OutputFormat::Junit => Box::new(notify::JunitRunNotifier::new(stdout)),
-        #[cfg(not(feature = "junit"))]
-        OutputFormat::Junit => {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                "`--format=junit` is not supported",
-            ));
-        }
     };
     Ok(notifier)
 }
