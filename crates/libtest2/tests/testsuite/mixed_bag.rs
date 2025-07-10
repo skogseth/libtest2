@@ -323,20 +323,20 @@ fn list_with_specified_order() {
         &["--list", "--exact", "owl", "fox", "bunny", "frog"],
         0,
         str![[r#"
-bunny: test
-fox: test
-frog: test
 owl: test
+fox: test
+bunny: test
+frog: test
 
 4 tests
 
 
 "#]],
         str![[r#"
-bunny: test
-fox: test
-frog: test
 owl: test
+fox: test
+bunny: test
+frog: test
 
 4 tests
 
@@ -718,20 +718,8 @@ fn list_json() {
   {
     "event": "discover-case",
     "mode": "test",
-    "name": "bear",
-    "run": true
-  },
-  {
-    "event": "discover-case",
-    "mode": "test",
     "name": "bunny",
     "run": false
-  },
-  {
-    "event": "discover-case",
-    "mode": "test",
-    "name": "cat",
-    "run": true
   },
   {
     "event": "discover-case",
@@ -762,6 +750,18 @@ fn list_json() {
     "mode": "test",
     "name": "owl",
     "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "bear",
+    "run": true
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "cat",
+    "run": true
   },
   {
     "elapsed_s": "[..]",
@@ -779,20 +779,8 @@ fn list_json() {
   {
     "event": "discover-case",
     "mode": "test",
-    "name": "bear",
-    "run": true
-  },
-  {
-    "event": "discover-case",
-    "mode": "test",
     "name": "bunny",
     "run": false
-  },
-  {
-    "event": "discover-case",
-    "mode": "test",
-    "name": "cat",
-    "run": true
   },
   {
     "event": "discover-case",
@@ -823,6 +811,18 @@ fn list_json() {
     "mode": "test",
     "name": "owl",
     "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "bear",
+    "run": true
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "cat",
+    "run": true
   },
   {
     "elapsed_s": "[..]",
@@ -849,20 +849,8 @@ fn test_json() {
   {
     "event": "discover-case",
     "mode": "test",
-    "name": "bear",
-    "run": true
-  },
-  {
-    "event": "discover-case",
-    "mode": "test",
     "name": "bunny",
     "run": false
-  },
-  {
-    "event": "discover-case",
-    "mode": "test",
-    "name": "cat",
-    "run": true
   },
   {
     "event": "discover-case",
@@ -893,6 +881,18 @@ fn test_json() {
     "mode": "test",
     "name": "owl",
     "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "bear",
+    "run": true
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "cat",
+    "run": true
   },
   {
     "elapsed_s": "[..]",
