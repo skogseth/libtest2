@@ -1,3 +1,6 @@
+use snapbox::prelude::*;
+use snapbox::str;
+
 fn test_cmd() -> snapbox::cmd::Command {
     static BIN: once_cell_polyfill::sync::OnceLock<(std::path::PathBuf, std::path::PathBuf)> =
         once_cell_polyfill::sync::OnceLock::new();
@@ -26,7 +29,7 @@ fn barro(_state: &libtest2::State) -> libtest2::RunResult {
     snapbox::cmd::Command::new(bin).current_dir(current_dir)
 }
 
-fn check(args: &[&str], single: &str, parallel: &str) {
+fn check(args: &[&str], single: impl IntoData, parallel: impl IntoData) {
     test_cmd()
         .args(args)
         .args(["--test-threads", "1"])
@@ -40,7 +43,8 @@ fn check(args: &[&str], single: &str, parallel: &str) {
 fn normal() {
     check(
         &[],
-        r#"
+        str![[r#"
+
 running 3 tests
 test bar   ... ok
 test barro ... ok
@@ -48,14 +52,17 @@ test foo   ... ok
 
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 3 tests
 ...
 
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -63,20 +70,24 @@ test result: ok. 3 passed; 0 failed; 0 ignored; 0 filtered out; finished in [..]
 fn filter_one() {
     check(
         &["foo"],
-        r#"
+        str![[r#"
+
 running 1 test
 test foo ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 1 test
 test foo ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -84,21 +95,25 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]
 fn filter_two() {
     check(
         &["bar"],
-        r#"
+        str![[r#"
+
 running 2 tests
 test bar   ... ok
 test barro ... ok
 
 test result: ok. 2 passed; 0 failed; 0 ignored; 1 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 2 tests
 ...
 
 test result: ok. 2 passed; 0 failed; 0 ignored; 1 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -106,20 +121,24 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 1 filtered out; finished in [..]
 fn filter_exact() {
     check(
         &["bar", "--exact"],
-        r#"
+        str![[r#"
+
 running 1 test
 test bar ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 1 test
 test bar ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -127,20 +146,24 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]
 fn filter_two_and_skip() {
     check(
         &["--skip", "barro", "bar"],
-        r#"
+        str![[r#"
+
 running 1 test
 test bar ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 1 test
 test bar ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -148,7 +171,8 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]
 fn skip_nothing() {
     check(
         &["--skip", "peter"],
-        r#"
+        str![[r#"
+
 running 3 tests
 test bar   ... ok
 test barro ... ok
@@ -156,14 +180,17 @@ test foo   ... ok
 
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 3 tests
 ...
 
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -171,20 +198,24 @@ test result: ok. 3 passed; 0 failed; 0 ignored; 0 filtered out; finished in [..]
 fn skip_two() {
     check(
         &["--skip", "bar"],
-        r#"
+        str![[r#"
+
 running 1 test
 test foo ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 1 test
 test foo ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -192,21 +223,25 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]
 fn skip_exact() {
     check(
         &["--exact", "--skip", "bar"],
-        r#"
+        str![[r#"
+
 running 2 tests
 test barro ... ok
 test foo   ... ok
 
 test result: ok. 2 passed; 0 failed; 0 ignored; 1 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 2 tests
 ...
 
 test result: ok. 2 passed; 0 failed; 0 ignored; 1 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -214,17 +249,21 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 1 filtered out; finished in [..]
 fn terse_output() {
     check(
         &["--quiet", "--skip", "foo"],
-        r#"
+        str![[r#"
+
 running 2 tests
 ..
 test result: ok. 2 passed; 0 failed; 0 ignored; 1 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 2 tests
 ..
 test result: ok. 2 passed; 0 failed; 0 ignored; 1 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
