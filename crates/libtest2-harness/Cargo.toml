@@ -27,7 +27,6 @@ pre-release-replacements = [
 default = []
 color = ["dep:anstream", "dep:anstyle"]
 json = ["libtest-json/serde", "dep:serde", "dep:serde_json"]
-junit = []
 threads = []
 
 [dependencies]

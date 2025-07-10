@@ -24,19 +24,14 @@ pub struct TestOpts {
     pub list: bool,
     pub filters: Vec<String>,
     pub filter_exact: bool,
-    pub force_run_in_process: bool,
-    pub exclude_should_panic: bool,
     pub run_ignored: RunIgnored,
     pub run_tests: bool,
     pub bench_benchmarks: bool,
     pub nocapture: bool,
     pub color: ColorConfig,
     pub format: OutputFormat,
-    pub shuffle: bool,
-    pub shuffle_seed: Option<u64>,
     pub test_threads: Option<std::num::NonZeroUsize>,
     pub skip: Vec<String>,
-    pub time_options: Option<TestTimeOptions>,
     /// Stop at first failing test.
     /// May run a few more tests due to threading, but will
     /// abort as soon as possible.
@@ -83,97 +78,11 @@ pub enum OutputFormat {
     Terse,
     /// JSON output
     Json,
-    /// JUnit output
-    Junit,
 }
 
 impl Default for OutputFormat {
     fn default() -> Self {
         Self::Pretty
-    }
-}
-
-/// Structure with parameters for calculating test execution time (see [`TestOpts::time_options`])
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub struct TestTimeOptions {
-    /// Denotes if the test critical execution time limit excess should be considered
-    /// a test failure.
-    pub error_on_excess: bool,
-    pub unit_threshold: TimeThreshold,
-    pub integration_threshold: TimeThreshold,
-    pub doctest_threshold: TimeThreshold,
-}
-
-impl Default for TestTimeOptions {
-    fn default() -> Self {
-        Self {
-            error_on_excess: false,
-            unit_threshold: TimeThreshold {
-                warn: std::time::Duration::from_millis(50),
-                critical: std::time::Duration::from_millis(100),
-            },
-            integration_threshold: TimeThreshold {
-                warn: std::time::Duration::from_millis(50),
-                critical: std::time::Duration::from_millis(100),
-            },
-            doctest_threshold: TimeThreshold {
-                warn: std::time::Duration::from_millis(50),
-                critical: std::time::Duration::from_millis(100),
-            },
-        }
-    }
-}
-
-/// Structure denoting time limits for test execution (see [`TestTimeOptions`])
-#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
-pub struct TimeThreshold {
-    pub warn: std::time::Duration,
-    pub critical: std::time::Duration,
-}
-
-impl TimeThreshold {
-    /// Attempts to create a `TimeThreshold` instance with values obtained
-    /// from the environment variable, and returns `None` if the variable
-    /// is not set.
-    /// Environment variable format is expected to match `\d+,\d+`.
-    ///
-    /// # Panics
-    ///
-    /// Panics if variable with provided name is set but contains inappropriate
-    /// value.
-    fn from_env_var(env_var_name: &str) -> Result<Option<Self>, ErrorContext<'static>> {
-        use std::str::FromStr;
-
-        let durations_str = match std::env::var(env_var_name) {
-            Ok(value) => value,
-            Err(_) => {
-                return Ok(None);
-            }
-        };
-        let (warn_str, critical_str) = durations_str.split_once(',').ok_or_else(|| {
-            ErrorContext::msg(format_args!(
-                "Duration variable {env_var_name} expected to have 2 numbers separated by comma, but got {durations_str}"
-            ))
-        })?;
-
-        let parse_u64 = |v| {
-            u64::from_str(v).map_err(|_err| {
-                ErrorContext::msg(format_args!(
-                    "Duration value in variable {env_var_name} is expected to be a number, but got {v}"
-                ))
-            })
-        };
-
-        let warn = parse_u64(warn_str)?;
-        let critical = parse_u64(critical_str)?;
-        if warn > critical {
-            panic!("Test execution warn time should be less or equal to the critical time");
-        }
-
-        Ok(Some(Self {
-            warn: std::time::Duration::from_millis(warn),
-            critical: std::time::Duration::from_millis(critical),
-        }))
     }
 }
 
@@ -194,10 +103,6 @@ Options:
         --include-ignored 
                         Run ignored and not ignored tests
         --ignored       Run only ignored tests
-        --force-run-in-process 
-                        Forces tests to run in-process when panic=abort
-        --exclude-should-panic 
-                        Excludes tests marked as should_panic
         --test          Run tests and not benchmarks
         --bench         Run benchmarks instead of tests
         --list          List all tests and benchmarks
@@ -216,12 +121,11 @@ Options:
                         on serially (default);
                         always = always colorize output;
                         never = never colorize output;
-        --format pretty|terse|json|junit
+        --format pretty|terse|json
                         Configure formatting of output:
                         pretty = Print verbose output;
                         terse = Display one character per test;
                         json = Output a json document;
-                        junit = Output a JUnit document
         --show-output   Show captured stdout of successful tests
     -Z unstable-options Enable nightly-only flags:
                         unstable-options = Allow use of experimental features
@@ -247,10 +151,6 @@ Options:
                         `VARIABLE=WARN_TIME,CRITICAL_TIME`.
                         `CRITICAL_TIME` here means the limit that should not
                         be exceeded by test.
-        --shuffle       Run tests in random order
-        --shuffle-seed SEED
-                        Run tests in random order; seed the random number
-                        generator with SEED
 "#;
 
 pub const AFTER_HELP: &str = r#"
@@ -261,12 +161,6 @@ be passed, which will run all tests matching any of the filters.
 By default, all tests are run in parallel. This can be altered with the
 --test-threads flag or the RUST_TEST_THREADS environment variable when running
 tests (set it to 1).
-
-By default, the tests are run in alphabetical order. Use --shuffle or set
-RUST_TEST_SHUFFLE to run the tests in random order. Pass the generated
-"shuffle seed" to --shuffle-seed (or set RUST_TEST_SHUFFLE_SEED) to run the
-tests in the same order again. Note that --shuffle and --shuffle-seed do not
-affect whether the tests are run in parallel.
 
 All tests have their standard output and standard error captured by default.
 This can be overridden with the --nocapture flag or setting RUST_TEST_NOCAPTURE
@@ -318,12 +212,6 @@ impl TestOptsBuilder {
                 self.include_ignored = true;
             }
             Long("ignored") => self.ignored = true,
-            Long("force-run-in-process") => {
-                self.opts.force_run_in_process = true;
-            }
-            Long("exclude-should-panic") => {
-                self.opts.exclude_should_panic = true;
-            }
             Long("test") => {
                 self.opts.run_tests = true;
             }
@@ -377,13 +265,12 @@ impl TestOptsBuilder {
                 let format = parser
                     .next_flag_value()
                     .ok_or_missing(Value(std::ffi::OsStr::new("FORMAT")))
-                    .one_of(&["pretty", "terse", "json", "junit"])
+                    .one_of(&["pretty", "terse", "json"])
                     .within(arg)?;
                 self.format = Some(match format {
                     "pretty" => OutputFormat::Pretty,
                     "terse" => OutputFormat::Terse,
                     "json" => OutputFormat::Json,
-                    "junit" => OutputFormat::Junit,
                     _ => unreachable!("`one_of` should prevent this"),
                 });
             }
@@ -401,34 +288,6 @@ impl TestOptsBuilder {
                 }
                 // Don't validate `feature` as other parsers might provide values
                 self.opts.allowed_unstable.push(feature.to_owned());
-            }
-            Long("report-time") => {
-                self.opts.time_options.get_or_insert_with(Default::default);
-            }
-            Long("ensure-time") => {
-                let time = self.opts.time_options.get_or_insert_with(Default::default);
-                time.error_on_excess = true;
-                if let Some(threshold) = TimeThreshold::from_env_var("RUST_TEST_TIME_UNIT")? {
-                    time.unit_threshold = threshold;
-                }
-                if let Some(threshold) = TimeThreshold::from_env_var("RUST_TEST_TIME_INTEGRATION")?
-                {
-                    time.integration_threshold = threshold;
-                }
-                if let Some(threshold) = TimeThreshold::from_env_var("RUST_TEST_TIME_DOCTEST")? {
-                    time.doctest_threshold = threshold;
-                }
-            }
-            Long("shuffle") => {
-                self.opts.shuffle = true;
-            }
-            Long("shuffle-seed") => {
-                let seed = parser
-                    .next_flag_value()
-                    .ok_or_missing(Value(std::ffi::OsStr::new("SEED")))
-                    .parse()
-                    .within(arg)?;
-                self.opts.shuffle_seed = Some(seed);
             }
             Value(filter) => {
                 let filter = filter.string("FILTER")?;
@@ -448,49 +307,6 @@ impl TestOptsBuilder {
             .allowed_unstable
             .iter()
             .any(|f| f == UNSTABLE_OPTIONS);
-
-        if self.opts.force_run_in_process && !allow_unstable_options {
-            return Err(ErrorContext::msg(
-                "`--force-run-in-process` requires `-Zunstable-options`",
-            ));
-        }
-
-        if self.opts.exclude_should_panic && !allow_unstable_options {
-            return Err(ErrorContext::msg(
-                "`--exclude-should-panic` requires `-Zunstable-options`",
-            ));
-        }
-
-        if self.opts.shuffle && !allow_unstable_options {
-            return Err(ErrorContext::msg(
-                "`--shuffle` requires `-Zunstable-options`",
-            ));
-        }
-        if !self.opts.shuffle && allow_unstable_options {
-            self.opts.shuffle = match std::env::var("RUST_TEST_SHUFFLE") {
-                Ok(val) => &val != "0",
-                Err(_) => false,
-            };
-        }
-
-        if self.opts.shuffle_seed.is_some() && !allow_unstable_options {
-            return Err(ErrorContext::msg(
-                "`--shuffle-seed` requires `-Zunstable-options`",
-            ));
-        }
-        if self.opts.shuffle_seed.is_none() && allow_unstable_options {
-            self.opts.shuffle_seed = match std::env::var("RUST_TEST_SHUFFLE_SEED") {
-                Ok(val) => match val.parse::<u64>() {
-                    Ok(n) => Some(n),
-                    Err(_) => {
-                        return Err(ErrorContext::msg(
-                            "RUST_TEST_SHUFFLE_SEED is `{val}`, should be a number.",
-                        ));
-                    }
-                },
-                Err(_) => None,
-            };
-        }
 
         if !self.opts.nocapture {
             self.opts.nocapture = match std::env::var("RUST_TEST_NOCAPTURE") {

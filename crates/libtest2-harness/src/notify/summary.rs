@@ -5,7 +5,6 @@ use super::OK;
 
 #[derive(Default, Clone, Debug)]
 pub(crate) struct Summary {
-    pub(crate) seed: Option<u64>,
     pub(crate) failures: std::collections::BTreeMap<String, Option<String>>,
     pub(crate) elapsed_s: super::Elapsed,
 
@@ -29,13 +28,9 @@ impl Summary {
 
     pub(crate) fn write_start(&self, writer: &mut dyn std::io::Write) -> std::io::Result<()> {
         let s = if self.num_run == 1 { "" } else { "s" };
-        let seed = self
-            .seed
-            .map(|s| format!(" (shuffle seed: {s})"))
-            .unwrap_or_default();
 
         writeln!(writer)?;
-        writeln!(writer, "running {} test{s}{seed}", self.num_run)?;
+        writeln!(writer, "running {} test{s}", self.num_run)?;
         Ok(())
     }
 
@@ -95,9 +90,7 @@ impl super::Notifier for Summary {
                     self.num_filtered_out += 1;
                 }
             }
-            Event::DiscoverComplete { seed, .. } => {
-                self.seed = seed;
-            }
+            Event::DiscoverComplete { .. } => {}
             Event::SuiteStart => {}
             Event::CaseStart { .. } => {}
             Event::CaseComplete {

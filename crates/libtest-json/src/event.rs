@@ -13,7 +13,6 @@ pub enum Event {
     DiscoverComplete {
         #[allow(dead_code)]
         elapsed_s: Elapsed,
-        seed: Option<u64>,
     },
     SuiteStart,
     CaseStart {

@@ -1,6 +1,6 @@
 use libtest_lexarg::OutputFormat;
 
-use crate::{cli, notify, shuffle, Case, RunError, RunMode, State};
+use crate::{cli, notify, Case, RunError, RunMode, State};
 
 pub struct Harness {
     raw: Vec<std::ffi::OsString>,
@@ -149,15 +149,6 @@ fn notifier(opts: &libtest_lexarg::TestOpts) -> std::io::Result<Box<dyn notify::
         _ if opts.list => Box::new(notify::TerseListNotifier::new(stdout)),
         OutputFormat::Pretty => Box::new(notify::PrettyRunNotifier::new(stdout)),
         OutputFormat::Terse => Box::new(notify::TerseRunNotifier::new(stdout)),
-        #[cfg(feature = "junit")]
-        OutputFormat::Junit => Box::new(notify::JunitRunNotifier::new(stdout)),
-        #[cfg(not(feature = "junit"))]
-        OutputFormat::Junit => {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                "`--format=junit` is not supported",
-            ));
-        }
     };
     Ok(notifier)
 }
@@ -172,10 +163,6 @@ fn discover(
 
     // Do this first so it applies to both discover and running
     cases.sort_unstable_by_key(|case| case.name().to_owned());
-    let seed = shuffle::get_shuffle_seed(opts);
-    if let Some(seed) = seed {
-        shuffle::shuffle_tests(seed, cases);
-    }
 
     let matches_filter = |case: &dyn Case, filter: &str| {
         let test_name = case.name();
@@ -207,7 +194,6 @@ fn discover(
 
     notifier.notify(notify::Event::DiscoverComplete {
         elapsed_s: notify::Elapsed(timer.elapsed()),
-        seed,
     })?;
 
     Ok(())
@@ -221,17 +207,8 @@ fn run(
     notifier.notify(notify::Event::SuiteStart)?;
     let timer = std::time::Instant::now();
 
-    if opts.force_run_in_process {
-        todo!("`--force-run-in-process` is not yet supported");
-    }
-    if opts.exclude_should_panic {
-        todo!("`--exclude-should-panic` is not yet supported");
-    }
     if opts.nocapture {
         todo!("`--nocapture` is not yet supported");
-    }
-    if opts.time_options.is_some() {
-        todo!("`--report-time` / `--ensure-time` are not yet supported");
     }
     if opts.options.display_output {
         todo!("`--show-output` is not yet supported");

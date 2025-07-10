@@ -44,14 +44,6 @@
         "elapsed_s": {
           "$ref": "#/$defs/Elapsed"
         },
-        "seed": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "format": "uint64",
-          "minimum": 0
-        },
         "event": {
           "type": "string",
           "const": "discover-complete"
