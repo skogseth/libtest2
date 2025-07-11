@@ -32,6 +32,13 @@ pub enum Event {
     },
 }
 
+impl Event {
+    #[cfg(feature = "json")]
+    pub fn to_jsonline(&self) -> String {
+        serde_json::to_string(self).expect("always valid json")
+    }
+}
+
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]

@@ -173,7 +173,6 @@ dependencies = [
  "lexarg-parser",
  "libtest-json",
  "libtest-lexarg",
- "serde_json",
 ]
 
 [[package]]
