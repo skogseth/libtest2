@@ -64,18 +64,22 @@ fn empty() {
         0,
         str![[r#"
 
-running 0 tests
+running 4 tests
+test one     ... ok
+test one_two ... ok
+test three   ... ok
+test two     ... ok
 
-test result: ok. 0 passed; 0 failed; 0 ignored; 4 filtered out; finished in [..]s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
         str![[r#"
 
-running 0 tests
+running 4 tests
 ...
 
-test result: ok. 0 passed; 0 failed; 0 ignored; 4 filtered out; finished in [..]s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
@@ -90,19 +94,21 @@ fn list() {
         &argfile,
         0,
         str![[r#"
+one: test
+one_two: test
+three: test
+two: test
 
-running 0 tests
-
-test result: ok. 0 passed; 0 failed; 0 ignored; 4 filtered out; finished in [..]s
+4 tests
 
 
 "#]],
         str![[r#"
-
-running 0 tests
+one: test
+one_two: test
 ...
 
-test result: ok. 0 passed; 0 failed; 0 ignored; 4 filtered out; finished in [..]s
+4 tests
 
 
 "#]],
@@ -124,18 +130,20 @@ two
         0,
         str![[r#"
 
-running 0 tests
+running 2 tests
+test one ... ok
+test two ... ok
 
-test result: ok. 0 passed; 0 failed; 0 ignored; 4 filtered out; finished in [..]s
+test result: ok. 2 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]s
 
 
 "#]],
         str![[r#"
 
-running 0 tests
+running 2 tests
 ...
 
-test result: ok. 0 passed; 0 failed; 0 ignored; 4 filtered out; finished in [..]s
+test result: ok. 2 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]s
 
 
 "#]],
@@ -154,18 +162,20 @@ two",
         0,
         str![[r#"
 
-running 0 tests
+running 2 tests
+test one ... ok
+test two ... ok
 
-test result: ok. 0 passed; 0 failed; 0 ignored; 4 filtered out; finished in [..]s
+test result: ok. 2 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]s
 
 
 "#]],
         str![[r#"
 
-running 0 tests
+running 2 tests
 ...
 
-test result: ok. 0 passed; 0 failed; 0 ignored; 4 filtered out; finished in [..]s
+test result: ok. 2 passed; 0 failed; 0 ignored; 2 filtered out; finished in [..]s
 
 
 "#]],
@@ -175,26 +185,5 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 4 filtered out; finished in [..]
 #[test]
 fn invalid() {
     let argfile = std::path::Path::new("highly-improbably-non-existent-file.txt");
-    check(
-        &[],
-        argfile,
-        0,
-        str![[r#"
-
-running 0 tests
-
-test result: ok. 0 passed; 0 failed; 0 ignored; 4 filtered out; finished in [..]s
-
-
-"#]],
-        str![[r#"
-
-running 0 tests
-...
-
-test result: ok. 0 passed; 0 failed; 0 ignored; 4 filtered out; finished in [..]s
-
-
-"#]],
-    );
+    check(&[], argfile, 1, str![""], str![""]);
 }
