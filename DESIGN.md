@@ -156,3 +156,15 @@ Unsure which of those would be slower and how the different characteristics matc
 
 Rather than build into every harness shuffle, sharding, and any other specific logic like that,
 we can instead give the user direct control over the test order by the order they are specified on the command line.
+
+### Decision: argfile support
+
+Similar to filters changing the order of tests,
+argfile support allows for passing a large list of arguments to a test binary.
+
+The syntax and semantics match rustc:
+- Expanded before parsing, independent of any other syntax
+- Arguments are delimited by newlines; no shell escaping
+  - rustc has unstable support for `@shell:<path>`
+- Lines are read literal, empty lines are empty arguments and no comments
+- Non-recursive

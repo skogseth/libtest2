@@ -3,18 +3,19 @@ use libtest_lexarg::OutputFormat;
 use crate::{cli, notify, Case, RunError, RunMode, State};
 
 pub struct Harness {
-    raw: Vec<std::ffi::OsString>,
+    raw: std::io::Result<Vec<std::ffi::OsString>>,
     cases: Vec<Box<dyn Case>>,
 }
 
 impl Harness {
     pub fn with_args(args: impl IntoIterator<Item = impl Into<std::ffi::OsString>>) -> Self {
-        let raw = args.into_iter().map(|s| s.into()).collect::<Vec<_>>();
+        let raw = expand_args(args);
         Self { raw, cases: vec![] }
     }
 
     pub fn with_env() -> Self {
-        let raw = std::env::args_os().collect::<Vec<_>>();
+        let raw = std::env::args_os();
+        let raw = expand_args(raw);
         Self { raw, cases: vec![] }
     }
 
@@ -31,7 +32,14 @@ impl Harness {
     }
 
     pub fn main(mut self) -> ! {
-        let mut parser = cli::Parser::new(&self.raw);
+        let raw = match self.raw {
+            Ok(raw) => raw,
+            Err(err) => {
+                eprintln!("{err}");
+                std::process::exit(1)
+            }
+        };
+        let mut parser = cli::Parser::new(&raw);
         let opts = parse(&mut parser).unwrap_or_else(|err| {
             eprintln!("{err}");
             std::process::exit(1)
@@ -129,6 +137,27 @@ fn parse<'p>(
         None
     };
     Ok(opts)
+}
+
+fn expand_args(
+    args: impl IntoIterator<Item = impl Into<std::ffi::OsString>>,
+) -> std::io::Result<Vec<std::ffi::OsString>> {
+    let mut expanded = Vec::new();
+    for arg in args {
+        let arg = arg.into();
+        if let Some(argfile) = arg.to_str().and_then(|s| s.strip_prefix("@")) {
+            expanded.extend(parse_argfile(std::path::Path::new(argfile))?);
+        } else {
+            expanded.push(arg);
+        }
+    }
+    Ok(expanded)
+}
+
+fn parse_argfile(path: &std::path::Path) -> std::io::Result<Vec<std::ffi::OsString>> {
+    // Logic taken from rust-lang/rust's `compiler/rustc_driver_impl/src/args.rs`
+    let content = std::fs::read_to_string(path)?;
+    Ok(content.lines().map(|s| s.into()).collect())
 }
 
 fn notifier(opts: &libtest_lexarg::TestOpts) -> std::io::Result<Box<dyn notify::Notifier>> {

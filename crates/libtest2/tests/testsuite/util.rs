@@ -40,6 +40,15 @@ harness = {harness}
     package_root
 }
 
+pub fn new_file(name_prefix: &str, name_suffix: &str, content: &str) -> std::path::PathBuf {
+    static SUFFIX: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
+    let suffix = SUFFIX.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+    let name = format!("{name_prefix}{suffix}{name_suffix}");
+    let path = tempdir().join(name);
+    std::fs::write(&path, content).unwrap();
+    path
+}
+
 pub fn compile_test(package_root: &std::path::Path) -> std::path::PathBuf {
     let manifest_path = package_root.join("Cargo.toml");
     let target_name = package_root.file_name().unwrap().to_str().unwrap();
