@@ -13,7 +13,7 @@ impl<W: std::io::Write> JsonNotifier<W> {
 
 impl<W: std::io::Write> super::Notifier for JsonNotifier<W> {
     fn notify(&mut self, event: Event) -> std::io::Result<()> {
-        let event = serde_json::to_string(&event)?;
+        let event = event.to_jsonline();
         writeln!(self.writer, "{event}")?;
         Ok(())
     }
