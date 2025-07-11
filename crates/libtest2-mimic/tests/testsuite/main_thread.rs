@@ -1,3 +1,5 @@
+use snapbox::str;
+
 #[test]
 fn check_test_on_main_thread() {
     let package_root = crate::util::new_test(
@@ -22,9 +24,10 @@ fn main() {
         .current_dir(package_root)
         .assert()
         .success()
-        .stdout_eq(
-            "
+        .stdout_eq(str![[r#"
+
 running 1 test
-...",
-        );
+...
+
+"#]]);
 }

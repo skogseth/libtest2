@@ -1,3 +1,6 @@
+use snapbox::prelude::*;
+use snapbox::str;
+
 fn test_cmd() -> snapbox::cmd::Command {
     static BIN: once_cell_polyfill::sync::OnceLock<(std::path::PathBuf, std::path::PathBuf)> =
         once_cell_polyfill::sync::OnceLock::new();
@@ -51,7 +54,7 @@ fn bear(state: &libtest2::State) -> libtest2::RunResult {
     snapbox::cmd::Command::new(bin).current_dir(current_dir)
 }
 
-fn check(args: &[&str], code: i32, single: &str, parallel: &str) {
+fn check(args: &[&str], code: i32, single: impl IntoData, parallel: impl IntoData) {
     test_cmd()
         .args(args)
         .args(["--test-threads", "1"])
@@ -70,7 +73,8 @@ fn normal() {
     check(
         &[],
         101,
-        r#"
+        str![[r#"
+
 running 8 tests
 test bear  ... ignored
 test bunny ... ignored
@@ -92,8 +96,10 @@ failures:
 
 test result: FAILED. 2 passed; 1 failed; 5 ignored; 0 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 8 tests
 ...
 
@@ -108,7 +114,8 @@ failures:
 
 test result: FAILED. 2 passed; 1 failed; 5 ignored; 0 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -117,7 +124,8 @@ fn test_mode() {
     check(
         &["--test"],
         101,
-        r#"
+        str![[r#"
+
 running 8 tests
 test bear  ... ignored
 test bunny ... ignored
@@ -139,8 +147,10 @@ failures:
 
 test result: FAILED. 2 passed; 1 failed; 5 ignored; 0 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 8 tests
 ...
 
@@ -155,7 +165,8 @@ failures:
 
 test result: FAILED. 2 passed; 1 failed; 5 ignored; 0 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -164,7 +175,8 @@ fn bench_mode() {
     check(
         &["--bench"],
         101,
-        r#"
+        str![[r#"
+
 running 8 tests
 test bear  ... ignored
 test bunny ... ignored
@@ -186,8 +198,10 @@ failures:
 
 test result: FAILED. 2 passed; 1 failed; 5 ignored; 0 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 8 tests
 ...
 
@@ -202,7 +216,8 @@ failures:
 
 test result: FAILED. 2 passed; 1 failed; 5 ignored; 0 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -211,7 +226,8 @@ fn list() {
     check(
         &["--list"],
         0,
-        r#"bear: test
+        str![[r#"
+bear: test
 bunny: test
 cat: test
 dog: test
@@ -222,8 +238,10 @@ owl: test
 
 8 tests
 
-"#,
-        r#"bear: test
+
+"#]],
+        str![[r#"
+bear: test
 bunny: test
 cat: test
 dog: test
@@ -234,7 +252,8 @@ owl: test
 
 8 tests
 
-"#,
+
+"#]],
     );
 }
 
@@ -243,7 +262,8 @@ fn list_ignored() {
     check(
         &["--list", "--ignored"],
         0,
-        r#"bear: test
+        str![[r#"
+bear: test
 bunny: test
 cat: test
 dog: test
@@ -254,8 +274,10 @@ owl: test
 
 8 tests
 
-"#,
-        r#"bear: test
+
+"#]],
+        str![[r#"
+bear: test
 bunny: test
 cat: test
 dog: test
@@ -266,7 +288,8 @@ owl: test
 
 8 tests
 
-"#,
+
+"#]],
     );
 }
 
@@ -275,18 +298,50 @@ fn list_with_filter() {
     check(
         &["--list", "a"],
         0,
-        r#"bear: test
+        str![[r#"
+bear: test
 cat: test
 
 2 tests
 
-"#,
-        r#"bear: test
+
+"#]],
+        str![[r#"
+bear: test
 cat: test
 
 2 tests
 
-"#,
+
+"#]],
+    );
+}
+
+#[test]
+fn list_with_specified_order() {
+    check(
+        &["--list", "--exact", "owl", "fox", "bunny", "frog"],
+        0,
+        str![[r#"
+owl: test
+fox: test
+bunny: test
+frog: test
+
+4 tests
+
+
+"#]],
+        str![[r#"
+owl: test
+fox: test
+bunny: test
+frog: test
+
+4 tests
+
+
+"#]],
     );
 }
 
@@ -295,21 +350,25 @@ fn filter_c() {
     check(
         &["a"],
         0,
-        r#"
+        str![[r#"
+
 running 2 tests
 test bear ... ignored
 test cat  ... ok
 
 test result: ok. 1 passed; 0 failed; 1 ignored; 6 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 2 tests
 ...
 
 test result: ok. 1 passed; 0 failed; 1 ignored; 6 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -318,21 +377,25 @@ fn filter_o_test() {
     check(
         &["--test", "a"],
         0,
-        r#"
+        str![[r#"
+
 running 2 tests
 test bear ... ignored
 test cat  ... ok
 
 test result: ok. 1 passed; 0 failed; 1 ignored; 6 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 2 tests
 ...
 
 test result: ok. 1 passed; 0 failed; 1 ignored; 6 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -341,7 +404,8 @@ fn filter_o_test_include_ignored() {
     check(
         &["--test", "--include-ignored", "o"],
         101,
-        r#"
+        str![[r#"
+
 running 4 tests
 test dog  ... FAILED
 test fox  ... ok
@@ -363,8 +427,10 @@ failures:
 
 test result: FAILED. 2 passed; 2 failed; 0 ignored; 4 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 4 tests
 ...
 
@@ -383,7 +449,8 @@ failures:
 
 test result: FAILED. 2 passed; 2 failed; 0 ignored; 4 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -392,7 +459,8 @@ fn filter_o_test_ignored() {
     check(
         &["--test", "--ignored", "o"],
         101,
-        r#"
+        str![[r#"
+
 running 4 tests
 test dog  ... FAILED
 test fox  ... ok
@@ -414,8 +482,10 @@ failures:
 
 test result: FAILED. 2 passed; 2 failed; 0 ignored; 4 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 4 tests
 ...
 
@@ -434,7 +504,8 @@ failures:
 
 test result: FAILED. 2 passed; 2 failed; 0 ignored; 4 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -443,7 +514,8 @@ fn normal_include_ignored() {
     check(
         &["--include-ignored"],
         101,
-        r#"
+        str![[r#"
+
 running 8 tests
 test bear  ... FAILED
 test bunny ... FAILED
@@ -477,8 +549,10 @@ failures:
 
 test result: FAILED. 4 passed; 4 failed; 0 ignored; 0 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 8 tests
 ...
 
@@ -505,7 +579,8 @@ failures:
 
 test result: FAILED. 4 passed; 4 failed; 0 ignored; 0 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -514,7 +589,8 @@ fn normal_ignored() {
     check(
         &["--ignored"],
         101,
-        r#"
+        str![[r#"
+
 running 8 tests
 test bear  ... FAILED
 test bunny ... FAILED
@@ -548,8 +624,10 @@ failures:
 
 test result: FAILED. 4 passed; 4 failed; 0 ignored; 0 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 8 tests
 ...
 
@@ -576,7 +654,8 @@ failures:
 
 test result: FAILED. 4 passed; 4 failed; 0 ignored; 0 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -585,7 +664,8 @@ fn lots_of_flags() {
     check(
         &["--ignored", "--skip", "g", "--test", "o"],
         101,
-        r#"
+        str![[r#"
+
 running 2 tests
 test fox ... ok
 test owl ... FAILED
@@ -601,8 +681,10 @@ failures:
 
 test result: FAILED. 1 passed; 1 failed; 0 ignored; 6 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 2 tests
 ...
 
@@ -617,7 +699,8 @@ failures:
 
 test result: FAILED. 1 passed; 1 failed; 0 ignored; 6 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }
 
@@ -627,28 +710,128 @@ fn list_json() {
     check(
         &["-Zunstable-options", "--format=json", "--list", "a"],
         0,
-        r#"{"event":"discover-start"}
-{"event":"discover-case","name":"bear","mode":"test","run":true}
-{"event":"discover-case","name":"bunny","mode":"test","run":false}
-{"event":"discover-case","name":"cat","mode":"test","run":true}
-{"event":"discover-case","name":"dog","mode":"test","run":false}
-{"event":"discover-case","name":"fly","mode":"test","run":false}
-{"event":"discover-case","name":"fox","mode":"test","run":false}
-{"event":"discover-case","name":"frog","mode":"test","run":false}
-{"event":"discover-case","name":"owl","mode":"test","run":false}
-{"event":"discover-complete","elapsed_s":"[..]"}
-"#,
-        r#"{"event":"discover-start"}
-{"event":"discover-case","name":"bear","mode":"test","run":true}
-{"event":"discover-case","name":"bunny","mode":"test","run":false}
-{"event":"discover-case","name":"cat","mode":"test","run":true}
-{"event":"discover-case","name":"dog","mode":"test","run":false}
-{"event":"discover-case","name":"fly","mode":"test","run":false}
-{"event":"discover-case","name":"fox","mode":"test","run":false}
-{"event":"discover-case","name":"frog","mode":"test","run":false}
-{"event":"discover-case","name":"owl","mode":"test","run":false}
-{"event":"discover-complete","elapsed_s":"[..]"}
-"#,
+        str![[r#"
+[
+  {
+    "event": "discover-start"
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "bunny",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "dog",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "fly",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "fox",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "frog",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "owl",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "bear",
+    "run": true
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "cat",
+    "run": true
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover-complete"
+  }
+]
+"#]]
+        .is_json()
+        .against_jsonlines(),
+        str![[r#"
+[
+  {
+    "event": "discover-start"
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "bunny",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "dog",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "fly",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "fox",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "frog",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "owl",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "bear",
+    "run": true
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "cat",
+    "run": true
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover-complete"
+  }
+]
+"#]]
+        .is_json()
+        .against_jsonlines(),
     );
 }
 
@@ -658,40 +841,191 @@ fn test_json() {
     check(
         &["-Zunstable-options", "--format=json", "a"],
         0,
-        r#"{"event":"discover-start"}
-{"event":"discover-case","name":"bear","mode":"test","run":true}
-{"event":"discover-case","name":"bunny","mode":"test","run":false}
-{"event":"discover-case","name":"cat","mode":"test","run":true}
-{"event":"discover-case","name":"dog","mode":"test","run":false}
-{"event":"discover-case","name":"fly","mode":"test","run":false}
-{"event":"discover-case","name":"fox","mode":"test","run":false}
-{"event":"discover-case","name":"frog","mode":"test","run":false}
-{"event":"discover-case","name":"owl","mode":"test","run":false}
-{"event":"discover-complete","elapsed_s":"[..]"}
-{"event":"suite-start"}
-{"event":"case-start","name":"bear"}
-{"event":"case-complete","name":"bear","mode":"test","status":"ignored","message":"fails","elapsed_s":"[..]"}
-{"event":"case-start","name":"cat"}
-{"event":"case-complete","name":"cat","mode":"test","status":null,"message":null,"elapsed_s":"[..]"}
-{"event":"suite-complete","elapsed_s":"[..]"}
-"#,
-        r#"{"event":"discover-start"}
-{"event":"discover-case","name":"bear","mode":"test","run":true}
-{"event":"discover-case","name":"bunny","mode":"test","run":false}
-{"event":"discover-case","name":"cat","mode":"test","run":true}
-{"event":"discover-case","name":"dog","mode":"test","run":false}
-{"event":"discover-case","name":"fly","mode":"test","run":false}
-{"event":"discover-case","name":"fox","mode":"test","run":false}
-{"event":"discover-case","name":"frog","mode":"test","run":false}
-{"event":"discover-case","name":"owl","mode":"test","run":false}
-{"event":"discover-complete","elapsed_s":"[..]"}
-{"event":"suite-start"}
-[..]
-[..]
-[..]
-[..]
-{"event":"suite-complete","elapsed_s":"[..]"}
-"#,
+        str![[r#"
+[
+  {
+    "event": "discover-start"
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "bunny",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "dog",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "fly",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "fox",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "frog",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "owl",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "bear",
+    "run": true
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "cat",
+    "run": true
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover-complete"
+  },
+  {
+    "event": "suite-start"
+  },
+  {
+    "event": "case-start",
+    "name": "bear"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "case-complete",
+    "message": "fails",
+    "mode": "test",
+    "name": "bear",
+    "status": "ignored"
+  },
+  {
+    "event": "case-start",
+    "name": "cat"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "case-complete",
+    "message": null,
+    "mode": "test",
+    "name": "cat",
+    "status": null
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "suite-complete"
+  }
+]
+"#]]
+        .is_json()
+        .against_jsonlines(),
+        str![[r#"
+[
+  {
+    "event": "discover-start"
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "bear",
+    "run": true
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "bunny",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "cat",
+    "run": true
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "dog",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "fly",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "fox",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "frog",
+    "run": false
+  },
+  {
+    "event": "discover-case",
+    "mode": "test",
+    "name": "owl",
+    "run": false
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover-complete"
+  },
+  {
+    "event": "suite-start"
+  },
+  {
+    "event": "case-start",
+    "name": "bear"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "case-complete",
+    "message": "fails",
+    "mode": "test",
+    "name": "bear",
+    "status": "ignored"
+  },
+  {
+    "event": "case-start",
+    "name": "cat"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "case-complete",
+    "message": null,
+    "mode": "test",
+    "name": "cat",
+    "status": null
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "suite-complete"
+  }
+]
+"#]]
+        .unordered()
+        .is_json()
+        .against_jsonlines(),
     );
 }
 
@@ -700,7 +1034,8 @@ fn terse_output() {
     check(
         &["--quiet"],
         101,
-        r#"
+        str![[r#"
+
 running 8 tests
 ii.Fi.ii
 failures:
@@ -714,8 +1049,10 @@ failures:
 
 test result: FAILED. 2 passed; 1 failed; 5 ignored; 0 filtered out; finished in [..]s
 
-"#,
-        r#"
+
+"#]],
+        str![[r#"
+
 running 8 tests
 ...
 failures:
@@ -729,6 +1066,7 @@ failures:
 
 test result: FAILED. 2 passed; 1 failed; 5 ignored; 0 filtered out; finished in [..]s
 
-"#,
+
+"#]],
     );
 }

@@ -149,3 +149,10 @@ support for multi-character shorts is something people may want to opt-in to (it
 Performance isn't the top priority, so remoing `&str` -> `char` conversions isn't necessarily viewed as a benefit.
 This also makes `match` need to work off of `&str` instead of `char`.
 Unsure which of those would be slower and how the different characteristics match up.
+
+## Harness
+
+### Decision: report and run tests in filter order
+
+Rather than build into every harness shuffle, sharding, and any other specific logic like that,
+we can instead give the user direct control over the test order by the order they are specified on the command line.
