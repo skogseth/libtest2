@@ -1,6 +1,6 @@
 [package]
 name = "libtest-json"
-version = "0.1.0"
+version = "0.0.1"
 description = "Definition of the json output for libtest"
 categories = ["development-tools::testing"]
 keywords = ["libtest"]

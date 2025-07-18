@@ -1,6 +1,6 @@
 [package]
 name = "libtest2-harness"
-version = "0.1.0"
+version = "0.0.1"
 description = "An experimental replacement for the core of libtest"
 categories = ["development-tools::testing"]
 keywords = ["libtest"]
@@ -30,12 +30,12 @@ json = ["libtest-json/json"]
 threads = []
 
 [dependencies]
-lexarg-parser = { version = "0.1.0", path = "../lexarg-parser" }
-lexarg-error = { version = "0.1.0", path = "../lexarg-error" }
-libtest-lexarg = { version = "0.1.0", path = "../libtest-lexarg" }
+lexarg-parser = { version = "0.0.1", path = "../lexarg-parser" }
+lexarg-error = { version = "0.0.1", path = "../lexarg-error" }
+libtest-lexarg = { version = "0.0.1", path = "../libtest-lexarg" }
 anstream = { version = "0.6.4", optional = true }
 anstyle = { version = "1.0.10", optional = true }
-libtest-json = { version = "0.1.0", path = "../libtest-json" }
+libtest-json = { version = "0.0.1", path = "../libtest-json" }
 
 [dev-dependencies]
 
