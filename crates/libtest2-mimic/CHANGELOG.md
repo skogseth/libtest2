@@ -7,5 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [0.0.1] - 2025-07-18
+
 <!-- next-url -->
-[Unreleased]: https://github.com/rust-cli/argfile/compare/4c90b451737fda8cdb965a665d86d5a5ba06a9b4...HEAD
+[Unreleased]: https://github.com/epage/pytest-rs/compare/libtest2-mimic-v0.0.1...HEAD
+[0.0.1]: https://github.com/rust-cli/argfile/compare/4c90b451737fda8cdb965a665d86d5a5ba06a9b4...libtest2-mimic-v0.0.1
