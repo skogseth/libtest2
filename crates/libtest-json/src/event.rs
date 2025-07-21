@@ -12,6 +12,7 @@ pub enum Event {
             serde(default, skip_serializing_if = "RunMode::is_default")
         )]
         mode: RunMode,
+        /// Whether selected to be run by the user
         #[cfg_attr(
             feature = "serde",
             serde(default = "true_default", skip_serializing_if = "is_true")
@@ -32,6 +33,7 @@ pub enum Event {
             serde(default, skip_serializing_if = "RunMode::is_default")
         )]
         mode: RunMode,
+        /// `None` means success
         status: Option<RunStatus>,
         message: Option<String>,
         elapsed_s: Option<Elapsed>,

@@ -24,6 +24,7 @@
           "$ref": "#/$defs/RunMode"
         },
         "run": {
+          "description": "Whether selected to be run by the user",
           "type": "boolean"
         },
         "event": {
@@ -90,6 +91,7 @@
           "$ref": "#/$defs/RunMode"
         },
         "status": {
+          "description": "`None` means success",
           "anyOf": [
             {
               "$ref": "#/$defs/RunStatus"
