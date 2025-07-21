@@ -20,7 +20,19 @@ Care abouts
 
 See also [eRFC 3558](https://github.com/rust-lang/rfcs/pull/3558)
 
+Current proposal:
+- [serde definition](https://github.com/assert-rs/libtest2/blob/main/crates/libtest-json/src/event.rs)
+- [JSONSchema](https://github.com/assert-rs/libtest2/blob/main/crates/libtest-json/event.schema.json)
+- [example output](https://github.com/assert-rs/libtest2/blob/main/crates/libtest2-mimic/tests/testsuite/mixed_bag.rs)
+
+Decisions
+- Always report discovery
+  - Allows callers to provide a progress indicator
+  - Replaces the need for harnesses to provide statistics
+
 ### Prior Art
+
+#### libtest's existing format
 
 [libtest's existing format](https://github.com/rust-lang/rust/blob/master/library/test/src/formatters/json.rs) (as ndjson):
 ```json
@@ -106,6 +118,24 @@ See also [eRFC 3558](https://github.com/rust-lang/rfcs/pull/3558)
   - `mib_per_second` is too application-specific
   - Does not convey units
   - No extension point for special reporters
+
+#### TAP
+
+[TAP](https://testanything.org/tap-version-14-specification.html)
+
+#### pytest-json-report
+
+[pytest-json-report](https://github.com/numirias/pytest-json-report)
+
+#### pytest-reportlog
+
+[pytest-reportlog](https://github.com/pytest-dev/pytest-reportlog)
+
+Endorsed in [pytest's docs](https://docs.pytest.org/en/latest/deprecations.html#result-log-result-log)
+
+#### subunit
+
+[subunit](https://github.com/testing-cabal/subunit) ([rust impl](https://github.com/mtreinish/subunit-rust))
 
 ## lexarg
 
