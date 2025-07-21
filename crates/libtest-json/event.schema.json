@@ -33,8 +33,7 @@
       },
       "required": [
         "event",
-        "name",
-        "run"
+        "name"
       ]
     },
     {

@@ -12,6 +12,10 @@ pub enum Event {
             serde(default, skip_serializing_if = "RunMode::is_default")
         )]
         mode: RunMode,
+        #[cfg_attr(
+            feature = "serde",
+            serde(default = "true_default", skip_serializing_if = "is_true")
+        )]
         run: bool,
     },
     DiscoverComplete {
@@ -42,6 +46,14 @@ impl Event {
     pub fn to_jsonline(&self) -> String {
         serde_json::to_string(self).expect("always valid json")
     }
+}
+
+fn true_default() -> bool {
+    true
+}
+
+fn is_true(yes: &bool) -> bool {
+    *yes
 }
 
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]

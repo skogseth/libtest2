@@ -740,13 +740,11 @@ fn list_json() {
   },
   {
     "event": "discover-case",
-    "name": "bear",
-    "run": true
+    "name": "bear"
   },
   {
     "event": "discover-case",
-    "name": "cat",
-    "run": true
+    "name": "cat"
   },
   {
     "elapsed_s": "[..]",
@@ -793,13 +791,11 @@ fn list_json() {
   },
   {
     "event": "discover-case",
-    "name": "bear",
-    "run": true
+    "name": "bear"
   },
   {
     "event": "discover-case",
-    "name": "cat",
-    "run": true
+    "name": "cat"
   },
   {
     "elapsed_s": "[..]",
@@ -855,13 +851,11 @@ fn test_json() {
   },
   {
     "event": "discover-case",
-    "name": "bear",
-    "run": true
+    "name": "bear"
   },
   {
     "event": "discover-case",
-    "name": "cat",
-    "run": true
+    "name": "cat"
   },
   {
     "elapsed_s": "[..]",
@@ -907,8 +901,7 @@ fn test_json() {
   },
   {
     "event": "discover-case",
-    "name": "bear",
-    "run": true
+    "name": "bear"
   },
   {
     "event": "discover-case",
@@ -917,8 +910,7 @@ fn test_json() {
   },
   {
     "event": "discover-case",
-    "name": "cat",
-    "run": true
+    "name": "cat"
   },
   {
     "event": "discover-case",

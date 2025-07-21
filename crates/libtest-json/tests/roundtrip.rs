@@ -30,7 +30,7 @@ fn discover_case() {
             mode: libtest_json::RunMode::Test,
             run: true,
         },
-        str![[r#"{"event":"discover-case","name":"Hello\tworld!","run":true}"#]],
+        str![[r#"{"event":"discover-case","name":"Hello\tworld!"}"#]],
     );
 
     t(
