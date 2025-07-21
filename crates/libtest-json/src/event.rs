@@ -11,7 +11,6 @@ pub enum Event {
         run: bool,
     },
     DiscoverComplete {
-        #[allow(dead_code)]
         elapsed_s: Elapsed,
     },
     SuiteStart,
@@ -20,11 +19,9 @@ pub enum Event {
     },
     CaseComplete {
         name: String,
-        #[allow(dead_code)]
         mode: RunMode,
         status: Option<RunStatus>,
         message: Option<String>,
-        #[allow(dead_code)]
         elapsed_s: Option<Elapsed>,
     },
     SuiteComplete {
