@@ -66,7 +66,125 @@ pub enum Event {
 impl Event {
     #[cfg(feature = "json")]
     pub fn to_jsonline(&self) -> String {
-        serde_json::to_string(self).expect("always valid json")
+        use json_write::JsonWrite as _;
+
+        let mut buffer = String::new();
+        buffer.open_object().unwrap();
+        match self {
+            Self::DiscoverStart => {
+                buffer.key("event").unwrap();
+                buffer.keyval_sep().unwrap();
+                buffer.value("discover_start").unwrap();
+            }
+            Self::DiscoverCase { name, mode, run } => {
+                buffer.key("event").unwrap();
+                buffer.keyval_sep().unwrap();
+                buffer.value("discover_case").unwrap();
+
+                buffer.val_sep().unwrap();
+                buffer.key("name").unwrap();
+                buffer.keyval_sep().unwrap();
+                buffer.value(name).unwrap();
+
+                if !mode.is_default() {
+                    buffer.val_sep().unwrap();
+                    buffer.key("mode").unwrap();
+                    buffer.keyval_sep().unwrap();
+                    buffer.value(mode.as_str()).unwrap();
+                }
+
+                if !run {
+                    buffer.val_sep().unwrap();
+                    buffer.key("run").unwrap();
+                    buffer.keyval_sep().unwrap();
+                    buffer.value(run).unwrap();
+                }
+            }
+            Self::DiscoverComplete { elapsed_s } => {
+                buffer.key("event").unwrap();
+                buffer.keyval_sep().unwrap();
+                buffer.value("discover_complete").unwrap();
+                if let Some(elapsed_s) = elapsed_s {
+                    buffer.val_sep().unwrap();
+                    buffer.key("elapsed_s").unwrap();
+                    buffer.keyval_sep().unwrap();
+                    buffer.value(String::from(*elapsed_s)).unwrap();
+                }
+            }
+            Self::SuiteStart => {
+                buffer.key("event").unwrap();
+                buffer.keyval_sep().unwrap();
+                buffer.value("suite_start").unwrap();
+            }
+            Self::CaseStart { name } => {
+                buffer.key("event").unwrap();
+                buffer.keyval_sep().unwrap();
+                buffer.value("case_start").unwrap();
+
+                buffer.val_sep().unwrap();
+                buffer.key("name").unwrap();
+                buffer.keyval_sep().unwrap();
+                buffer.value(name).unwrap();
+            }
+            Self::CaseComplete {
+                name,
+                mode,
+                status,
+                message,
+                elapsed_s,
+            } => {
+                buffer.key("event").unwrap();
+                buffer.keyval_sep().unwrap();
+                buffer.value("case_complete").unwrap();
+
+                buffer.val_sep().unwrap();
+                buffer.key("name").unwrap();
+                buffer.keyval_sep().unwrap();
+                buffer.value(name).unwrap();
+
+                if !mode.is_default() {
+                    buffer.val_sep().unwrap();
+                    buffer.key("mode").unwrap();
+                    buffer.keyval_sep().unwrap();
+                    buffer.value(mode.as_str()).unwrap();
+                }
+
+                if let Some(status) = status {
+                    buffer.val_sep().unwrap();
+                    buffer.key("status").unwrap();
+                    buffer.keyval_sep().unwrap();
+                    buffer.value(status.as_str()).unwrap();
+                }
+
+                if let Some(message) = message {
+                    buffer.val_sep().unwrap();
+                    buffer.key("message").unwrap();
+                    buffer.keyval_sep().unwrap();
+                    buffer.value(message).unwrap();
+                }
+
+                if let Some(elapsed_s) = elapsed_s {
+                    buffer.val_sep().unwrap();
+                    buffer.key("elapsed_s").unwrap();
+                    buffer.keyval_sep().unwrap();
+                    buffer.value(String::from(*elapsed_s)).unwrap();
+                }
+            }
+            Self::SuiteComplete { elapsed_s } => {
+                buffer.key("event").unwrap();
+                buffer.keyval_sep().unwrap();
+                buffer.value("suite_complete").unwrap();
+                if let Some(elapsed_s) = elapsed_s {
+                    buffer.val_sep().unwrap();
+                    buffer.key("elapsed_s").unwrap();
+                    buffer.keyval_sep().unwrap();
+                    buffer.value(String::from(*elapsed_s)).unwrap();
+                }
+            }
+        }
+        buffer.close_object().unwrap();
+
+        buffer
     }
 }
 
@@ -108,6 +226,15 @@ impl RunMode {
 pub enum RunStatus {
     Ignored,
     Failed,
+}
+
+impl RunStatus {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Ignored => "ignored",
+            Self::Failed => "failed",
+        }
+    }
 }
 
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
