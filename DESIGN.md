@@ -168,3 +168,14 @@ The syntax and semantics match rustc:
   - rustc has unstable support for `@shell:<path>`
 - Lines are read literal, empty lines are empty arguments and no comments
 - Non-recursive
+
+## `json-write`
+
+### Decision: custom json writer
+
+The goal is to minimize build times.  Switching from `serde_json` dropped out build times by an order of magnitude.
+
+Other libraries exist in this space but generally take on too much, e.g.
+- https://crates.io/crates/write-json: json-safe API
+- https://crates.io/crates/json-writer: also supports a more json-safe API
+- https://crates.io/crates/escape8259: only strings, also parses
