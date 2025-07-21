@@ -154,26 +154,7 @@
       ]
     },
     "Elapsed": {
-      "$ref": "#/$defs/Duration"
-    },
-    "Duration": {
-      "type": "object",
-      "properties": {
-        "secs": {
-          "type": "integer",
-          "format": "uint64",
-          "minimum": 0
-        },
-        "nanos": {
-          "type": "integer",
-          "format": "uint32",
-          "minimum": 0
-        }
-      },
-      "required": [
-        "secs",
-        "nanos"
-      ]
+      "type": "string"
     },
     "RunStatus": {
       "type": "string",
