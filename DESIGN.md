@@ -1,5 +1,12 @@
 # Design decisions
 
+Overall goals:
+1. Very fast build times (our competitor, libtest, has 0s build times)
+2. Flexible enough that we can have just one test harness to cover nearly everyone's needs
+  - `trybuild`, `trycmd`, `tryfn`, `toml-test-harness`, etc can all be extensions
+3. Minimal breaking changes after 1.0
+4. Provide building blocks for other other custom test harnesses
+
 ## json format
 
 Goals:
