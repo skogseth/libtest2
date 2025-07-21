@@ -7,7 +7,7 @@
       "properties": {
         "event": {
           "type": "string",
-          "const": "discover-start"
+          "const": "discover_start"
         }
       },
       "required": [
@@ -24,34 +24,39 @@
           "$ref": "#/$defs/RunMode"
         },
         "run": {
+          "description": "Whether selected to be run by the user",
           "type": "boolean"
         },
         "event": {
           "type": "string",
-          "const": "discover-case"
+          "const": "discover_case"
         }
       },
       "required": [
         "event",
-        "name",
-        "mode",
-        "run"
+        "name"
       ]
     },
     {
       "type": "object",
       "properties": {
         "elapsed_s": {
-          "$ref": "#/$defs/Elapsed"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Elapsed"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "event": {
           "type": "string",
-          "const": "discover-complete"
+          "const": "discover_complete"
         }
       },
       "required": [
-        "event",
-        "elapsed_s"
+        "event"
       ]
     },
     {
@@ -59,7 +64,7 @@
       "properties": {
         "event": {
           "type": "string",
-          "const": "suite-start"
+          "const": "suite_start"
         }
       },
       "required": [
@@ -74,7 +79,7 @@
         },
         "event": {
           "type": "string",
-          "const": "case-start"
+          "const": "case_start"
         }
       },
       "required": [
@@ -92,6 +97,7 @@
           "$ref": "#/$defs/RunMode"
         },
         "status": {
+          "description": "`None` means success",
           "anyOf": [
             {
               "$ref": "#/$defs/RunStatus"
@@ -119,29 +125,34 @@
         },
         "event": {
           "type": "string",
-          "const": "case-complete"
+          "const": "case_complete"
         }
       },
       "required": [
         "event",
-        "name",
-        "mode"
+        "name"
       ]
     },
     {
       "type": "object",
       "properties": {
         "elapsed_s": {
-          "$ref": "#/$defs/Elapsed"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Elapsed"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "event": {
           "type": "string",
-          "const": "suite-complete"
+          "const": "suite_complete"
         }
       },
       "required": [
-        "event",
-        "elapsed_s"
+        "event"
       ]
     }
   ],
@@ -154,26 +165,7 @@
       ]
     },
     "Elapsed": {
-      "$ref": "#/$defs/Duration"
-    },
-    "Duration": {
-      "type": "object",
-      "properties": {
-        "secs": {
-          "type": "integer",
-          "format": "uint64",
-          "minimum": 0
-        },
-        "nanos": {
-          "type": "integer",
-          "format": "uint32",
-          "minimum": 0
-        }
-      },
-      "required": [
-        "secs",
-        "nanos"
-      ]
+      "type": "string"
     },
     "RunStatus": {
       "type": "string",

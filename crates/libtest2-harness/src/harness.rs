@@ -233,7 +233,7 @@ fn discover(
     cases.retain(|_| retain_cases.next().unwrap());
 
     notifier.notify(notify::Event::DiscoverComplete {
-        elapsed_s: notify::Elapsed(timer.elapsed()),
+        elapsed_s: Some(notify::Elapsed(timer.elapsed())),
     })?;
 
     Ok(())
@@ -389,7 +389,7 @@ fn run(
     }
 
     notifier.notify(notify::Event::SuiteComplete {
-        elapsed_s: notify::Elapsed(timer.elapsed()),
+        elapsed_s: Some(notify::Elapsed(timer.elapsed())),
     })?;
 
     Ok(success)

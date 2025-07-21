@@ -713,59 +713,49 @@ fn list_json() {
         str![[r#"
 [
   {
-    "event": "discover-start"
+    "event": "discover_start"
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "bunny",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "dog",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "fly",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "fox",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "frog",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "owl",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
-    "name": "bear",
-    "run": true
+    "event": "discover_case",
+    "name": "bear"
   },
   {
-    "event": "discover-case",
-    "mode": "test",
-    "name": "cat",
-    "run": true
+    "event": "discover_case",
+    "name": "cat"
   },
   {
     "elapsed_s": "[..]",
-    "event": "discover-complete"
+    "event": "discover_complete"
   }
 ]
 "#]]
@@ -774,59 +764,49 @@ fn list_json() {
         str![[r#"
 [
   {
-    "event": "discover-start"
+    "event": "discover_start"
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "bunny",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "dog",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "fly",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "fox",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "frog",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "owl",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
-    "name": "bear",
-    "run": true
+    "event": "discover_case",
+    "name": "bear"
   },
   {
-    "event": "discover-case",
-    "mode": "test",
-    "name": "cat",
-    "run": true
+    "event": "discover_case",
+    "name": "cat"
   },
   {
     "elapsed_s": "[..]",
-    "event": "discover-complete"
+    "event": "discover_complete"
   }
 ]
 "#]]
@@ -844,90 +824,76 @@ fn test_json() {
         str![[r#"
 [
   {
-    "event": "discover-start"
+    "event": "discover_start"
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "bunny",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "dog",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "fly",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "fox",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "frog",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "owl",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
-    "name": "bear",
-    "run": true
-  },
-  {
-    "event": "discover-case",
-    "mode": "test",
-    "name": "cat",
-    "run": true
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "discover-complete"
-  },
-  {
-    "event": "suite-start"
-  },
-  {
-    "event": "case-start",
+    "event": "discover_case",
     "name": "bear"
   },
   {
-    "elapsed_s": "[..]",
-    "event": "case-complete",
-    "message": "fails",
-    "mode": "test",
-    "name": "bear",
-    "status": "ignored"
-  },
-  {
-    "event": "case-start",
+    "event": "discover_case",
     "name": "cat"
   },
   {
     "elapsed_s": "[..]",
-    "event": "case-complete",
-    "message": null,
-    "mode": "test",
-    "name": "cat",
-    "status": null
+    "event": "discover_complete"
+  },
+  {
+    "event": "suite_start"
+  },
+  {
+    "event": "case_start",
+    "name": "bear"
   },
   {
     "elapsed_s": "[..]",
-    "event": "suite-complete"
+    "event": "case_complete",
+    "message": "fails",
+    "name": "bear",
+    "status": "ignored"
+  },
+  {
+    "event": "case_start",
+    "name": "cat"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "case_complete",
+    "name": "cat"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "suite_complete"
   }
 ]
 "#]]
@@ -936,90 +902,76 @@ fn test_json() {
         str![[r#"
 [
   {
-    "event": "discover-start"
+    "event": "discover_start"
   },
   {
-    "event": "discover-case",
-    "mode": "test",
-    "name": "bear",
-    "run": true
+    "event": "discover_case",
+    "name": "bear"
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "bunny",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
-    "name": "cat",
-    "run": true
+    "event": "discover_case",
+    "name": "cat"
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "dog",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "fly",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "fox",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "frog",
     "run": false
   },
   {
-    "event": "discover-case",
-    "mode": "test",
+    "event": "discover_case",
     "name": "owl",
     "run": false
   },
   {
     "elapsed_s": "[..]",
-    "event": "discover-complete"
+    "event": "discover_complete"
   },
   {
-    "event": "suite-start"
+    "event": "suite_start"
   },
   {
-    "event": "case-start",
+    "event": "case_start",
     "name": "bear"
   },
   {
     "elapsed_s": "[..]",
-    "event": "case-complete",
+    "event": "case_complete",
     "message": "fails",
-    "mode": "test",
     "name": "bear",
     "status": "ignored"
   },
   {
-    "event": "case-start",
+    "event": "case_start",
     "name": "cat"
   },
   {
     "elapsed_s": "[..]",
-    "event": "case-complete",
-    "message": null,
-    "mode": "test",
-    "name": "cat",
-    "status": null
+    "event": "case_complete",
+    "name": "cat"
   },
   {
     "elapsed_s": "[..]",
-    "event": "suite-complete"
+    "event": "suite_complete"
   }
 ]
 "#]]
