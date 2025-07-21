@@ -47,7 +47,7 @@ fn discover_case() {
 fn discover_complete() {
     t(
         libtest_json::Event::DiscoverComplete { elapsed_s: None },
-        str![[r#"{"event":"discover-complete","elapsed_s":null}"#]],
+        str![[r#"{"event":"discover-complete"}"#]],
     );
 
     t(
@@ -86,7 +86,7 @@ fn case_complete() {
             message: None,
             elapsed_s: None,
         },
-        str![[r#"{"event":"case-complete","name":"Hello\tworld!","elapsed_s":null}"#]],
+        str![[r#"{"event":"case-complete","name":"Hello\tworld!"}"#]],
     );
 
     t(
@@ -107,7 +107,7 @@ fn case_complete() {
 fn suite_complete() {
     t(
         libtest_json::Event::SuiteComplete { elapsed_s: None },
-        str![[r#"{"event":"suite-complete","elapsed_s":null}"#]],
+        str![[r#"{"event":"suite-complete"}"#]],
     );
 
     t(

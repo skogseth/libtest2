@@ -20,6 +20,10 @@ pub enum Event {
         run: bool,
     },
     DiscoverComplete {
+        #[cfg_attr(
+            feature = "serde",
+            serde(default, skip_serializing_if = "Option::is_none")
+        )]
         elapsed_s: Option<Elapsed>,
     },
     SuiteStart,
@@ -44,9 +48,17 @@ pub enum Event {
             serde(default, skip_serializing_if = "Option::is_none")
         )]
         message: Option<String>,
+        #[cfg_attr(
+            feature = "serde",
+            serde(default, skip_serializing_if = "Option::is_none")
+        )]
         elapsed_s: Option<Elapsed>,
     },
     SuiteComplete {
+        #[cfg_attr(
+            feature = "serde",
+            serde(default, skip_serializing_if = "Option::is_none")
+        )]
         elapsed_s: Option<Elapsed>,
     },
 }
