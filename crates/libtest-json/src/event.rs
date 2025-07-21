@@ -39,6 +39,10 @@ pub enum Event {
             serde(default, skip_serializing_if = "Option::is_none")
         )]
         status: Option<RunStatus>,
+        #[cfg_attr(
+            feature = "serde",
+            serde(default, skip_serializing_if = "Option::is_none")
+        )]
         message: Option<String>,
         elapsed_s: Option<Elapsed>,
     },

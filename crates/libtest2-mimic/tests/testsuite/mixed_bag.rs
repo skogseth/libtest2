@@ -882,7 +882,6 @@ fn test_json() {
   {
     "elapsed_s": "[..]",
     "event": "case-complete",
-    "message": null,
     "name": "cat"
   },
   {
@@ -961,7 +960,6 @@ fn test_json() {
   {
     "elapsed_s": "[..]",
     "event": "case-complete",
-    "message": null,
     "name": "cat"
   },
   {
