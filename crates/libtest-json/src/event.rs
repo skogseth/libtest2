@@ -1,7 +1,7 @@
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "serde", serde(rename_all = "kebab-case"))]
+#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
 #[cfg_attr(feature = "serde", serde(tag = "event"))]
 pub enum Event {
     DiscoverStart,
@@ -81,7 +81,7 @@ fn is_true(yes: &bool) -> bool {
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "serde", serde(rename_all = "kebab-case"))]
+#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
 pub enum RunMode {
     #[default]
     Test,
@@ -104,7 +104,7 @@ impl RunMode {
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "serde", serde(rename_all = "kebab-case"))]
+#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
 pub enum RunStatus {
     Ignored,
     Failed,

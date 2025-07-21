@@ -7,7 +7,7 @@
       "properties": {
         "event": {
           "type": "string",
-          "const": "discover-start"
+          "const": "discover_start"
         }
       },
       "required": [
@@ -29,7 +29,7 @@
         },
         "event": {
           "type": "string",
-          "const": "discover-case"
+          "const": "discover_case"
         }
       },
       "required": [
@@ -52,7 +52,7 @@
         },
         "event": {
           "type": "string",
-          "const": "discover-complete"
+          "const": "discover_complete"
         }
       },
       "required": [
@@ -64,7 +64,7 @@
       "properties": {
         "event": {
           "type": "string",
-          "const": "suite-start"
+          "const": "suite_start"
         }
       },
       "required": [
@@ -79,7 +79,7 @@
         },
         "event": {
           "type": "string",
-          "const": "case-start"
+          "const": "case_start"
         }
       },
       "required": [
@@ -125,7 +125,7 @@
         },
         "event": {
           "type": "string",
-          "const": "case-complete"
+          "const": "case_complete"
         }
       },
       "required": [
@@ -148,7 +148,7 @@
         },
         "event": {
           "type": "string",
-          "const": "suite-complete"
+          "const": "suite_complete"
         }
       },
       "required": [
