@@ -30,7 +30,7 @@ fn discover_case() {
             mode: libtest_json::RunMode::Test,
             run: true,
         },
-        str![[r#"{"event":"discover-case","name":"Hello\tworld!","mode":"test","run":true}"#]],
+        str![[r#"{"event":"discover-case","name":"Hello\tworld!","run":true}"#]],
     );
 
     t(
@@ -81,9 +81,7 @@ fn case_complete() {
             message: None,
             elapsed_s: None,
         },
-        str![[
-            r#"{"event":"case-complete","name":"Hello\tworld!","mode":"test","status":null,"message":null,"elapsed_s":null}"#
-        ]],
+        str![[r#"{"event":"case-complete","name":"Hello\tworld!","status":null,"message":null,"elapsed_s":null}"#]],
     );
 
     t(

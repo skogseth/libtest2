@@ -7,6 +7,10 @@ pub enum Event {
     DiscoverStart,
     DiscoverCase {
         name: String,
+        #[cfg_attr(
+            feature = "serde",
+            serde(default, skip_serializing_if = "RunMode::is_default")
+        )]
         mode: RunMode,
         run: bool,
     },
@@ -19,6 +23,10 @@ pub enum Event {
     },
     CaseComplete {
         name: String,
+        #[cfg_attr(
+            feature = "serde",
+            serde(default, skip_serializing_if = "RunMode::is_default")
+        )]
         mode: RunMode,
         status: Option<RunStatus>,
         message: Option<String>,
@@ -52,6 +60,10 @@ impl RunMode {
             Self::Test => "test",
             Self::Bench => "bench",
         }
+    }
+
+    fn is_default(&self) -> bool {
+        *self == Default::default()
     }
 }
 

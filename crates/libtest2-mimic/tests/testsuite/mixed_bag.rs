@@ -710,49 +710,41 @@ fn list_json() {
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "bunny",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "dog",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "fly",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "fox",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "frog",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "owl",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "bear",
     "run": true
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "cat",
     "run": true
   },
@@ -771,49 +763,41 @@ fn list_json() {
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "bunny",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "dog",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "fly",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "fox",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "frog",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "owl",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "bear",
     "run": true
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "cat",
     "run": true
   },
@@ -841,49 +825,41 @@ fn test_json() {
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "bunny",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "dog",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "fly",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "fox",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "frog",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "owl",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "bear",
     "run": true
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "cat",
     "run": true
   },
@@ -902,7 +878,6 @@ fn test_json() {
     "elapsed_s": "[..]",
     "event": "case-complete",
     "message": "fails",
-    "mode": "test",
     "name": "bear",
     "status": "ignored"
   },
@@ -914,7 +889,6 @@ fn test_json() {
     "elapsed_s": "[..]",
     "event": "case-complete",
     "message": null,
-    "mode": "test",
     "name": "cat",
     "status": null
   },
@@ -933,49 +907,41 @@ fn test_json() {
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "bear",
     "run": true
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "bunny",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "cat",
     "run": true
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "dog",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "fly",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "fox",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "frog",
     "run": false
   },
   {
     "event": "discover-case",
-    "mode": "test",
     "name": "owl",
     "run": false
   },
@@ -994,7 +960,6 @@ fn test_json() {
     "elapsed_s": "[..]",
     "event": "case-complete",
     "message": "fails",
-    "mode": "test",
     "name": "bear",
     "status": "ignored"
   },
@@ -1006,7 +971,6 @@ fn test_json() {
     "elapsed_s": "[..]",
     "event": "case-complete",
     "message": null,
-    "mode": "test",
     "name": "cat",
     "status": null
   },
