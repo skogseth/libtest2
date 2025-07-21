@@ -41,7 +41,14 @@
       "type": "object",
       "properties": {
         "elapsed_s": {
-          "$ref": "#/$defs/Elapsed"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Elapsed"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "event": {
           "type": "string",
@@ -49,8 +56,7 @@
         }
       },
       "required": [
-        "event",
-        "elapsed_s"
+        "event"
       ]
     },
     {
@@ -131,7 +137,14 @@
       "type": "object",
       "properties": {
         "elapsed_s": {
-          "$ref": "#/$defs/Elapsed"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Elapsed"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "event": {
           "type": "string",
@@ -139,8 +152,7 @@
         }
       },
       "required": [
-        "event",
-        "elapsed_s"
+        "event"
       ]
     }
   ],

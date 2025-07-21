@@ -46,8 +46,13 @@ fn discover_case() {
 #[test]
 fn discover_complete() {
     t(
+        libtest_json::Event::DiscoverComplete { elapsed_s: None },
+        str![[r#"{"event":"discover-complete","elapsed_s":null}"#]],
+    );
+
+    t(
         libtest_json::Event::DiscoverComplete {
-            elapsed_s: libtest_json::Elapsed(Default::default()),
+            elapsed_s: Some(libtest_json::Elapsed(Default::default())),
         },
         str![[r#"{"event":"discover-complete","elapsed_s":"0"}"#]],
     );
@@ -101,8 +106,13 @@ fn case_complete() {
 #[test]
 fn suite_complete() {
     t(
+        libtest_json::Event::SuiteComplete { elapsed_s: None },
+        str![[r#"{"event":"suite-complete","elapsed_s":null}"#]],
+    );
+
+    t(
         libtest_json::Event::SuiteComplete {
-            elapsed_s: libtest_json::Elapsed(Default::default()),
+            elapsed_s: Some(libtest_json::Elapsed(Default::default())),
         },
         str![[r#"{"event":"suite-complete","elapsed_s":"0"}"#]],
     );

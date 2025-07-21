@@ -6,7 +6,7 @@ use super::OK;
 #[derive(Default, Clone, Debug)]
 pub(crate) struct Summary {
     pub(crate) failures: std::collections::BTreeMap<String, Option<String>>,
-    pub(crate) elapsed_s: super::Elapsed,
+    pub(crate) elapsed_s: Option<super::Elapsed>,
 
     pub(crate) num_run: usize,
     /// Number of tests and benchmarks that were filtered out (either by the
@@ -68,10 +68,15 @@ impl Summary {
             }
         }
         writeln!(writer)?;
+        let finished = if let Some(elapsed_s) = elapsed_s {
+            format!("; finished in {elapsed_s}")
+        } else {
+            "".to_owned()
+        };
         writeln!(
                     writer,
                     "test result: {summary_style}{summary}{summary_style:#}. {num_passed} passed; {num_failed} failed; {num_ignored} ignored; \
-                        {num_filtered_out} filtered out; finished in {elapsed_s}",
+                        {num_filtered_out} filtered out{finished}",
                 )?;
         writeln!(writer)?;
 

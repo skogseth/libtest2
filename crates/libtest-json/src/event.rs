@@ -20,7 +20,7 @@ pub enum Event {
         run: bool,
     },
     DiscoverComplete {
-        elapsed_s: Elapsed,
+        elapsed_s: Option<Elapsed>,
     },
     SuiteStart,
     CaseStart {
@@ -47,7 +47,7 @@ pub enum Event {
         elapsed_s: Option<Elapsed>,
     },
     SuiteComplete {
-        elapsed_s: Elapsed,
+        elapsed_s: Option<Elapsed>,
     },
 }
 
