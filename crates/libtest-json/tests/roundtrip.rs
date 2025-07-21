@@ -81,7 +81,7 @@ fn case_complete() {
             message: None,
             elapsed_s: None,
         },
-        str![[r#"{"event":"case-complete","name":"Hello\tworld!","status":null,"message":null,"elapsed_s":null}"#]],
+        str![[r#"{"event":"case-complete","name":"Hello\tworld!","message":null,"elapsed_s":null}"#]],
     );
 
     t(
