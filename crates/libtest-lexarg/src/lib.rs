@@ -159,12 +159,12 @@ tests whose names contain the filter are run. Multiple filter strings may
 be passed, which will run all tests matching any of the filters.
 
 By default, all tests are run in parallel. This can be altered with the
---test-threads flag or the RUST_TEST_THREADS environment variable when running
+--test-threads flag when running
 tests (set it to 1).
 
 All tests have their standard output and standard error captured by default.
-This can be overridden with the --nocapture flag or setting RUST_TEST_NOCAPTURE
-environment variable to a value other than "0". Logging is not captured by default.
+This can be overridden with the --nocapture flag to a value other than "0".
+Logging is not captured by default.
 
 Test Attributes:
 
@@ -308,13 +308,6 @@ impl TestOptsBuilder {
             .iter()
             .any(|f| f == UNSTABLE_OPTIONS);
 
-        if !self.opts.nocapture {
-            self.opts.nocapture = match std::env::var("RUST_TEST_NOCAPTURE") {
-                Ok(val) => &val != "0",
-                Err(_) => false,
-            };
-        }
-
         if self.format.is_some() && !allow_unstable_options {
             return Err(ErrorContext::msg(
                 "`--format` requires `-Zunstable-options`",
@@ -338,17 +331,6 @@ impl TestOptsBuilder {
             (false, true) => RunIgnored::Only,
             (false, false) => RunIgnored::No,
         };
-
-        if self.opts.test_threads.is_none() {
-            if let Ok(value) = std::env::var("RUST_TEST_THREADS") {
-                self.opts.test_threads =
-                    Some(value.parse::<std::num::NonZeroUsize>().map_err(|_e| {
-                        ErrorContext::msg(format!(
-                            "RUST_TEST_THREADS is `{value}`, should be a positive integer."
-                        ))
-                    })?);
-            }
-        }
 
         let opts = self.opts;
         Ok(opts)
