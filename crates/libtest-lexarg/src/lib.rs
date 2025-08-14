@@ -100,21 +100,19 @@ pub const UNSTABLE_OPTIONS: &str = "unstable-options";
 
 pub const OPTIONS_HELP: &str = r#"
 Options:
-        --include-ignored 
-                        Run ignored and not ignored tests
-        --ignored       Run only ignored tests
-        --test          Run tests and not benchmarks
-        --bench         Run benchmarks instead of tests
-        --list          List all tests and benchmarks
-        --nocapture     don't capture stdout/stderr of each task, allow
-                        printing directly
-        --test-threads n_threads
-                        Number of threads used for running tests in parallel
         --skip FILTER   Skip tests whose names contain FILTER (this flag can
                         be used multiple times)
-    -q, --quiet         Display one character per test instead of one line.
-                        Alias to --format=terse
         --exact         Exactly match filters rather than by substring
+        --test          Run tests and not benchmarks
+        --bench         Run benchmarks instead of tests
+        --ignored       Run only ignored tests
+        --include-ignored 
+                        Run ignored and not ignored tests
+        --no-capture    don't capture stdout/stderr of each task, allow
+                        printing directly
+        --show-output   Show captured stdout of successful tests
+        --test-threads n_threads
+                        Number of threads used for running tests in parallel
         --color auto|always|never
                         Configure coloring of output:
                         auto = colorize if stdout is a tty and tests are run
@@ -126,7 +124,9 @@ Options:
                         pretty = Print verbose output;
                         terse = Display one character per test;
                         json = Output a json document;
-        --show-output   Show captured stdout of successful tests
+        --list          List all tests and benchmarks
+    -q, --quiet         Display one character per test instead of one line.
+                        Alias to --format=terse
     -Z unstable-options Enable nightly-only flags:
                         unstable-options = Allow use of experimental features
 "#;
@@ -141,7 +141,7 @@ By default, all tests are run in parallel. This can be altered with the
 tests (set it to 1).
 
 All tests have their standard output and standard error captured by default.
-This can be overridden with the --nocapture flag to a value other than "0".
+This can be overridden with the --no-capture flag to a value other than "0".
 Logging is not captured by default.
 
 Test Attributes:
@@ -199,7 +199,7 @@ impl TestOptsBuilder {
             Long("list") => {
                 self.opts.list = true;
             }
-            Long("nocapture") => {
+            Long("no-capture") => {
                 self.opts.nocapture = true;
             }
             Long("test-threads") => {
