@@ -108,7 +108,7 @@ Options:
         --ignored       Run only ignored tests
         --include-ignored 
                         Run ignored and not ignored tests
-        --nocapture     don't capture stdout/stderr of each task, allow
+        --no-capture    don't capture stdout/stderr of each task, allow
                         printing directly
         --show-output   Show captured stdout of successful tests
         --test-threads n_threads
@@ -141,7 +141,7 @@ By default, all tests are run in parallel. This can be altered with the
 tests (set it to 1).
 
 All tests have their standard output and standard error captured by default.
-This can be overridden with the --nocapture flag to a value other than "0".
+This can be overridden with the --no-capture flag to a value other than "0".
 Logging is not captured by default.
 
 Test Attributes:
@@ -199,7 +199,7 @@ impl TestOptsBuilder {
             Long("list") => {
                 self.opts.list = true;
             }
-            Long("nocapture") => {
+            Long("no-capture") => {
                 self.opts.nocapture = true;
             }
             Long("test-threads") => {
