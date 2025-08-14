@@ -1015,3 +1015,143 @@ test result: FAILED. 2 passed; 1 failed; 5 ignored; 0 filtered out; finished in 
 "#]],
     );
 }
+
+#[test]
+fn fail_fast() {
+    check(
+        &["--fail-fast"],
+        101,
+        str![[r#"
+
+running 8 tests
+test bear  ... ignored
+test bunny ... ignored
+test cat   ... ok
+test dog   ... FAILED
+
+failures:
+
+---- dog ----
+was not a good boy
+
+
+failures:
+    dog
+
+test result: FAILED. 1 passed; 1 failed; 2 ignored; 0 filtered out; finished in [..]s
+
+
+"#]],
+        str![[r#"
+...
+
+"#]],
+    );
+}
+
+#[test]
+#[cfg(feature = "json")]
+fn fail_fast_json() {
+    check(
+        &["-Zunstable-options", "--format=json", "--fail-fast"],
+        101,
+        str![[r#"
+[
+  {
+    "event": "discover_start"
+  },
+  {
+    "event": "discover_case",
+    "name": "bear"
+  },
+  {
+    "event": "discover_case",
+    "name": "bunny"
+  },
+  {
+    "event": "discover_case",
+    "name": "cat"
+  },
+  {
+    "event": "discover_case",
+    "name": "dog"
+  },
+  {
+    "event": "discover_case",
+    "name": "fly"
+  },
+  {
+    "event": "discover_case",
+    "name": "fox"
+  },
+  {
+    "event": "discover_case",
+    "name": "frog"
+  },
+  {
+    "event": "discover_case",
+    "name": "owl"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover_complete"
+  },
+  {
+    "event": "suite_start"
+  },
+  {
+    "event": "case_start",
+    "name": "bear"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "case_complete",
+    "message": "fails",
+    "name": "bear",
+    "status": "ignored"
+  },
+  {
+    "event": "case_start",
+    "name": "bunny"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "case_complete",
+    "message": "fails",
+    "name": "bunny",
+    "status": "ignored"
+  },
+  {
+    "event": "case_start",
+    "name": "cat"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "case_complete",
+    "name": "cat"
+  },
+  {
+    "event": "case_start",
+    "name": "dog"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "case_complete",
+    "message": "was not a good boy",
+    "name": "dog",
+    "status": "failed"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "suite_complete"
+  }
+]
+"#]]
+        .is_json()
+        .against_jsonlines(),
+        str![[r#"
+...
+
+"#]],
+    );
+}

@@ -108,6 +108,7 @@ Options:
         --ignored       Run only ignored tests
         --include-ignored 
                         Run ignored and not ignored tests
+        --fail-fast     Don't start new tests after the first failure
         --no-capture    don't capture stdout/stderr of each task, allow
                         printing directly
         --show-output   Show captured stdout of successful tests
@@ -220,6 +221,9 @@ impl TestOptsBuilder {
             }
             Long("exact") => {
                 self.opts.filter_exact = true;
+            }
+            Long("fail-fast") => {
+                self.opts.fail_fast = true;
             }
             Long("color") => {
                 let color = parser
