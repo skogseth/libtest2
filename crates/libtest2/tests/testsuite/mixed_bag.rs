@@ -1026,7 +1026,7 @@ test result: FAILED. 2 passed; 1 failed; 5 ignored; 0 filtered out; finished in 
 #[test]
 fn fail_fast() {
     check(
-        &[],
+        &["--fail-fast"],
         101,
         str![[r#"
 
@@ -1035,10 +1035,6 @@ test bear  ... ignored
 test bunny ... ignored
 test cat   ... ok
 test dog   ... FAILED
-test fly   ... ignored
-test fox   ... ok
-test frog  ... ignored
-test owl   ... ignored
 
 failures:
 
@@ -1049,7 +1045,7 @@ was not a good boy
 failures:
     dog
 
-test result: FAILED. 2 passed; 1 failed; 5 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 1 passed; 1 failed; 2 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
@@ -1064,7 +1060,7 @@ test result: FAILED. 2 passed; 1 failed; 5 ignored; 0 filtered out; finished in 
 #[cfg(feature = "json")]
 fn fail_fast_json() {
     check(
-        &["-Zunstable-options", "--format=json"],
+        &["-Zunstable-options", "--format=json", "--fail-fast"],
         101,
         str![[r#"
 [
@@ -1151,48 +1147,6 @@ fn fail_fast_json() {
     "message": "was not a good boy",
     "name": "dog",
     "status": "failed"
-  },
-  {
-    "event": "case_start",
-    "name": "fly"
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "case_complete",
-    "message": "fails",
-    "name": "fly",
-    "status": "ignored"
-  },
-  {
-    "event": "case_start",
-    "name": "fox"
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "case_complete",
-    "name": "fox"
-  },
-  {
-    "event": "case_start",
-    "name": "frog"
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "case_complete",
-    "message": "slow",
-    "name": "frog",
-    "status": "ignored"
-  },
-  {
-    "event": "case_start",
-    "name": "owl"
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "case_complete",
-    "message": "fails",
-    "name": "owl",
-    "status": "ignored"
   },
   {
     "elapsed_s": "[..]",
