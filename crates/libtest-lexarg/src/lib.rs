@@ -129,28 +129,6 @@ Options:
         --show-output   Show captured stdout of successful tests
     -Z unstable-options Enable nightly-only flags:
                         unstable-options = Allow use of experimental features
-        --report-time   Show execution time of each test.
-                        Threshold values for colorized output can be
-                        configured via
-                        `RUST_TEST_TIME_UNIT`, `RUST_TEST_TIME_INTEGRATION`
-                        and
-                        `RUST_TEST_TIME_DOCTEST` environment variables.
-                        Expected format of environment variable is
-                        `VARIABLE=WARN_TIME,CRITICAL_TIME`.
-                        Durations must be specified in milliseconds, e.g.
-                        `500,2000` means that the warn time
-                        is 0.5 seconds, and the critical time is 2 seconds.
-                        Not available for --format=terse
-        --ensure-time   Treat excess of the test execution time limit as
-                        error.
-                        Threshold values for this option can be configured via
-                        `RUST_TEST_TIME_UNIT`, `RUST_TEST_TIME_INTEGRATION`
-                        and
-                        `RUST_TEST_TIME_DOCTEST` environment variables.
-                        Expected format of environment variable is
-                        `VARIABLE=WARN_TIME,CRITICAL_TIME`.
-                        `CRITICAL_TIME` here means the limit that should not
-                        be exceeded by test.
 "#;
 
 pub const AFTER_HELP: &str = r#"
@@ -159,12 +137,12 @@ tests whose names contain the filter are run. Multiple filter strings may
 be passed, which will run all tests matching any of the filters.
 
 By default, all tests are run in parallel. This can be altered with the
---test-threads flag or the RUST_TEST_THREADS environment variable when running
+--test-threads flag when running
 tests (set it to 1).
 
 All tests have their standard output and standard error captured by default.
-This can be overridden with the --nocapture flag or setting RUST_TEST_NOCAPTURE
-environment variable to a value other than "0". Logging is not captured by default.
+This can be overridden with the --nocapture flag to a value other than "0".
+Logging is not captured by default.
 
 Test Attributes:
 
@@ -308,13 +286,6 @@ impl TestOptsBuilder {
             .iter()
             .any(|f| f == UNSTABLE_OPTIONS);
 
-        if !self.opts.nocapture {
-            self.opts.nocapture = match std::env::var("RUST_TEST_NOCAPTURE") {
-                Ok(val) => &val != "0",
-                Err(_) => false,
-            };
-        }
-
         if self.format.is_some() && !allow_unstable_options {
             return Err(ErrorContext::msg(
                 "`--format` requires `-Zunstable-options`",
@@ -338,17 +309,6 @@ impl TestOptsBuilder {
             (false, true) => RunIgnored::Only,
             (false, false) => RunIgnored::No,
         };
-
-        if self.opts.test_threads.is_none() {
-            if let Ok(value) = std::env::var("RUST_TEST_THREADS") {
-                self.opts.test_threads =
-                    Some(value.parse::<std::num::NonZeroUsize>().map_err(|_e| {
-                        ErrorContext::msg(format!(
-                            "RUST_TEST_THREADS is `{value}`, should be a positive integer."
-                        ))
-                    })?);
-            }
-        }
 
         let opts = self.opts;
         Ok(opts)
