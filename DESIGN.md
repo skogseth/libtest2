@@ -123,6 +123,13 @@ Decisions
 
 [TAP](https://testanything.org/tap-version-14-specification.html)
 
+TAP uses a custom syntax.
+Within the Rust toolchain, json output is commonly used and the output from a test harness may be mixed with the output from rustc.
+While Cargo could translate TAP to json messages for these cases, we then duplicate effort.
+
+TAP uses indices for tests.
+**TODO** we could report indices during discovery and then use those from then on for a lighter weight way of tracking cases.
+
 #### pytest-json-report
 
 [pytest-json-report](https://github.com/numirias/pytest-json-report)
