@@ -129,28 +129,6 @@ Options:
         --show-output   Show captured stdout of successful tests
     -Z unstable-options Enable nightly-only flags:
                         unstable-options = Allow use of experimental features
-        --report-time   Show execution time of each test.
-                        Threshold values for colorized output can be
-                        configured via
-                        `RUST_TEST_TIME_UNIT`, `RUST_TEST_TIME_INTEGRATION`
-                        and
-                        `RUST_TEST_TIME_DOCTEST` environment variables.
-                        Expected format of environment variable is
-                        `VARIABLE=WARN_TIME,CRITICAL_TIME`.
-                        Durations must be specified in milliseconds, e.g.
-                        `500,2000` means that the warn time
-                        is 0.5 seconds, and the critical time is 2 seconds.
-                        Not available for --format=terse
-        --ensure-time   Treat excess of the test execution time limit as
-                        error.
-                        Threshold values for this option can be configured via
-                        `RUST_TEST_TIME_UNIT`, `RUST_TEST_TIME_INTEGRATION`
-                        and
-                        `RUST_TEST_TIME_DOCTEST` environment variables.
-                        Expected format of environment variable is
-                        `VARIABLE=WARN_TIME,CRITICAL_TIME`.
-                        `CRITICAL_TIME` here means the limit that should not
-                        be exceeded by test.
 "#;
 
 pub const AFTER_HELP: &str = r#"
