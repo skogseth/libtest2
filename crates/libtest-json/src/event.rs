@@ -4,228 +4,393 @@
 #[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
 #[cfg_attr(feature = "serde", serde(tag = "event"))]
 pub enum Event {
-    DiscoverStart {
-        #[cfg_attr(
-            feature = "serde",
-            serde(default, skip_serializing_if = "Option::is_none")
-        )]
-        elapsed_s: Option<Elapsed>,
-    },
-    DiscoverCase {
-        name: String,
-        #[cfg_attr(
-            feature = "serde",
-            serde(default, skip_serializing_if = "RunMode::is_default")
-        )]
-        mode: RunMode,
-        /// Whether selected to be run by the user
-        #[cfg_attr(
-            feature = "serde",
-            serde(default = "true_default", skip_serializing_if = "is_true")
-        )]
-        selected: bool,
-        #[cfg_attr(
-            feature = "serde",
-            serde(default, skip_serializing_if = "Option::is_none")
-        )]
-        elapsed_s: Option<Elapsed>,
-    },
-    DiscoverComplete {
-        #[cfg_attr(
-            feature = "serde",
-            serde(default, skip_serializing_if = "Option::is_none")
-        )]
-        elapsed_s: Option<Elapsed>,
-    },
-    RunStart {
-        #[cfg_attr(
-            feature = "serde",
-            serde(default, skip_serializing_if = "Option::is_none")
-        )]
-        elapsed_s: Option<Elapsed>,
-    },
-    CaseStart {
-        name: String,
-        #[cfg_attr(
-            feature = "serde",
-            serde(default, skip_serializing_if = "Option::is_none")
-        )]
-        elapsed_s: Option<Elapsed>,
-    },
-    CaseComplete {
-        name: String,
-        /// `None` means success
-        #[cfg_attr(
-            feature = "serde",
-            serde(default, skip_serializing_if = "Option::is_none")
-        )]
-        status: Option<RunStatus>,
-        #[cfg_attr(
-            feature = "serde",
-            serde(default, skip_serializing_if = "Option::is_none")
-        )]
-        message: Option<String>,
-        #[cfg_attr(
-            feature = "serde",
-            serde(default, skip_serializing_if = "Option::is_none")
-        )]
-        elapsed_s: Option<Elapsed>,
-    },
-    RunComplete {
-        #[cfg_attr(
-            feature = "serde",
-            serde(default, skip_serializing_if = "Option::is_none")
-        )]
-        elapsed_s: Option<Elapsed>,
-    },
+    DiscoverStart(DiscoverStart),
+    DiscoverCase(DiscoverCase),
+    DiscoverComplete(DiscoverComplete),
+    RunStart(RunStart),
+    CaseStart(CaseStart),
+    CaseComplete(CaseComplete),
+    RunComplete(RunComplete),
 }
 
 impl Event {
+    #[cfg(feature = "json")]
+    pub fn to_jsonline(&self) -> String {
+        match self {
+            Self::DiscoverStart(event) => event.to_jsonline(),
+            Self::DiscoverCase(event) => event.to_jsonline(),
+            Self::DiscoverComplete(event) => event.to_jsonline(),
+            Self::RunStart(event) => event.to_jsonline(),
+            Self::CaseStart(event) => event.to_jsonline(),
+            Self::CaseComplete(event) => event.to_jsonline(),
+            Self::RunComplete(event) => event.to_jsonline(),
+        }
+    }
+}
+
+impl From<DiscoverStart> for Event {
+    fn from(inner: DiscoverStart) -> Self {
+        Self::DiscoverStart(inner)
+    }
+}
+
+impl From<DiscoverCase> for Event {
+    fn from(inner: DiscoverCase) -> Self {
+        Self::DiscoverCase(inner)
+    }
+}
+
+impl From<DiscoverComplete> for Event {
+    fn from(inner: DiscoverComplete) -> Self {
+        Self::DiscoverComplete(inner)
+    }
+}
+
+impl From<RunStart> for Event {
+    fn from(inner: RunStart) -> Self {
+        Self::RunStart(inner)
+    }
+}
+
+impl From<CaseStart> for Event {
+    fn from(inner: CaseStart) -> Self {
+        Self::CaseStart(inner)
+    }
+}
+
+impl From<CaseComplete> for Event {
+    fn from(inner: CaseComplete) -> Self {
+        Self::CaseComplete(inner)
+    }
+}
+
+impl From<RunComplete> for Event {
+    fn from(inner: RunComplete) -> Self {
+        Self::RunComplete(inner)
+    }
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
+pub struct DiscoverStart {
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, skip_serializing_if = "Option::is_none")
+    )]
+    pub elapsed_s: Option<Elapsed>,
+}
+
+impl DiscoverStart {
     #[cfg(feature = "json")]
     pub fn to_jsonline(&self) -> String {
         use json_write::JsonWrite as _;
 
         let mut buffer = String::new();
         buffer.open_object().unwrap();
-        match self {
-            Self::DiscoverStart { elapsed_s } => {
-                buffer.key("event").unwrap();
-                buffer.keyval_sep().unwrap();
-                buffer.value("discover_start").unwrap();
 
-                if let Some(elapsed_s) = elapsed_s {
-                    buffer.val_sep().unwrap();
-                    buffer.key("elapsed_s").unwrap();
-                    buffer.keyval_sep().unwrap();
-                    buffer.value(String::from(*elapsed_s)).unwrap();
-                }
-            }
-            Self::DiscoverCase {
-                name,
-                mode,
-                selected,
-                elapsed_s,
-            } => {
-                buffer.key("event").unwrap();
-                buffer.keyval_sep().unwrap();
-                buffer.value("discover_case").unwrap();
+        buffer.key("event").unwrap();
+        buffer.keyval_sep().unwrap();
+        buffer.value("discover_start").unwrap();
 
-                buffer.val_sep().unwrap();
-                buffer.key("name").unwrap();
-                buffer.keyval_sep().unwrap();
-                buffer.value(name).unwrap();
-
-                if !mode.is_default() {
-                    buffer.val_sep().unwrap();
-                    buffer.key("mode").unwrap();
-                    buffer.keyval_sep().unwrap();
-                    buffer.value(mode.as_str()).unwrap();
-                }
-
-                if !selected {
-                    buffer.val_sep().unwrap();
-                    buffer.key("selected").unwrap();
-                    buffer.keyval_sep().unwrap();
-                    buffer.value(selected).unwrap();
-                }
-
-                if let Some(elapsed_s) = elapsed_s {
-                    buffer.val_sep().unwrap();
-                    buffer.key("elapsed_s").unwrap();
-                    buffer.keyval_sep().unwrap();
-                    buffer.value(String::from(*elapsed_s)).unwrap();
-                }
-            }
-            Self::DiscoverComplete { elapsed_s } => {
-                buffer.key("event").unwrap();
-                buffer.keyval_sep().unwrap();
-                buffer.value("discover_complete").unwrap();
-
-                if let Some(elapsed_s) = elapsed_s {
-                    buffer.val_sep().unwrap();
-                    buffer.key("elapsed_s").unwrap();
-                    buffer.keyval_sep().unwrap();
-                    buffer.value(String::from(*elapsed_s)).unwrap();
-                }
-            }
-            Self::RunStart { elapsed_s } => {
-                buffer.key("event").unwrap();
-                buffer.keyval_sep().unwrap();
-                buffer.value("run_start").unwrap();
-
-                if let Some(elapsed_s) = elapsed_s {
-                    buffer.val_sep().unwrap();
-                    buffer.key("elapsed_s").unwrap();
-                    buffer.keyval_sep().unwrap();
-                    buffer.value(String::from(*elapsed_s)).unwrap();
-                }
-            }
-            Self::CaseStart { name, elapsed_s } => {
-                buffer.key("event").unwrap();
-                buffer.keyval_sep().unwrap();
-                buffer.value("case_start").unwrap();
-
-                buffer.val_sep().unwrap();
-                buffer.key("name").unwrap();
-                buffer.keyval_sep().unwrap();
-                buffer.value(name).unwrap();
-
-                if let Some(elapsed_s) = elapsed_s {
-                    buffer.val_sep().unwrap();
-                    buffer.key("elapsed_s").unwrap();
-                    buffer.keyval_sep().unwrap();
-                    buffer.value(String::from(*elapsed_s)).unwrap();
-                }
-            }
-            Self::CaseComplete {
-                name,
-                status,
-                message,
-                elapsed_s,
-            } => {
-                buffer.key("event").unwrap();
-                buffer.keyval_sep().unwrap();
-                buffer.value("case_complete").unwrap();
-
-                buffer.val_sep().unwrap();
-                buffer.key("name").unwrap();
-                buffer.keyval_sep().unwrap();
-                buffer.value(name).unwrap();
-
-                if let Some(status) = status {
-                    buffer.val_sep().unwrap();
-                    buffer.key("status").unwrap();
-                    buffer.keyval_sep().unwrap();
-                    buffer.value(status.as_str()).unwrap();
-                }
-
-                if let Some(message) = message {
-                    buffer.val_sep().unwrap();
-                    buffer.key("message").unwrap();
-                    buffer.keyval_sep().unwrap();
-                    buffer.value(message).unwrap();
-                }
-
-                if let Some(elapsed_s) = elapsed_s {
-                    buffer.val_sep().unwrap();
-                    buffer.key("elapsed_s").unwrap();
-                    buffer.keyval_sep().unwrap();
-                    buffer.value(String::from(*elapsed_s)).unwrap();
-                }
-            }
-            Self::RunComplete { elapsed_s } => {
-                buffer.key("event").unwrap();
-                buffer.keyval_sep().unwrap();
-                buffer.value("run_complete").unwrap();
-
-                if let Some(elapsed_s) = elapsed_s {
-                    buffer.val_sep().unwrap();
-                    buffer.key("elapsed_s").unwrap();
-                    buffer.keyval_sep().unwrap();
-                    buffer.value(String::from(*elapsed_s)).unwrap();
-                }
-            }
+        if let Some(elapsed_s) = self.elapsed_s {
+            buffer.val_sep().unwrap();
+            buffer.key("elapsed_s").unwrap();
+            buffer.keyval_sep().unwrap();
+            buffer.value(String::from(elapsed_s)).unwrap();
         }
+
+        buffer.close_object().unwrap();
+
+        buffer
+    }
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
+pub struct DiscoverCase {
+    pub name: String,
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, skip_serializing_if = "RunMode::is_default")
+    )]
+    pub mode: RunMode,
+    /// Whether selected to be run by the user
+    #[cfg_attr(
+        feature = "serde",
+        serde(default = "true_default", skip_serializing_if = "is_true")
+    )]
+    pub selected: bool,
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, skip_serializing_if = "Option::is_none")
+    )]
+    pub elapsed_s: Option<Elapsed>,
+}
+
+impl DiscoverCase {
+    #[cfg(feature = "json")]
+    pub fn to_jsonline(&self) -> String {
+        use json_write::JsonWrite as _;
+
+        let mut buffer = String::new();
+        buffer.open_object().unwrap();
+
+        buffer.key("event").unwrap();
+        buffer.keyval_sep().unwrap();
+        buffer.value("discover_case").unwrap();
+
+        buffer.val_sep().unwrap();
+        buffer.key("name").unwrap();
+        buffer.keyval_sep().unwrap();
+        buffer.value(&self.name).unwrap();
+
+        if !self.mode.is_default() {
+            buffer.val_sep().unwrap();
+            buffer.key("mode").unwrap();
+            buffer.keyval_sep().unwrap();
+            buffer.value(self.mode.as_str()).unwrap();
+        }
+
+        if !self.selected {
+            buffer.val_sep().unwrap();
+            buffer.key("selected").unwrap();
+            buffer.keyval_sep().unwrap();
+            buffer.value(self.selected).unwrap();
+        }
+
+        if let Some(elapsed_s) = self.elapsed_s {
+            buffer.val_sep().unwrap();
+            buffer.key("elapsed_s").unwrap();
+            buffer.keyval_sep().unwrap();
+            buffer.value(String::from(elapsed_s)).unwrap();
+        }
+
+        buffer.close_object().unwrap();
+
+        buffer
+    }
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
+pub struct DiscoverComplete {
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, skip_serializing_if = "Option::is_none")
+    )]
+    pub elapsed_s: Option<Elapsed>,
+}
+
+impl DiscoverComplete {
+    #[cfg(feature = "json")]
+    pub fn to_jsonline(&self) -> String {
+        use json_write::JsonWrite as _;
+
+        let mut buffer = String::new();
+        buffer.open_object().unwrap();
+
+        buffer.key("event").unwrap();
+        buffer.keyval_sep().unwrap();
+        buffer.value("discover_complete").unwrap();
+
+        if let Some(elapsed_s) = self.elapsed_s {
+            buffer.val_sep().unwrap();
+            buffer.key("elapsed_s").unwrap();
+            buffer.keyval_sep().unwrap();
+            buffer.value(String::from(elapsed_s)).unwrap();
+        }
+
+        buffer.close_object().unwrap();
+
+        buffer
+    }
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
+pub struct RunStart {
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, skip_serializing_if = "Option::is_none")
+    )]
+    pub elapsed_s: Option<Elapsed>,
+}
+
+impl RunStart {
+    #[cfg(feature = "json")]
+    pub fn to_jsonline(&self) -> String {
+        use json_write::JsonWrite as _;
+
+        let mut buffer = String::new();
+        buffer.open_object().unwrap();
+
+        buffer.key("event").unwrap();
+        buffer.keyval_sep().unwrap();
+        buffer.value("run_start").unwrap();
+
+        if let Some(elapsed_s) = self.elapsed_s {
+            buffer.val_sep().unwrap();
+            buffer.key("elapsed_s").unwrap();
+            buffer.keyval_sep().unwrap();
+            buffer.value(String::from(elapsed_s)).unwrap();
+        }
+
+        buffer.close_object().unwrap();
+
+        buffer
+    }
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
+pub struct CaseStart {
+    pub name: String,
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, skip_serializing_if = "Option::is_none")
+    )]
+    pub elapsed_s: Option<Elapsed>,
+}
+
+impl CaseStart {
+    #[cfg(feature = "json")]
+    pub fn to_jsonline(&self) -> String {
+        use json_write::JsonWrite as _;
+
+        let mut buffer = String::new();
+        buffer.open_object().unwrap();
+
+        buffer.key("event").unwrap();
+        buffer.keyval_sep().unwrap();
+        buffer.value("case_start").unwrap();
+
+        buffer.val_sep().unwrap();
+        buffer.key("name").unwrap();
+        buffer.keyval_sep().unwrap();
+        buffer.value(&self.name).unwrap();
+
+        if let Some(elapsed_s) = self.elapsed_s {
+            buffer.val_sep().unwrap();
+            buffer.key("elapsed_s").unwrap();
+            buffer.keyval_sep().unwrap();
+            buffer.value(String::from(elapsed_s)).unwrap();
+        }
+
+        buffer.close_object().unwrap();
+
+        buffer
+    }
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
+pub struct CaseComplete {
+    pub name: String,
+    /// `None` means success
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, skip_serializing_if = "Option::is_none")
+    )]
+    pub status: Option<RunStatus>,
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, skip_serializing_if = "Option::is_none")
+    )]
+    pub message: Option<String>,
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, skip_serializing_if = "Option::is_none")
+    )]
+    pub elapsed_s: Option<Elapsed>,
+}
+
+impl CaseComplete {
+    #[cfg(feature = "json")]
+    pub fn to_jsonline(&self) -> String {
+        use json_write::JsonWrite as _;
+
+        let mut buffer = String::new();
+        buffer.open_object().unwrap();
+
+        buffer.key("event").unwrap();
+        buffer.keyval_sep().unwrap();
+        buffer.value("case_complete").unwrap();
+
+        buffer.val_sep().unwrap();
+        buffer.key("name").unwrap();
+        buffer.keyval_sep().unwrap();
+        buffer.value(&self.name).unwrap();
+
+        if let Some(status) = self.status {
+            buffer.val_sep().unwrap();
+            buffer.key("status").unwrap();
+            buffer.keyval_sep().unwrap();
+            buffer.value(status.as_str()).unwrap();
+        }
+
+        if let Some(message) = &self.message {
+            buffer.val_sep().unwrap();
+            buffer.key("message").unwrap();
+            buffer.keyval_sep().unwrap();
+            buffer.value(message).unwrap();
+        }
+
+        if let Some(elapsed_s) = self.elapsed_s {
+            buffer.val_sep().unwrap();
+            buffer.key("elapsed_s").unwrap();
+            buffer.keyval_sep().unwrap();
+            buffer.value(String::from(elapsed_s)).unwrap();
+        }
+
+        buffer.close_object().unwrap();
+
+        buffer
+    }
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
+pub struct RunComplete {
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, skip_serializing_if = "Option::is_none")
+    )]
+    pub elapsed_s: Option<Elapsed>,
+}
+
+impl RunComplete {
+    #[cfg(feature = "json")]
+    pub fn to_jsonline(&self) -> String {
+        use json_write::JsonWrite as _;
+
+        let mut buffer = String::new();
+        buffer.open_object().unwrap();
+
+        buffer.key("event").unwrap();
+        buffer.keyval_sep().unwrap();
+        buffer.value("run_complete").unwrap();
+
+        if let Some(elapsed_s) = self.elapsed_s {
+            buffer.val_sep().unwrap();
+            buffer.key("elapsed_s").unwrap();
+            buffer.keyval_sep().unwrap();
+            buffer.value(String::from(elapsed_s)).unwrap();
+        }
+
         buffer.close_object().unwrap();
 
         buffer

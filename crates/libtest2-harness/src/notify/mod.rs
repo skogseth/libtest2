@@ -24,8 +24,6 @@ pub(crate) trait Notifier {
     fn notify(&mut self, event: Event) -> std::io::Result<()>;
 }
 
-pub(crate) use libtest_json::Elapsed;
-pub(crate) use libtest_json::Event;
-pub(crate) use libtest_json::RunStatus;
+pub(crate) use libtest_json::*;
 
 pub use libtest_json::RunMode;

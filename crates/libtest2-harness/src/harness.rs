@@ -190,9 +190,12 @@ fn discover(
     cases: &mut Vec<Box<dyn Case>>,
     notifier: &mut dyn notify::Notifier,
 ) -> std::io::Result<()> {
-    notifier.notify(notify::Event::DiscoverStart {
-        elapsed_s: Some(notify::Elapsed(start.elapsed())),
-    })?;
+    notifier.notify(
+        notify::event::DiscoverStart {
+            elapsed_s: Some(notify::Elapsed(start.elapsed())),
+        }
+        .into(),
+    )?;
 
     let matches_filter = |case: &dyn Case, filter: &str| {
         let test_name = case.name();
@@ -227,19 +230,25 @@ fn discover(
             !opts.skip.is_empty() && opts.skip.iter().any(|sf| matches_filter(case.as_ref(), sf));
         let retain_case = filtered_in && !filtered_out;
         retain_cases.push(retain_case);
-        notifier.notify(notify::Event::DiscoverCase {
-            name: case.name().to_owned(),
-            mode: RunMode::Test,
-            selected: retain_case,
-            elapsed_s: Some(notify::Elapsed(start.elapsed())),
-        })?;
+        notifier.notify(
+            notify::event::DiscoverCase {
+                name: case.name().to_owned(),
+                mode: RunMode::Test,
+                selected: retain_case,
+                elapsed_s: Some(notify::Elapsed(start.elapsed())),
+            }
+            .into(),
+        )?;
     }
     let mut retain_cases = retain_cases.into_iter();
     cases.retain(|_| retain_cases.next().unwrap());
 
-    notifier.notify(notify::Event::DiscoverComplete {
-        elapsed_s: Some(notify::Elapsed(start.elapsed())),
-    })?;
+    notifier.notify(
+        notify::event::DiscoverComplete {
+            elapsed_s: Some(notify::Elapsed(start.elapsed())),
+        }
+        .into(),
+    )?;
 
     Ok(())
 }
@@ -250,9 +259,12 @@ fn run(
     cases: Vec<Box<dyn Case>>,
     notifier: &mut dyn notify::Notifier,
 ) -> std::io::Result<bool> {
-    notifier.notify(notify::Event::RunStart {
-        elapsed_s: Some(notify::Elapsed(start.elapsed())),
-    })?;
+    notifier.notify(
+        notify::event::RunStart {
+            elapsed_s: Some(notify::Elapsed(start.elapsed())),
+        }
+        .into(),
+    )?;
 
     if opts.no_capture {
         todo!("`--no-capture` is not yet supported");
@@ -298,17 +310,10 @@ fn run(
         }
 
         impl RunningTest {
-            fn join(self, event: &mut notify::Event) {
-                if self.join_handle.join().is_err() {
-                    if let notify::Event::CaseComplete {
-                        status, message, ..
-                    } = event
-                    {
-                        if status.is_none() {
-                            *status = Some(notify::RunStatus::Failed);
-                            *message = Some("panicked after reporting success".to_owned());
-                        }
-                    }
+            fn join(self, event: &mut notify::event::CaseComplete) {
+                if self.join_handle.join().is_err() && event.status.is_none() {
+                    event.status = Some(notify::RunStatus::Failed);
+                    event.message = Some("panicked after reporting success".to_owned());
                 }
             }
         }
@@ -375,9 +380,9 @@ fn run(
             }
 
             let mut event = rx.recv().unwrap();
-            if let notify::Event::CaseComplete { name, .. } = &event {
-                let running_test = running_tests.remove(name).unwrap();
-                running_test.join(&mut event);
+            if let notify::Event::CaseComplete(event) = &mut event {
+                let running_test = running_tests.remove(&event.name).unwrap();
+                running_test.join(event);
                 pending -= 1;
             }
             notifier.notify(event)?;
@@ -398,9 +403,12 @@ fn run(
         }
     }
 
-    notifier.notify(notify::Event::RunComplete {
-        elapsed_s: Some(notify::Elapsed(start.elapsed())),
-    })?;
+    notifier.notify(
+        notify::event::RunComplete {
+            elapsed_s: Some(notify::Elapsed(start.elapsed())),
+        }
+        .into(),
+    )?;
 
     Ok(success)
 }
@@ -411,10 +419,13 @@ fn run_case(
     state: &State,
     notifier: &mut dyn notify::Notifier,
 ) -> std::io::Result<bool> {
-    notifier.notify(notify::Event::CaseStart {
-        name: case.name().to_owned(),
-        elapsed_s: Some(notify::Elapsed(start.elapsed())),
-    })?;
+    notifier.notify(
+        notify::event::CaseStart {
+            name: case.name().to_owned(),
+            elapsed_s: Some(notify::Elapsed(start.elapsed())),
+        }
+        .into(),
+    )?;
 
     let outcome = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         __rust_begin_short_backtrace(|| case.run(state))
@@ -438,12 +449,15 @@ fn run_case(
     let err = outcome.as_ref().err();
     let status = err.map(|e| e.status());
     let message = err.and_then(|e| e.cause().map(|c| c.to_string()));
-    notifier.notify(notify::Event::CaseComplete {
-        name: case.name().to_owned(),
-        status,
-        message,
-        elapsed_s: Some(notify::Elapsed(start.elapsed())),
-    })?;
+    notifier.notify(
+        notify::event::CaseComplete {
+            name: case.name().to_owned(),
+            status,
+            message,
+            elapsed_s: Some(notify::Elapsed(start.elapsed())),
+        }
+        .into(),
+    )?;
 
     Ok(status != Some(notify::RunStatus::Failed))
 }
