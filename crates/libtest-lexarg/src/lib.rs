@@ -28,6 +28,7 @@ pub struct TestOpts {
     pub run_tests: bool,
     pub bench_benchmarks: bool,
     pub no_capture: bool,
+    pub show_output: bool,
     pub color: ColorConfig,
     pub format: OutputFormat,
     pub test_threads: Option<std::num::NonZeroUsize>,
@@ -92,7 +93,6 @@ impl Default for OutputFormat {
 /// In case we want to add other options as well, just add them in this struct.
 #[derive(Copy, Clone, Debug, Default)]
 pub struct Options {
-    pub display_output: bool,
     pub panic_abort: bool,
 }
 
@@ -257,7 +257,7 @@ impl TestOptsBuilder {
                 });
             }
             Long("show-output") => {
-                self.opts.options.display_output = true;
+                self.opts.show_output = true;
             }
             Short("Z") => {
                 let feature = parser
