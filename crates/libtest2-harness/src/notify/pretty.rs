@@ -38,7 +38,7 @@ impl<W: std::io::Write> super::Notifier for PrettyRunNotifier<W> {
                 }
             }
             Event::DiscoverComplete { .. } => {}
-            Event::SuiteStart { .. } => {
+            Event::RunStart { .. } => {
                 self.summary.write_start(&mut self.writer)?;
             }
             Event::CaseStart { name, .. } => {
@@ -59,7 +59,7 @@ impl<W: std::io::Write> super::Notifier for PrettyRunNotifier<W> {
                 }
                 writeln!(self.writer, "{style}{s}{style:#}")?;
             }
-            Event::SuiteComplete { .. } => {
+            Event::RunComplete { .. } => {
                 self.summary.write_complete(&mut self.writer)?;
             }
         }

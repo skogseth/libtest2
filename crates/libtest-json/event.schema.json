@@ -94,7 +94,7 @@
         },
         "event": {
           "type": "string",
-          "const": "suite_start"
+          "const": "run_start"
         }
       },
       "required": [
@@ -188,7 +188,7 @@
         },
         "event": {
           "type": "string",
-          "const": "suite_complete"
+          "const": "run_complete"
         }
       },
       "required": [

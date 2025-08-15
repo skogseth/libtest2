@@ -37,7 +37,7 @@ pub enum Event {
         )]
         elapsed_s: Option<Elapsed>,
     },
-    SuiteStart {
+    RunStart {
         #[cfg_attr(
             feature = "serde",
             serde(default, skip_serializing_if = "Option::is_none")
@@ -76,7 +76,7 @@ pub enum Event {
         )]
         elapsed_s: Option<Elapsed>,
     },
-    SuiteComplete {
+    RunComplete {
         #[cfg_attr(
             feature = "serde",
             serde(default, skip_serializing_if = "Option::is_none")
@@ -153,10 +153,10 @@ impl Event {
                     buffer.value(String::from(*elapsed_s)).unwrap();
                 }
             }
-            Self::SuiteStart { elapsed_s } => {
+            Self::RunStart { elapsed_s } => {
                 buffer.key("event").unwrap();
                 buffer.keyval_sep().unwrap();
-                buffer.value("suite_start").unwrap();
+                buffer.value("run_start").unwrap();
 
                 if let Some(elapsed_s) = elapsed_s {
                     buffer.val_sep().unwrap();
@@ -226,10 +226,10 @@ impl Event {
                     buffer.value(String::from(*elapsed_s)).unwrap();
                 }
             }
-            Self::SuiteComplete { elapsed_s } => {
+            Self::RunComplete { elapsed_s } => {
                 buffer.key("event").unwrap();
                 buffer.keyval_sep().unwrap();
-                buffer.value("suite_complete").unwrap();
+                buffer.value("run_complete").unwrap();
 
                 if let Some(elapsed_s) = elapsed_s {
                     buffer.val_sep().unwrap();

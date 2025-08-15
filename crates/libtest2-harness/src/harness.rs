@@ -250,7 +250,7 @@ fn run(
     cases: Vec<Box<dyn Case>>,
     notifier: &mut dyn notify::Notifier,
 ) -> std::io::Result<bool> {
-    notifier.notify(notify::Event::SuiteStart {
+    notifier.notify(notify::Event::RunStart {
         elapsed_s: Some(notify::Elapsed(start.elapsed())),
     })?;
 
@@ -398,7 +398,7 @@ fn run(
         }
     }
 
-    notifier.notify(notify::Event::SuiteComplete {
+    notifier.notify(notify::Event::RunComplete {
         elapsed_s: Some(notify::Elapsed(start.elapsed())),
     })?;
 

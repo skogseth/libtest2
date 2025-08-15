@@ -71,14 +71,14 @@ fn discover_complete() {
 #[test]
 fn suite_start() {
     t(
-        libtest_json::Event::SuiteStart { elapsed_s: None },
-        str![[r#"{"event":"suite_start"}"#]],
+        libtest_json::Event::RunStart { elapsed_s: None },
+        str![[r#"{"event":"run_start"}"#]],
     );
     t(
-        libtest_json::Event::SuiteStart {
+        libtest_json::Event::RunStart {
             elapsed_s: Some(libtest_json::Elapsed(Default::default())),
         },
-        str![[r#"{"event":"suite_start","elapsed_s":"0"}"#]],
+        str![[r#"{"event":"run_start","elapsed_s":"0"}"#]],
     );
 }
 
@@ -130,14 +130,14 @@ fn case_complete() {
 #[test]
 fn suite_complete() {
     t(
-        libtest_json::Event::SuiteComplete { elapsed_s: None },
-        str![[r#"{"event":"suite_complete"}"#]],
+        libtest_json::Event::RunComplete { elapsed_s: None },
+        str![[r#"{"event":"run_complete"}"#]],
     );
 
     t(
-        libtest_json::Event::SuiteComplete {
+        libtest_json::Event::RunComplete {
             elapsed_s: Some(libtest_json::Elapsed(Default::default())),
         },
-        str![[r#"{"event":"suite_complete","elapsed_s":"0"}"#]],
+        str![[r#"{"event":"run_complete","elapsed_s":"0"}"#]],
     );
 }
