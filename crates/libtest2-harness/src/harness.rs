@@ -253,9 +253,6 @@ fn run(
     if opts.show_output {
         todo!("`--show-output` is not yet supported");
     }
-    if opts.options.panic_abort {
-        todo!("panic-abort is not yet supported");
-    }
 
     let threads = opts.test_threads.map(|t| t.get()).unwrap_or(1);
 

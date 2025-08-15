@@ -37,7 +37,6 @@ pub struct TestOpts {
     /// May run a few more tests due to threading, but will
     /// abort as soon as possible.
     pub fail_fast: bool,
-    pub options: Options,
     pub allowed_unstable: Vec<String>,
 }
 
@@ -85,15 +84,6 @@ impl Default for OutputFormat {
     fn default() -> Self {
         Self::Pretty
     }
-}
-
-/// Options for the test run defined by the caller (instead of CLI arguments) (see
-/// [`TestOpts::options`])
-///
-/// In case we want to add other options as well, just add them in this struct.
-#[derive(Copy, Clone, Debug, Default)]
-pub struct Options {
-    pub panic_abort: bool,
 }
 
 pub const UNSTABLE_OPTIONS: &str = "unstable-options";
