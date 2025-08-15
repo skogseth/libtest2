@@ -247,7 +247,7 @@ fn run(
     notifier.notify(notify::Event::SuiteStart)?;
     let timer = std::time::Instant::now();
 
-    if opts.nocapture {
+    if opts.no_capture {
         todo!("`--no-capture` is not yet supported");
     }
     if opts.options.display_output {

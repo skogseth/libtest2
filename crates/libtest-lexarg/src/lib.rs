@@ -27,7 +27,7 @@ pub struct TestOpts {
     pub run_ignored: RunIgnored,
     pub run_tests: bool,
     pub bench_benchmarks: bool,
-    pub nocapture: bool,
+    pub no_capture: bool,
     pub color: ColorConfig,
     pub format: OutputFormat,
     pub test_threads: Option<std::num::NonZeroUsize>,
@@ -201,7 +201,7 @@ impl TestOptsBuilder {
                 self.opts.list = true;
             }
             Long("no-capture") => {
-                self.opts.nocapture = true;
+                self.opts.no_capture = true;
             }
             Long("test-threads") => {
                 let test_threads = parser
