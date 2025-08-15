@@ -51,6 +51,7 @@ impl<W: std::io::Write> super::Notifier for PrettyRunNotifier<W> {
                     self.writer.flush()?;
                 }
             }
+            Event::CaseMessage(_) => {}
             Event::CaseComplete(inner) => {
                 let status = self.summary.get_status(&inner.name);
                 let (s, style) = match status {

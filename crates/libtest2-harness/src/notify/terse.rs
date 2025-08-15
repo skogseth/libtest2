@@ -35,6 +35,7 @@ impl<W: std::io::Write> super::Notifier for TerseListNotifier<W> {
             }
             Event::RunStart(_) => {}
             Event::CaseStart(_) => {}
+            Event::CaseMessage(_) => {}
             Event::CaseComplete(_) => {}
             Event::RunComplete(_) => {}
         }
@@ -68,6 +69,7 @@ impl<W: std::io::Write> super::Notifier for TerseRunNotifier<W> {
                 self.summary.write_start(&mut self.writer)?;
             }
             Event::CaseStart(_) => {}
+            Event::CaseMessage(_) => {}
             Event::CaseComplete(inner) => {
                 let status = self.summary.get_status(&inner.name);
                 let (c, style) = match status {
