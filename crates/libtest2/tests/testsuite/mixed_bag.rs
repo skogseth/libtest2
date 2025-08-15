@@ -713,58 +713,58 @@ fn list_json() {
         str![[r#"
 [
   {
-    "elapsed_s": "[..]",
-    "event": "discover_start"
+    "event": "discover_start",
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "bunny",
-    "run": false
+    "selected": false,
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "dog",
-    "run": false
+    "selected": false,
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "fly",
-    "run": false
+    "selected": false,
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "fox",
-    "run": false
+    "selected": false,
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "frog",
-    "run": false
+    "selected": false,
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "owl",
-    "run": false
+    "selected": false,
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
-    "name": "bear"
+    "name": "bear",
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
-    "name": "cat"
+    "name": "cat",
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
-    "event": "discover_complete"
+    "event": "discover_complete",
+    "elapsed_s": "[..]"
   }
 ]
 "#]]
@@ -773,58 +773,58 @@ fn list_json() {
         str![[r#"
 [
   {
-    "elapsed_s": "[..]",
-    "event": "discover_start"
+    "event": "discover_start",
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "bunny",
-    "run": false
+    "selected": false,
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "dog",
-    "run": false
+    "selected": false,
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "fly",
-    "run": false
+    "selected": false,
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "fox",
-    "run": false
+    "selected": false,
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "frog",
-    "run": false
+    "selected": false,
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "owl",
-    "run": false
+    "selected": false,
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
-    "name": "bear"
+    "name": "bear",
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
     "event": "discover_case",
-    "name": "cat"
+    "name": "cat",
+    "elapsed_s": "[..]"
   },
   {
-    "elapsed_s": "[..]",
-    "event": "discover_complete"
+    "event": "discover_complete",
+    "elapsed_s": "[..]"
   }
 ]
 "#]]
@@ -848,37 +848,37 @@ fn test_json() {
   {
     "event": "discover_case",
     "name": "bunny",
-    "run": false,
+    "selected": false,
     "elapsed_s": "[..]"
   },
   {
     "event": "discover_case",
     "name": "dog",
-    "run": false,
+    "selected": false,
     "elapsed_s": "[..]"
   },
   {
     "event": "discover_case",
     "name": "fly",
-    "run": false,
+    "selected": false,
     "elapsed_s": "[..]"
   },
   {
     "event": "discover_case",
     "name": "fox",
-    "run": false,
+    "selected": false,
     "elapsed_s": "[..]"
   },
   {
     "event": "discover_case",
     "name": "frog",
-    "run": false,
+    "selected": false,
     "elapsed_s": "[..]"
   },
   {
     "event": "discover_case",
     "name": "owl",
-    "run": false,
+    "selected": false,
     "elapsed_s": "[..]"
   },
   {
@@ -954,42 +954,6 @@ fn test_json() {
   {
     "elapsed_s": "[..]",
     "event": "discover_case",
-    "name": "bunny",
-    "run": false
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "discover_case",
-    "name": "dog",
-    "run": false
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "discover_case",
-    "name": "fly",
-    "run": false
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "discover_case",
-    "name": "fox",
-    "run": false
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "discover_case",
-    "name": "frog",
-    "run": false
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "discover_case",
-    "name": "owl",
-    "run": false
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "discover_case",
     "name": "bear"
   },
   {
@@ -1013,6 +977,42 @@ fn test_json() {
   },
   {
     "event": "run_complete",
+    "elapsed_s": "[..]"
+  },
+  {
+    "event": "discover_case",
+    "name": "bunny",
+    "selected": false,
+    "elapsed_s": "[..]"
+  },
+  {
+    "event": "discover_case",
+    "name": "dog",
+    "selected": false,
+    "elapsed_s": "[..]"
+  },
+  {
+    "event": "discover_case",
+    "name": "fly",
+    "selected": false,
+    "elapsed_s": "[..]"
+  },
+  {
+    "event": "discover_case",
+    "name": "fox",
+    "selected": false,
+    "elapsed_s": "[..]"
+  },
+  {
+    "event": "discover_case",
+    "name": "frog",
+    "selected": false,
+    "elapsed_s": "[..]"
+  },
+  {
+    "event": "discover_case",
+    "name": "owl",
+    "selected": false,
     "elapsed_s": "[..]"
   }
 ]

@@ -230,7 +230,7 @@ fn discover(
         notifier.notify(notify::Event::DiscoverCase {
             name: case.name().to_owned(),
             mode: RunMode::Test,
-            run: retain_case,
+            selected: retain_case,
             elapsed_s: Some(notify::Elapsed(start.elapsed())),
         })?;
     }

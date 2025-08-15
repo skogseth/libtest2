@@ -33,7 +33,7 @@
         "mode": {
           "$ref": "#/$defs/RunMode"
         },
-        "run": {
+        "selected": {
           "description": "Whether selected to be run by the user",
           "type": "boolean"
         },

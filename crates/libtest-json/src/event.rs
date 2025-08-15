@@ -23,7 +23,7 @@ pub enum Event {
             feature = "serde",
             serde(default = "true_default", skip_serializing_if = "is_true")
         )]
-        run: bool,
+        selected: bool,
         #[cfg_attr(
             feature = "serde",
             serde(default, skip_serializing_if = "Option::is_none")
@@ -103,7 +103,7 @@ impl Event {
             Self::DiscoverCase {
                 name,
                 mode,
-                run,
+                selected,
                 elapsed_s,
             } => {
                 buffer.key("event").unwrap();
@@ -122,11 +122,11 @@ impl Event {
                     buffer.value(mode.as_str()).unwrap();
                 }
 
-                if !run {
+                if !selected {
                     buffer.val_sep().unwrap();
-                    buffer.key("run").unwrap();
+                    buffer.key("selected").unwrap();
                     buffer.keyval_sep().unwrap();
-                    buffer.value(run).unwrap();
+                    buffer.value(selected).unwrap();
                 }
 
                 if let Some(elapsed_s) = elapsed_s {

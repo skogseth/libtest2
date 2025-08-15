@@ -34,7 +34,7 @@ fn discover_case() {
         libtest_json::Event::DiscoverCase {
             name: "Hello\tworld!".to_owned(),
             mode: libtest_json::RunMode::Test,
-            run: true,
+            selected: true,
             elapsed_s: None,
         },
         str![[r#"{"event":"discover_case","name":"Hello\tworld!"}"#]],
@@ -44,11 +44,11 @@ fn discover_case() {
         libtest_json::Event::DiscoverCase {
             name: "Hello\tworld!".to_owned(),
             mode: libtest_json::RunMode::Bench,
-            run: false,
+            selected: false,
             elapsed_s: Some(libtest_json::Elapsed(Default::default())),
         },
         str![[
-            r#"{"event":"discover_case","name":"Hello\tworld!","mode":"bench","run":false,"elapsed_s":"0"}"#
+            r#"{"event":"discover_case","name":"Hello\tworld!","mode":"bench","selected":false,"elapsed_s":"0"}"#
         ]],
     );
 }

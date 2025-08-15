@@ -32,8 +32,8 @@ impl<W: std::io::Write> super::Notifier for PrettyRunNotifier<W> {
         self.summary.notify(event.clone())?;
         match event {
             Event::DiscoverStart { .. } => {}
-            Event::DiscoverCase { name, run, .. } => {
-                if run {
+            Event::DiscoverCase { name, selected, .. } => {
+                if selected {
                     self.name_width = name.len().max(self.name_width);
                 }
             }

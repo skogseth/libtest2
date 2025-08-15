@@ -88,8 +88,8 @@ impl super::Notifier for Summary {
     fn notify(&mut self, event: Event) -> std::io::Result<()> {
         match event {
             Event::DiscoverStart { .. } => {}
-            Event::DiscoverCase { run, .. } => {
-                if run {
+            Event::DiscoverCase { selected, .. } => {
+                if selected {
                     self.num_run += 1;
                 } else {
                     self.num_filtered_out += 1;

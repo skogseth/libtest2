@@ -21,9 +21,12 @@ impl<W: std::io::Write> super::Notifier for TerseListNotifier<W> {
         match event {
             Event::DiscoverStart { .. } => {}
             Event::DiscoverCase {
-                name, mode, run, ..
+                name,
+                mode,
+                selected,
+                ..
             } => {
-                if run {
+                if selected {
                     let mode = mode.as_str();
                     writeln!(self.writer, "{name}: {mode}")?;
                     self.tests += 1;
