@@ -20,6 +20,7 @@ use lexarg_error::ErrorContext;
 ///
 /// To parse, see [`TestOptsBuilder`]
 #[derive(Debug, Default)]
+#[non_exhaustive]
 pub struct TestOpts {
     pub list: bool,
     pub filters: Vec<String>,
@@ -27,7 +28,8 @@ pub struct TestOpts {
     pub run_ignored: RunIgnored,
     pub run_tests: bool,
     pub bench_benchmarks: bool,
-    pub nocapture: bool,
+    pub no_capture: bool,
+    pub show_output: bool,
     pub color: ColorConfig,
     pub format: OutputFormat,
     pub test_threads: Option<std::num::NonZeroUsize>,
@@ -36,7 +38,6 @@ pub struct TestOpts {
     /// May run a few more tests due to threading, but will
     /// abort as soon as possible.
     pub fail_fast: bool,
-    pub options: Options,
     pub allowed_unstable: Vec<String>,
 }
 
@@ -84,16 +85,6 @@ impl Default for OutputFormat {
     fn default() -> Self {
         Self::Pretty
     }
-}
-
-/// Options for the test run defined by the caller (instead of CLI arguments) (see
-/// [`TestOpts::options`])
-///
-/// In case we want to add other options as well, just add them in this struct.
-#[derive(Copy, Clone, Debug, Default)]
-pub struct Options {
-    pub display_output: bool,
-    pub panic_abort: bool,
 }
 
 pub const UNSTABLE_OPTIONS: &str = "unstable-options";
@@ -201,7 +192,7 @@ impl TestOptsBuilder {
                 self.opts.list = true;
             }
             Long("no-capture") => {
-                self.opts.nocapture = true;
+                self.opts.no_capture = true;
             }
             Long("test-threads") => {
                 let test_threads = parser
@@ -257,7 +248,7 @@ impl TestOptsBuilder {
                 });
             }
             Long("show-output") => {
-                self.opts.options.display_output = true;
+                self.opts.show_output = true;
             }
             Short("Z") => {
                 let feature = parser
