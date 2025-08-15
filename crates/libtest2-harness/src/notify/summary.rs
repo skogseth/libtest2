@@ -22,10 +22,6 @@ pub(crate) struct Summary {
 }
 
 impl Summary {
-    pub(crate) fn has_failed(&self) -> bool {
-        0 < self.num_failed
-    }
-
     pub(crate) fn write_start(&self, writer: &mut dyn std::io::Write) -> std::io::Result<()> {
         let s = if self.num_run == 1 { "" } else { "s" };
 
@@ -35,7 +31,9 @@ impl Summary {
     }
 
     pub(crate) fn write_complete(&self, writer: &mut dyn ::std::io::Write) -> std::io::Result<()> {
-        let (summary, summary_style) = if self.has_failed() {
+        let has_failed = 0 < self.num_failed;
+
+        let (summary, summary_style) = if has_failed {
             ("FAILED", FAILED)
         } else {
             ("ok", OK)
@@ -46,7 +44,7 @@ impl Summary {
         let num_filtered_out = self.num_filtered_out;
         let elapsed_s = self.elapsed_s;
 
-        if self.has_failed() {
+        if has_failed {
             writeln!(writer)?;
             writeln!(writer, "failures:")?;
             writeln!(writer)?;
