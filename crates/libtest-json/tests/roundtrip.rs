@@ -105,7 +105,6 @@ fn case_complete() {
     t(
         libtest_json::Event::CaseComplete {
             name: "Hello\tworld!".to_owned(),
-            mode: libtest_json::RunMode::Test,
             status: None,
             message: None,
             elapsed_s: None,
@@ -116,13 +115,12 @@ fn case_complete() {
     t(
         libtest_json::Event::CaseComplete {
             name: "Hello\tworld!".to_owned(),
-            mode: libtest_json::RunMode::Bench,
             status: Some(libtest_json::RunStatus::Ignored),
             message: Some("This\tfailed".to_owned()),
             elapsed_s: Some(libtest_json::Elapsed(Default::default())),
         },
         str![[
-            r#"{"event":"case_complete","name":"Hello\tworld!","mode":"bench","status":"ignored","message":"This\tfailed","elapsed_s":"0"}"#
+            r#"{"event":"case_complete","name":"Hello\tworld!","status":"ignored","message":"This\tfailed","elapsed_s":"0"}"#
         ]],
     );
 }

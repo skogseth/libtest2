@@ -54,11 +54,6 @@ pub enum Event {
     },
     CaseComplete {
         name: String,
-        #[cfg_attr(
-            feature = "serde",
-            serde(default, skip_serializing_if = "RunMode::is_default")
-        )]
-        mode: RunMode,
         /// `None` means success
         #[cfg_attr(
             feature = "serde",
@@ -184,7 +179,6 @@ impl Event {
             }
             Self::CaseComplete {
                 name,
-                mode,
                 status,
                 message,
                 elapsed_s,
@@ -197,13 +191,6 @@ impl Event {
                 buffer.key("name").unwrap();
                 buffer.keyval_sep().unwrap();
                 buffer.value(name).unwrap();
-
-                if !mode.is_default() {
-                    buffer.val_sep().unwrap();
-                    buffer.key("mode").unwrap();
-                    buffer.keyval_sep().unwrap();
-                    buffer.value(mode.as_str()).unwrap();
-                }
 
                 if let Some(status) = status {
                     buffer.val_sep().unwrap();

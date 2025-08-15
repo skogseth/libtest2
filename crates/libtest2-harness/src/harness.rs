@@ -440,7 +440,6 @@ fn run_case(
     let message = err.and_then(|e| e.cause().map(|c| c.to_string()));
     notifier.notify(notify::Event::CaseComplete {
         name: case.name().to_owned(),
-        mode: RunMode::Test,
         status,
         message,
         elapsed_s: Some(notify::Elapsed(start.elapsed())),
