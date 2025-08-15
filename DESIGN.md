@@ -32,6 +32,7 @@ Decisions
 - Each event carries an `elapsed_s` as an offset from process start
   - Makes units explicit
   - Can track duration of any operation
+- Defer to cargo to provide test-binary differentiating information, like it does for rustc
 
 ### Prior Art
 
