@@ -33,6 +33,10 @@ Decisions
   - Makes units explicit
   - Can track duration of any operation
 - Defer to cargo to provide test-binary differentiating information, like it does for rustc
+- No equivelant of rustc including a rendered diagnostic
+  - Terse and pretty progress indicators are too nebulous to render (see their notifiers)
+  - There is likely not enough value add in the failure message
+  - This puts more of a burden on custom test harnesses for their implementation than is strictly needed
 
 ### Prior Art
 
