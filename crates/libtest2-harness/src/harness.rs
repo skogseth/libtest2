@@ -32,6 +32,8 @@ impl Harness {
     }
 
     pub fn main(mut self) -> ! {
+        let start = std::time::Instant::now();
+
         let raw = match self.raw {
             Ok(raw) => raw,
             Err(err) => {
@@ -57,13 +59,13 @@ impl Harness {
             eprintln!("{err}");
             std::process::exit(1)
         });
-        discover(&opts, &mut self.cases, notifier.as_mut()).unwrap_or_else(|err| {
+        discover(&start, &opts, &mut self.cases, notifier.as_mut()).unwrap_or_else(|err| {
             eprintln!("{err}");
             std::process::exit(1)
         });
 
         if !opts.list {
-            match run(&opts, self.cases, notifier.as_mut()) {
+            match run(&start, &opts, self.cases, notifier.as_mut()) {
                 Ok(true) => {}
                 Ok(false) => std::process::exit(ERROR_EXIT_CODE),
                 Err(e) => {
@@ -183,12 +185,14 @@ fn notifier(opts: &libtest_lexarg::TestOpts) -> std::io::Result<Box<dyn notify::
 }
 
 fn discover(
+    start: &std::time::Instant,
     opts: &libtest_lexarg::TestOpts,
     cases: &mut Vec<Box<dyn Case>>,
     notifier: &mut dyn notify::Notifier,
 ) -> std::io::Result<()> {
-    notifier.notify(notify::Event::DiscoverStart)?;
-    let timer = std::time::Instant::now();
+    notifier.notify(notify::Event::DiscoverStart {
+        elapsed_s: Some(notify::Elapsed(start.elapsed())),
+    })?;
 
     let matches_filter = |case: &dyn Case, filter: &str| {
         let test_name = case.name();
@@ -227,25 +231,28 @@ fn discover(
             name: case.name().to_owned(),
             mode: RunMode::Test,
             run: retain_case,
+            elapsed_s: Some(notify::Elapsed(start.elapsed())),
         })?;
     }
     let mut retain_cases = retain_cases.into_iter();
     cases.retain(|_| retain_cases.next().unwrap());
 
     notifier.notify(notify::Event::DiscoverComplete {
-        elapsed_s: Some(notify::Elapsed(timer.elapsed())),
+        elapsed_s: Some(notify::Elapsed(start.elapsed())),
     })?;
 
     Ok(())
 }
 
 fn run(
+    start: &std::time::Instant,
     opts: &libtest_lexarg::TestOpts,
     cases: Vec<Box<dyn Case>>,
     notifier: &mut dyn notify::Notifier,
 ) -> std::io::Result<bool> {
-    notifier.notify(notify::Event::SuiteStart)?;
-    let timer = std::time::Instant::now();
+    notifier.notify(notify::Event::SuiteStart {
+        elapsed_s: Some(notify::Elapsed(start.elapsed())),
+    })?;
 
     if opts.no_capture {
         todo!("`--no-capture` is not yet supported");
@@ -324,6 +331,7 @@ fn run(
                 let name = case.name().to_owned();
 
                 let cfg = std::thread::Builder::new().name(name.clone());
+                let start = *start;
                 let tx = tx.clone();
                 let case = std::sync::Arc::new(case);
                 let case_fallback = case.clone();
@@ -333,8 +341,9 @@ fn run(
                 let sync_success_fallback = sync_success.clone();
                 let join_handle = cfg.spawn(move || {
                     let mut notifier = SenderNotifier { tx: tx.clone() };
-                    let case_success = run_case(case.as_ref().as_ref(), &state, &mut notifier)
-                        .expect("`SenderNotifier` is infallible");
+                    let case_success =
+                        run_case(&start, case.as_ref().as_ref(), &state, &mut notifier)
+                            .expect("`SenderNotifier` is infallible");
                     if !case_success {
                         sync_success.store(case_success, std::sync::atomic::Ordering::Relaxed);
                     }
@@ -347,9 +356,13 @@ fn run(
                     Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => {
                         // `ErrorKind::WouldBlock` means hitting the thread limit on some
                         // platforms, so run the test synchronously here instead.
-                        let case_success =
-                            run_case(case_fallback.as_ref().as_ref(), &state_fallback, notifier)
-                                .expect("`SenderNotifier` is infallible");
+                        let case_success = run_case(
+                            &start,
+                            case_fallback.as_ref().as_ref(),
+                            &state_fallback,
+                            notifier,
+                        )
+                        .expect("`SenderNotifier` is infallible");
                         if !case_success {
                             sync_success_fallback
                                 .store(case_success, std::sync::atomic::Ordering::Relaxed);
@@ -378,7 +391,7 @@ fn run(
     if !exclusive_cases.is_empty() {
         notifier.threaded(false);
         for case in exclusive_cases {
-            success &= run_case(case.as_ref(), &state, notifier)?;
+            success &= run_case(start, case.as_ref(), &state, notifier)?;
             if !success && opts.fail_fast {
                 break;
             }
@@ -386,21 +399,22 @@ fn run(
     }
 
     notifier.notify(notify::Event::SuiteComplete {
-        elapsed_s: Some(notify::Elapsed(timer.elapsed())),
+        elapsed_s: Some(notify::Elapsed(start.elapsed())),
     })?;
 
     Ok(success)
 }
 
 fn run_case(
+    start: &std::time::Instant,
     case: &dyn Case,
     state: &State,
     notifier: &mut dyn notify::Notifier,
 ) -> std::io::Result<bool> {
     notifier.notify(notify::Event::CaseStart {
         name: case.name().to_owned(),
+        elapsed_s: Some(notify::Elapsed(start.elapsed())),
     })?;
-    let timer = std::time::Instant::now();
 
     let outcome = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         __rust_begin_short_backtrace(|| case.run(state))
@@ -429,7 +443,7 @@ fn run_case(
         mode: RunMode::Test,
         status,
         message,
-        elapsed_s: Some(notify::Elapsed(timer.elapsed())),
+        elapsed_s: Some(notify::Elapsed(start.elapsed())),
     })?;
 
     Ok(status != Some(notify::RunStatus::Failed))

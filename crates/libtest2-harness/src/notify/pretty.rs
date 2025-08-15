@@ -31,14 +31,14 @@ impl<W: std::io::Write> super::Notifier for PrettyRunNotifier<W> {
     fn notify(&mut self, event: Event) -> std::io::Result<()> {
         self.summary.notify(event.clone())?;
         match event {
-            Event::DiscoverStart => {}
+            Event::DiscoverStart { .. } => {}
             Event::DiscoverCase { name, run, .. } => {
                 if run {
                     self.name_width = name.len().max(self.name_width);
                 }
             }
             Event::DiscoverComplete { .. } => {}
-            Event::SuiteStart => {
+            Event::SuiteStart { .. } => {
                 self.summary.write_start(&mut self.writer)?;
             }
             Event::CaseStart { name, .. } => {

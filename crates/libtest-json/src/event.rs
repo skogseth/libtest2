@@ -4,7 +4,13 @@
 #[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
 #[cfg_attr(feature = "serde", serde(tag = "event"))]
 pub enum Event {
-    DiscoverStart,
+    DiscoverStart {
+        #[cfg_attr(
+            feature = "serde",
+            serde(default, skip_serializing_if = "Option::is_none")
+        )]
+        elapsed_s: Option<Elapsed>,
+    },
     DiscoverCase {
         name: String,
         #[cfg_attr(
@@ -18,6 +24,11 @@ pub enum Event {
             serde(default = "true_default", skip_serializing_if = "is_true")
         )]
         run: bool,
+        #[cfg_attr(
+            feature = "serde",
+            serde(default, skip_serializing_if = "Option::is_none")
+        )]
+        elapsed_s: Option<Elapsed>,
     },
     DiscoverComplete {
         #[cfg_attr(
@@ -26,9 +37,20 @@ pub enum Event {
         )]
         elapsed_s: Option<Elapsed>,
     },
-    SuiteStart,
+    SuiteStart {
+        #[cfg_attr(
+            feature = "serde",
+            serde(default, skip_serializing_if = "Option::is_none")
+        )]
+        elapsed_s: Option<Elapsed>,
+    },
     CaseStart {
         name: String,
+        #[cfg_attr(
+            feature = "serde",
+            serde(default, skip_serializing_if = "Option::is_none")
+        )]
+        elapsed_s: Option<Elapsed>,
     },
     CaseComplete {
         name: String,
@@ -71,12 +93,24 @@ impl Event {
         let mut buffer = String::new();
         buffer.open_object().unwrap();
         match self {
-            Self::DiscoverStart => {
+            Self::DiscoverStart { elapsed_s } => {
                 buffer.key("event").unwrap();
                 buffer.keyval_sep().unwrap();
                 buffer.value("discover_start").unwrap();
+
+                if let Some(elapsed_s) = elapsed_s {
+                    buffer.val_sep().unwrap();
+                    buffer.key("elapsed_s").unwrap();
+                    buffer.keyval_sep().unwrap();
+                    buffer.value(String::from(*elapsed_s)).unwrap();
+                }
             }
-            Self::DiscoverCase { name, mode, run } => {
+            Self::DiscoverCase {
+                name,
+                mode,
+                run,
+                elapsed_s,
+            } => {
                 buffer.key("event").unwrap();
                 buffer.keyval_sep().unwrap();
                 buffer.value("discover_case").unwrap();
@@ -99,11 +133,7 @@ impl Event {
                     buffer.keyval_sep().unwrap();
                     buffer.value(run).unwrap();
                 }
-            }
-            Self::DiscoverComplete { elapsed_s } => {
-                buffer.key("event").unwrap();
-                buffer.keyval_sep().unwrap();
-                buffer.value("discover_complete").unwrap();
+
                 if let Some(elapsed_s) = elapsed_s {
                     buffer.val_sep().unwrap();
                     buffer.key("elapsed_s").unwrap();
@@ -111,12 +141,31 @@ impl Event {
                     buffer.value(String::from(*elapsed_s)).unwrap();
                 }
             }
-            Self::SuiteStart => {
+            Self::DiscoverComplete { elapsed_s } => {
+                buffer.key("event").unwrap();
+                buffer.keyval_sep().unwrap();
+                buffer.value("discover_complete").unwrap();
+
+                if let Some(elapsed_s) = elapsed_s {
+                    buffer.val_sep().unwrap();
+                    buffer.key("elapsed_s").unwrap();
+                    buffer.keyval_sep().unwrap();
+                    buffer.value(String::from(*elapsed_s)).unwrap();
+                }
+            }
+            Self::SuiteStart { elapsed_s } => {
                 buffer.key("event").unwrap();
                 buffer.keyval_sep().unwrap();
                 buffer.value("suite_start").unwrap();
+
+                if let Some(elapsed_s) = elapsed_s {
+                    buffer.val_sep().unwrap();
+                    buffer.key("elapsed_s").unwrap();
+                    buffer.keyval_sep().unwrap();
+                    buffer.value(String::from(*elapsed_s)).unwrap();
+                }
             }
-            Self::CaseStart { name } => {
+            Self::CaseStart { name, elapsed_s } => {
                 buffer.key("event").unwrap();
                 buffer.keyval_sep().unwrap();
                 buffer.value("case_start").unwrap();
@@ -125,6 +174,13 @@ impl Event {
                 buffer.key("name").unwrap();
                 buffer.keyval_sep().unwrap();
                 buffer.value(name).unwrap();
+
+                if let Some(elapsed_s) = elapsed_s {
+                    buffer.val_sep().unwrap();
+                    buffer.key("elapsed_s").unwrap();
+                    buffer.keyval_sep().unwrap();
+                    buffer.value(String::from(*elapsed_s)).unwrap();
+                }
             }
             Self::CaseComplete {
                 name,
@@ -174,6 +230,7 @@ impl Event {
                 buffer.key("event").unwrap();
                 buffer.keyval_sep().unwrap();
                 buffer.value("suite_complete").unwrap();
+
                 if let Some(elapsed_s) = elapsed_s {
                     buffer.val_sep().unwrap();
                     buffer.key("elapsed_s").unwrap();
@@ -237,6 +294,7 @@ impl RunStatus {
     }
 }
 
+/// Time elapsed since process start
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
