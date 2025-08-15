@@ -88,15 +88,15 @@ impl super::Notifier for Summary {
     fn notify(&mut self, event: Event) -> std::io::Result<()> {
         match event {
             Event::DiscoverStart { .. } => {}
-            Event::DiscoverCase { run, .. } => {
-                if run {
+            Event::DiscoverCase { selected, .. } => {
+                if selected {
                     self.num_run += 1;
                 } else {
                     self.num_filtered_out += 1;
                 }
             }
             Event::DiscoverComplete { .. } => {}
-            Event::SuiteStart { .. } => {}
+            Event::RunStart { .. } => {}
             Event::CaseStart { .. } => {}
             Event::CaseComplete {
                 name,
@@ -115,7 +115,7 @@ impl super::Notifier for Summary {
                     self.num_passed += 1;
                 }
             },
-            Event::SuiteComplete { elapsed_s, .. } => {
+            Event::RunComplete { elapsed_s, .. } => {
                 self.elapsed_s = elapsed_s;
             }
         }

@@ -23,7 +23,7 @@ pub enum Event {
             feature = "serde",
             serde(default = "true_default", skip_serializing_if = "is_true")
         )]
-        run: bool,
+        selected: bool,
         #[cfg_attr(
             feature = "serde",
             serde(default, skip_serializing_if = "Option::is_none")
@@ -37,7 +37,7 @@ pub enum Event {
         )]
         elapsed_s: Option<Elapsed>,
     },
-    SuiteStart {
+    RunStart {
         #[cfg_attr(
             feature = "serde",
             serde(default, skip_serializing_if = "Option::is_none")
@@ -54,11 +54,6 @@ pub enum Event {
     },
     CaseComplete {
         name: String,
-        #[cfg_attr(
-            feature = "serde",
-            serde(default, skip_serializing_if = "RunMode::is_default")
-        )]
-        mode: RunMode,
         /// `None` means success
         #[cfg_attr(
             feature = "serde",
@@ -76,7 +71,7 @@ pub enum Event {
         )]
         elapsed_s: Option<Elapsed>,
     },
-    SuiteComplete {
+    RunComplete {
         #[cfg_attr(
             feature = "serde",
             serde(default, skip_serializing_if = "Option::is_none")
@@ -108,7 +103,7 @@ impl Event {
             Self::DiscoverCase {
                 name,
                 mode,
-                run,
+                selected,
                 elapsed_s,
             } => {
                 buffer.key("event").unwrap();
@@ -127,11 +122,11 @@ impl Event {
                     buffer.value(mode.as_str()).unwrap();
                 }
 
-                if !run {
+                if !selected {
                     buffer.val_sep().unwrap();
-                    buffer.key("run").unwrap();
+                    buffer.key("selected").unwrap();
                     buffer.keyval_sep().unwrap();
-                    buffer.value(run).unwrap();
+                    buffer.value(selected).unwrap();
                 }
 
                 if let Some(elapsed_s) = elapsed_s {
@@ -153,10 +148,10 @@ impl Event {
                     buffer.value(String::from(*elapsed_s)).unwrap();
                 }
             }
-            Self::SuiteStart { elapsed_s } => {
+            Self::RunStart { elapsed_s } => {
                 buffer.key("event").unwrap();
                 buffer.keyval_sep().unwrap();
-                buffer.value("suite_start").unwrap();
+                buffer.value("run_start").unwrap();
 
                 if let Some(elapsed_s) = elapsed_s {
                     buffer.val_sep().unwrap();
@@ -184,7 +179,6 @@ impl Event {
             }
             Self::CaseComplete {
                 name,
-                mode,
                 status,
                 message,
                 elapsed_s,
@@ -197,13 +191,6 @@ impl Event {
                 buffer.key("name").unwrap();
                 buffer.keyval_sep().unwrap();
                 buffer.value(name).unwrap();
-
-                if !mode.is_default() {
-                    buffer.val_sep().unwrap();
-                    buffer.key("mode").unwrap();
-                    buffer.keyval_sep().unwrap();
-                    buffer.value(mode.as_str()).unwrap();
-                }
 
                 if let Some(status) = status {
                     buffer.val_sep().unwrap();
@@ -226,10 +213,10 @@ impl Event {
                     buffer.value(String::from(*elapsed_s)).unwrap();
                 }
             }
-            Self::SuiteComplete { elapsed_s } => {
+            Self::RunComplete { elapsed_s } => {
                 buffer.key("event").unwrap();
                 buffer.keyval_sep().unwrap();
-                buffer.value("suite_complete").unwrap();
+                buffer.value("run_complete").unwrap();
 
                 if let Some(elapsed_s) = elapsed_s {
                     buffer.val_sep().unwrap();

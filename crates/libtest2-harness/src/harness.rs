@@ -230,7 +230,7 @@ fn discover(
         notifier.notify(notify::Event::DiscoverCase {
             name: case.name().to_owned(),
             mode: RunMode::Test,
-            run: retain_case,
+            selected: retain_case,
             elapsed_s: Some(notify::Elapsed(start.elapsed())),
         })?;
     }
@@ -250,7 +250,7 @@ fn run(
     cases: Vec<Box<dyn Case>>,
     notifier: &mut dyn notify::Notifier,
 ) -> std::io::Result<bool> {
-    notifier.notify(notify::Event::SuiteStart {
+    notifier.notify(notify::Event::RunStart {
         elapsed_s: Some(notify::Elapsed(start.elapsed())),
     })?;
 
@@ -398,7 +398,7 @@ fn run(
         }
     }
 
-    notifier.notify(notify::Event::SuiteComplete {
+    notifier.notify(notify::Event::RunComplete {
         elapsed_s: Some(notify::Elapsed(start.elapsed())),
     })?;
 
@@ -440,7 +440,6 @@ fn run_case(
     let message = err.and_then(|e| e.cause().map(|c| c.to_string()));
     notifier.notify(notify::Event::CaseComplete {
         name: case.name().to_owned(),
-        mode: RunMode::Test,
         status,
         message,
         elapsed_s: Some(notify::Elapsed(start.elapsed())),

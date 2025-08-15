@@ -33,7 +33,7 @@
         "mode": {
           "$ref": "#/$defs/RunMode"
         },
-        "run": {
+        "selected": {
           "description": "Whether selected to be run by the user",
           "type": "boolean"
         },
@@ -94,7 +94,7 @@
         },
         "event": {
           "type": "string",
-          "const": "suite_start"
+          "const": "run_start"
         }
       },
       "required": [
@@ -132,9 +132,6 @@
       "properties": {
         "name": {
           "type": "string"
-        },
-        "mode": {
-          "$ref": "#/$defs/RunMode"
         },
         "status": {
           "description": "`None` means success",
@@ -188,7 +185,7 @@
         },
         "event": {
           "type": "string",
-          "const": "suite_complete"
+          "const": "run_complete"
         }
       },
       "required": [

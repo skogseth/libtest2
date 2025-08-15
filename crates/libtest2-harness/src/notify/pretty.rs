@@ -32,13 +32,13 @@ impl<W: std::io::Write> super::Notifier for PrettyRunNotifier<W> {
         self.summary.notify(event.clone())?;
         match event {
             Event::DiscoverStart { .. } => {}
-            Event::DiscoverCase { name, run, .. } => {
-                if run {
+            Event::DiscoverCase { name, selected, .. } => {
+                if selected {
                     self.name_width = name.len().max(self.name_width);
                 }
             }
             Event::DiscoverComplete { .. } => {}
-            Event::SuiteStart { .. } => {
+            Event::RunStart { .. } => {
                 self.summary.write_start(&mut self.writer)?;
             }
             Event::CaseStart { name, .. } => {
@@ -59,7 +59,7 @@ impl<W: std::io::Write> super::Notifier for PrettyRunNotifier<W> {
                 }
                 writeln!(self.writer, "{style}{s}{style:#}")?;
             }
-            Event::SuiteComplete { .. } => {
+            Event::RunComplete { .. } => {
                 self.summary.write_complete(&mut self.writer)?;
             }
         }

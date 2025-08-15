@@ -34,7 +34,7 @@ fn discover_case() {
         libtest_json::Event::DiscoverCase {
             name: "Hello\tworld!".to_owned(),
             mode: libtest_json::RunMode::Test,
-            run: true,
+            selected: true,
             elapsed_s: None,
         },
         str![[r#"{"event":"discover_case","name":"Hello\tworld!"}"#]],
@@ -44,11 +44,11 @@ fn discover_case() {
         libtest_json::Event::DiscoverCase {
             name: "Hello\tworld!".to_owned(),
             mode: libtest_json::RunMode::Bench,
-            run: false,
+            selected: false,
             elapsed_s: Some(libtest_json::Elapsed(Default::default())),
         },
         str![[
-            r#"{"event":"discover_case","name":"Hello\tworld!","mode":"bench","run":false,"elapsed_s":"0"}"#
+            r#"{"event":"discover_case","name":"Hello\tworld!","mode":"bench","selected":false,"elapsed_s":"0"}"#
         ]],
     );
 }
@@ -71,14 +71,14 @@ fn discover_complete() {
 #[test]
 fn suite_start() {
     t(
-        libtest_json::Event::SuiteStart { elapsed_s: None },
-        str![[r#"{"event":"suite_start"}"#]],
+        libtest_json::Event::RunStart { elapsed_s: None },
+        str![[r#"{"event":"run_start"}"#]],
     );
     t(
-        libtest_json::Event::SuiteStart {
+        libtest_json::Event::RunStart {
             elapsed_s: Some(libtest_json::Elapsed(Default::default())),
         },
-        str![[r#"{"event":"suite_start","elapsed_s":"0"}"#]],
+        str![[r#"{"event":"run_start","elapsed_s":"0"}"#]],
     );
 }
 
@@ -105,7 +105,6 @@ fn case_complete() {
     t(
         libtest_json::Event::CaseComplete {
             name: "Hello\tworld!".to_owned(),
-            mode: libtest_json::RunMode::Test,
             status: None,
             message: None,
             elapsed_s: None,
@@ -116,13 +115,12 @@ fn case_complete() {
     t(
         libtest_json::Event::CaseComplete {
             name: "Hello\tworld!".to_owned(),
-            mode: libtest_json::RunMode::Bench,
             status: Some(libtest_json::RunStatus::Ignored),
             message: Some("This\tfailed".to_owned()),
             elapsed_s: Some(libtest_json::Elapsed(Default::default())),
         },
         str![[
-            r#"{"event":"case_complete","name":"Hello\tworld!","mode":"bench","status":"ignored","message":"This\tfailed","elapsed_s":"0"}"#
+            r#"{"event":"case_complete","name":"Hello\tworld!","status":"ignored","message":"This\tfailed","elapsed_s":"0"}"#
         ]],
     );
 }
@@ -130,14 +128,14 @@ fn case_complete() {
 #[test]
 fn suite_complete() {
     t(
-        libtest_json::Event::SuiteComplete { elapsed_s: None },
-        str![[r#"{"event":"suite_complete"}"#]],
+        libtest_json::Event::RunComplete { elapsed_s: None },
+        str![[r#"{"event":"run_complete"}"#]],
     );
 
     t(
-        libtest_json::Event::SuiteComplete {
+        libtest_json::Event::RunComplete {
             elapsed_s: Some(libtest_json::Elapsed(Default::default())),
         },
-        str![[r#"{"event":"suite_complete","elapsed_s":"0"}"#]],
+        str![[r#"{"event":"run_complete","elapsed_s":"0"}"#]],
     );
 }
