@@ -5,20 +5,20 @@ use super::OK;
 
 #[derive(Default, Clone, Debug)]
 pub(crate) struct Summary {
-    pub(crate) num_run: usize,
+    num_run: usize,
     /// Number of tests and benchmarks that were filtered out (either by the
     /// filter-in pattern or by `--skip` arguments).
-    pub(crate) num_filtered_out: usize,
+    num_filtered_out: usize,
 
-    pub(crate) failures: std::collections::BTreeMap<String, Option<String>>,
-    pub(crate) elapsed_s: Option<super::Elapsed>,
+    failures: std::collections::BTreeMap<String, Option<String>>,
+    elapsed_s: Option<super::Elapsed>,
 
     /// Number of passed tests.
-    pub(crate) num_passed: usize,
+    num_passed: usize,
     /// Number of failed tests and benchmarks.
-    pub(crate) num_failed: usize,
+    num_failed: usize,
     /// Number of ignored tests and benchmarks.
-    pub(crate) num_ignored: usize,
+    num_ignored: usize,
 }
 
 impl Summary {
