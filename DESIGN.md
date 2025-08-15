@@ -29,6 +29,9 @@ Decisions
 - Always report discovery
   - Allows callers to provide a progress indicator
   - Replaces the need for harnesses to provide statistics
+- Each event carries an `elapsed_s` as an offset from process start
+  - Makes units explicit
+  - Can track duration of any operation
 
 ### Prior Art
 
