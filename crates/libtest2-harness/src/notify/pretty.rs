@@ -31,35 +31,43 @@ impl<W: std::io::Write> super::Notifier for PrettyRunNotifier<W> {
     fn notify(&mut self, event: Event) -> std::io::Result<()> {
         self.summary.notify(event.clone())?;
         match event {
-            Event::DiscoverStart { .. } => {}
-            Event::DiscoverCase { name, selected, .. } => {
-                if selected {
-                    self.name_width = name.len().max(self.name_width);
+            Event::DiscoverStart(_) => {}
+            Event::DiscoverCase(inner) => {
+                if inner.selected {
+                    self.name_width = inner.name.len().max(self.name_width);
                 }
             }
-            Event::DiscoverComplete { .. } => {}
-            Event::RunStart { .. } => {
+            Event::DiscoverComplete(_) => {}
+            Event::RunStart(_) => {
                 self.summary.write_start(&mut self.writer)?;
             }
-            Event::CaseStart { name, .. } => {
+            Event::CaseStart(inner) => {
                 if !self.is_multithreaded {
-                    write!(self.writer, "test {: <1$} ... ", name, self.name_width)?;
+                    write!(
+                        self.writer,
+                        "test {: <1$} ... ",
+                        inner.name, self.name_width
+                    )?;
                     self.writer.flush()?;
                 }
             }
-            Event::CaseComplete { name, status, .. } => {
-                let (s, style) = match status {
+            Event::CaseComplete(inner) => {
+                let (s, style) = match inner.status {
                     Some(RunStatus::Ignored) => ("ignored", IGNORED),
                     Some(RunStatus::Failed) => ("FAILED", FAILED),
                     None => ("ok", OK),
                 };
 
                 if self.is_multithreaded {
-                    write!(self.writer, "test {: <1$} ... ", name, self.name_width)?;
+                    write!(
+                        self.writer,
+                        "test {: <1$} ... ",
+                        inner.name, self.name_width
+                    )?;
                 }
                 writeln!(self.writer, "{style}{s}{style:#}")?;
             }
-            Event::RunComplete { .. } => {
+            Event::RunComplete(_) => {
                 self.summary.write_complete(&mut self.writer)?;
             }
         }

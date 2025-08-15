@@ -5,6 +5,103 @@
     {
       "type": "object",
       "properties": {
+        "event": {
+          "type": "string",
+          "const": "discover_start"
+        }
+      },
+      "$ref": "#/$defs/DiscoverStart",
+      "required": [
+        "event"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "string",
+          "const": "discover_case"
+        }
+      },
+      "$ref": "#/$defs/DiscoverCase",
+      "required": [
+        "event"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "string",
+          "const": "discover_complete"
+        }
+      },
+      "$ref": "#/$defs/DiscoverComplete",
+      "required": [
+        "event"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "string",
+          "const": "run_start"
+        }
+      },
+      "$ref": "#/$defs/RunStart",
+      "required": [
+        "event"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "string",
+          "const": "case_start"
+        }
+      },
+      "$ref": "#/$defs/CaseStart",
+      "required": [
+        "event"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "string",
+          "const": "case_complete"
+        }
+      },
+      "$ref": "#/$defs/CaseComplete",
+      "required": [
+        "event"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "string",
+          "const": "run_complete"
+        }
+      },
+      "$ref": "#/$defs/RunComplete",
+      "required": [
+        "event"
+      ]
+    }
+  ],
+  "$defs": {
+    "Elapsed": {
+      "description": "Time elapsed since process start",
+      "type": "string"
+    },
+    "DiscoverStart": {
+      "type": "object",
+      "properties": {
         "elapsed_s": {
           "anyOf": [
             {
@@ -14,17 +111,17 @@
               "type": "null"
             }
           ]
-        },
-        "event": {
-          "type": "string",
-          "const": "discover_start"
         }
-      },
-      "required": [
-        "event"
+      }
+    },
+    "RunMode": {
+      "type": "string",
+      "enum": [
+        "test",
+        "bench"
       ]
     },
-    {
+    "DiscoverCase": {
       "type": "object",
       "properties": {
         "name": {
@@ -46,18 +143,13 @@
               "type": "null"
             }
           ]
-        },
-        "event": {
-          "type": "string",
-          "const": "discover_case"
         }
       },
       "required": [
-        "event",
         "name"
       ]
     },
-    {
+    "DiscoverComplete": {
       "type": "object",
       "properties": {
         "elapsed_s": {
@@ -69,17 +161,10 @@
               "type": "null"
             }
           ]
-        },
-        "event": {
-          "type": "string",
-          "const": "discover_complete"
         }
-      },
-      "required": [
-        "event"
-      ]
+      }
     },
-    {
+    "RunStart": {
       "type": "object",
       "properties": {
         "elapsed_s": {
@@ -91,17 +176,10 @@
               "type": "null"
             }
           ]
-        },
-        "event": {
-          "type": "string",
-          "const": "run_start"
         }
-      },
-      "required": [
-        "event"
-      ]
+      }
     },
-    {
+    "CaseStart": {
       "type": "object",
       "properties": {
         "name": {
@@ -116,18 +194,20 @@
               "type": "null"
             }
           ]
-        },
-        "event": {
-          "type": "string",
-          "const": "case_start"
         }
       },
       "required": [
-        "event",
         "name"
       ]
     },
-    {
+    "RunStatus": {
+      "type": "string",
+      "enum": [
+        "ignored",
+        "failed"
+      ]
+    },
+    "CaseComplete": {
       "type": "object",
       "properties": {
         "name": {
@@ -159,18 +239,13 @@
               "type": "null"
             }
           ]
-        },
-        "event": {
-          "type": "string",
-          "const": "case_complete"
         }
       },
       "required": [
-        "event",
         "name"
       ]
     },
-    {
+    "RunComplete": {
       "type": "object",
       "properties": {
         "elapsed_s": {
@@ -182,35 +257,8 @@
               "type": "null"
             }
           ]
-        },
-        "event": {
-          "type": "string",
-          "const": "run_complete"
         }
-      },
-      "required": [
-        "event"
-      ]
-    }
-  ],
-  "$defs": {
-    "Elapsed": {
-      "description": "Time elapsed since process start",
-      "type": "string"
-    },
-    "RunMode": {
-      "type": "string",
-      "enum": [
-        "test",
-        "bench"
-      ]
-    },
-    "RunStatus": {
-      "type": "string",
-      "enum": [
-        "ignored",
-        "failed"
-      ]
+      }
     }
   }
 }

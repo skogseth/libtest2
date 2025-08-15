@@ -19,28 +19,24 @@ impl<W: std::io::Write> TerseListNotifier<W> {
 impl<W: std::io::Write> super::Notifier for TerseListNotifier<W> {
     fn notify(&mut self, event: Event) -> std::io::Result<()> {
         match event {
-            Event::DiscoverStart { .. } => {}
-            Event::DiscoverCase {
-                name,
-                mode,
-                selected,
-                ..
-            } => {
-                if selected {
-                    let mode = mode.as_str();
+            Event::DiscoverStart(_) => {}
+            Event::DiscoverCase(inner) => {
+                if inner.selected {
+                    let name = &inner.name;
+                    let mode = inner.mode.as_str();
                     writeln!(self.writer, "{name}: {mode}")?;
                     self.tests += 1;
                 }
             }
-            Event::DiscoverComplete { .. } => {
+            Event::DiscoverComplete(_) => {
                 writeln!(self.writer)?;
                 writeln!(self.writer, "{} tests", self.tests)?;
                 writeln!(self.writer)?;
             }
-            Event::RunStart { .. } => {}
-            Event::CaseStart { .. } => {}
-            Event::CaseComplete { .. } => {}
-            Event::RunComplete { .. } => {}
+            Event::RunStart(_) => {}
+            Event::CaseStart(_) => {}
+            Event::CaseComplete(_) => {}
+            Event::RunComplete(_) => {}
         }
         Ok(())
     }
@@ -65,15 +61,15 @@ impl<W: std::io::Write> super::Notifier for TerseRunNotifier<W> {
     fn notify(&mut self, event: Event) -> std::io::Result<()> {
         self.summary.notify(event.clone())?;
         match event {
-            Event::DiscoverStart { .. } => {}
-            Event::DiscoverCase { .. } => {}
-            Event::DiscoverComplete { .. } => {}
-            Event::RunStart { .. } => {
+            Event::DiscoverStart(_) => {}
+            Event::DiscoverCase(_) => {}
+            Event::DiscoverComplete(_) => {}
+            Event::RunStart(_) => {
                 self.summary.write_start(&mut self.writer)?;
             }
-            Event::CaseStart { .. } => {}
-            Event::CaseComplete { status, .. } => {
-                let (c, style) = match status {
+            Event::CaseStart(_) => {}
+            Event::CaseComplete(inner) => {
+                let (c, style) = match inner.status {
                     Some(RunStatus::Ignored) => ('i', IGNORED),
                     Some(RunStatus::Failed) => ('F', FAILED),
                     None => ('.', OK),
@@ -81,7 +77,7 @@ impl<W: std::io::Write> super::Notifier for TerseRunNotifier<W> {
                 write!(self.writer, "{style}{c}{style:#}")?;
                 self.writer.flush()?;
             }
-            Event::RunComplete { .. } => {
+            Event::RunComplete(_) => {
                 self.summary.write_complete(&mut self.writer)?;
             }
         }

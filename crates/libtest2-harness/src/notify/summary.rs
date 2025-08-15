@@ -87,36 +87,31 @@ impl Summary {
 impl super::Notifier for Summary {
     fn notify(&mut self, event: Event) -> std::io::Result<()> {
         match event {
-            Event::DiscoverStart { .. } => {}
-            Event::DiscoverCase { selected, .. } => {
-                if selected {
+            Event::DiscoverStart(_) => {}
+            Event::DiscoverCase(inner) => {
+                if inner.selected {
                     self.num_run += 1;
                 } else {
                     self.num_filtered_out += 1;
                 }
             }
-            Event::DiscoverComplete { .. } => {}
-            Event::RunStart { .. } => {}
-            Event::CaseStart { .. } => {}
-            Event::CaseComplete {
-                name,
-                status,
-                message,
-                ..
-            } => match status {
+            Event::DiscoverComplete(_) => {}
+            Event::RunStart(_) => {}
+            Event::CaseStart(_) => {}
+            Event::CaseComplete(inner) => match inner.status {
                 Some(RunStatus::Ignored) => {
                     self.num_ignored += 1;
                 }
                 Some(RunStatus::Failed) => {
                     self.num_failed += 1;
-                    self.failures.insert(name, message);
+                    self.failures.insert(inner.name, inner.message);
                 }
                 None => {
                     self.num_passed += 1;
                 }
             },
-            Event::RunComplete { elapsed_s, .. } => {
-                self.elapsed_s = elapsed_s;
+            Event::RunComplete(inner) => {
+                self.elapsed_s = inner.elapsed_s;
             }
         }
         Ok(())

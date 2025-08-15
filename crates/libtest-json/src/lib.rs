@@ -5,7 +5,7 @@
 #![warn(clippy::print_stdout)]
 #![allow(clippy::todo)]
 
-mod event;
+pub mod event;
 
 pub use event::Elapsed;
 pub use event::Event;
