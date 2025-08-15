@@ -20,6 +20,7 @@ use lexarg_error::ErrorContext;
 ///
 /// To parse, see [`TestOptsBuilder`]
 #[derive(Debug, Default)]
+#[non_exhaustive]
 pub struct TestOpts {
     pub list: bool,
     pub filters: Vec<String>,
