@@ -5,6 +5,16 @@
     {
       "type": "object",
       "properties": {
+        "elapsed_s": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Elapsed"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "event": {
           "type": "string",
           "const": "discover_start"
@@ -26,6 +36,16 @@
         "run": {
           "description": "Whether selected to be run by the user",
           "type": "boolean"
+        },
+        "elapsed_s": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Elapsed"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "event": {
           "type": "string",
@@ -62,6 +82,16 @@
     {
       "type": "object",
       "properties": {
+        "elapsed_s": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Elapsed"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "event": {
           "type": "string",
           "const": "suite_start"
@@ -76,6 +106,16 @@
       "properties": {
         "name": {
           "type": "string"
+        },
+        "elapsed_s": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Elapsed"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "event": {
           "type": "string",
@@ -157,15 +197,16 @@
     }
   ],
   "$defs": {
+    "Elapsed": {
+      "description": "Time elapsed since process start",
+      "type": "string"
+    },
     "RunMode": {
       "type": "string",
       "enum": [
         "test",
         "bench"
       ]
-    },
-    "Elapsed": {
-      "type": "string"
     },
     "RunStatus": {
       "type": "string",

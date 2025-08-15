@@ -19,8 +19,10 @@ impl<W: std::io::Write> TerseListNotifier<W> {
 impl<W: std::io::Write> super::Notifier for TerseListNotifier<W> {
     fn notify(&mut self, event: Event) -> std::io::Result<()> {
         match event {
-            Event::DiscoverStart => {}
-            Event::DiscoverCase { name, mode, run } => {
+            Event::DiscoverStart { .. } => {}
+            Event::DiscoverCase {
+                name, mode, run, ..
+            } => {
                 if run {
                     let mode = mode.as_str();
                     writeln!(self.writer, "{name}: {mode}")?;
@@ -32,7 +34,7 @@ impl<W: std::io::Write> super::Notifier for TerseListNotifier<W> {
                 writeln!(self.writer, "{} tests", self.tests)?;
                 writeln!(self.writer)?;
             }
-            Event::SuiteStart => {}
+            Event::SuiteStart { .. } => {}
             Event::CaseStart { .. } => {}
             Event::CaseComplete { .. } => {}
             Event::SuiteComplete { .. } => {}
@@ -60,10 +62,10 @@ impl<W: std::io::Write> super::Notifier for TerseRunNotifier<W> {
     fn notify(&mut self, event: Event) -> std::io::Result<()> {
         self.summary.notify(event.clone())?;
         match event {
-            Event::DiscoverStart => {}
+            Event::DiscoverStart { .. } => {}
             Event::DiscoverCase { .. } => {}
             Event::DiscoverComplete { .. } => {}
-            Event::SuiteStart => {
+            Event::SuiteStart { .. } => {
                 self.summary.write_start(&mut self.writer)?;
             }
             Event::CaseStart { .. } => {}

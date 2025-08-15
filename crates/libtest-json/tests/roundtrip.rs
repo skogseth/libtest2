@@ -17,8 +17,14 @@ fn t(input: libtest_json::Event, snapshot: impl IntoData) {
 #[test]
 fn discover_start() {
     t(
-        libtest_json::Event::DiscoverStart,
+        libtest_json::Event::DiscoverStart { elapsed_s: None },
         str![[r#"{"event":"discover_start"}"#]],
+    );
+    t(
+        libtest_json::Event::DiscoverStart {
+            elapsed_s: Some(libtest_json::Elapsed(Default::default())),
+        },
+        str![[r#"{"event":"discover_start","elapsed_s":"0"}"#]],
     );
 }
 
@@ -29,6 +35,7 @@ fn discover_case() {
             name: "Hello\tworld!".to_owned(),
             mode: libtest_json::RunMode::Test,
             run: true,
+            elapsed_s: None,
         },
         str![[r#"{"event":"discover_case","name":"Hello\tworld!"}"#]],
     );
@@ -38,8 +45,11 @@ fn discover_case() {
             name: "Hello\tworld!".to_owned(),
             mode: libtest_json::RunMode::Bench,
             run: false,
+            elapsed_s: Some(libtest_json::Elapsed(Default::default())),
         },
-        str![[r#"{"event":"discover_case","name":"Hello\tworld!","mode":"bench","run":false}"#]],
+        str![[
+            r#"{"event":"discover_case","name":"Hello\tworld!","mode":"bench","run":false,"elapsed_s":"0"}"#
+        ]],
     );
 }
 
@@ -61,8 +71,14 @@ fn discover_complete() {
 #[test]
 fn suite_start() {
     t(
-        libtest_json::Event::SuiteStart,
+        libtest_json::Event::SuiteStart { elapsed_s: None },
         str![[r#"{"event":"suite_start"}"#]],
+    );
+    t(
+        libtest_json::Event::SuiteStart {
+            elapsed_s: Some(libtest_json::Elapsed(Default::default())),
+        },
+        str![[r#"{"event":"suite_start","elapsed_s":"0"}"#]],
     );
 }
 
@@ -71,8 +87,16 @@ fn case_start() {
     t(
         libtest_json::Event::CaseStart {
             name: "Hello\tworld!".to_owned(),
+            elapsed_s: None,
         },
         str![[r#"{"event":"case_start","name":"Hello\tworld!"}"#]],
+    );
+    t(
+        libtest_json::Event::CaseStart {
+            name: "Hello\tworld!".to_owned(),
+            elapsed_s: Some(libtest_json::Elapsed(Default::default())),
+        },
+        str![[r#"{"event":"case_start","name":"Hello\tworld!","elapsed_s":"0"}"#]],
     );
 }
 

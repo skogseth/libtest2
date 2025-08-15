@@ -87,7 +87,7 @@ impl Summary {
 impl super::Notifier for Summary {
     fn notify(&mut self, event: Event) -> std::io::Result<()> {
         match event {
-            Event::DiscoverStart => {}
+            Event::DiscoverStart { .. } => {}
             Event::DiscoverCase { run, .. } => {
                 if run {
                     self.num_run += 1;
@@ -96,7 +96,7 @@ impl super::Notifier for Summary {
                 }
             }
             Event::DiscoverComplete { .. } => {}
-            Event::SuiteStart => {}
+            Event::SuiteStart { .. } => {}
             Event::CaseStart { .. } => {}
             Event::CaseComplete {
                 name,
