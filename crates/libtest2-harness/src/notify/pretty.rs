@@ -52,7 +52,8 @@ impl<W: std::io::Write> super::Notifier for PrettyRunNotifier<W> {
                 }
             }
             Event::CaseComplete(inner) => {
-                let (s, style) = match inner.status {
+                let status = self.summary.get_status(&inner.name);
+                let (s, style) = match status {
                     Some(RunStatus::Ignored) => ("ignored", IGNORED),
                     Some(RunStatus::Failed) => ("FAILED", FAILED),
                     None => ("ok", OK),

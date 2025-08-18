@@ -69,7 +69,8 @@ impl<W: std::io::Write> super::Notifier for TerseRunNotifier<W> {
             }
             Event::CaseStart(_) => {}
             Event::CaseComplete(inner) => {
-                let (c, style) = match inner.status {
+                let status = self.summary.get_status(&inner.name);
+                let (c, style) = match status {
                     Some(RunStatus::Ignored) => ('i', IGNORED),
                     Some(RunStatus::Failed) => ('F', FAILED),
                     None => ('.', OK),

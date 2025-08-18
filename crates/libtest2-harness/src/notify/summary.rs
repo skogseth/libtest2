@@ -16,6 +16,11 @@ pub(crate) struct Summary {
 }
 
 impl Summary {
+    pub(crate) fn get_status(&self, name: &str) -> Option<RunStatus> {
+        let event = self.status.get(name)?;
+        event.status
+    }
+
     pub(crate) fn write_start(&self, writer: &mut dyn std::io::Write) -> std::io::Result<()> {
         let s = if self.num_run == 1 { "" } else { "s" };
 
