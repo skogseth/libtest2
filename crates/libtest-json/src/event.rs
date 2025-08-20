@@ -397,10 +397,12 @@ impl RunComplete {
     }
 }
 
+#[cfg(feature = "serde")]
 fn true_default() -> bool {
     true
 }
 
+#[cfg(feature = "serde")]
 fn is_true(yes: &bool) -> bool {
     *yes
 }
@@ -423,6 +425,7 @@ impl RunMode {
         }
     }
 
+    #[cfg(any(feature = "serde", feature = "json"))]
     fn is_default(&self) -> bool {
         *self == Default::default()
     }
