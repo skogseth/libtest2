@@ -1,3 +1,4 @@
+use super::event::CaseComplete;
 use super::Event;
 use super::RunStatus;
 use super::FAILED;
@@ -5,25 +6,19 @@ use super::OK;
 
 #[derive(Default, Clone, Debug)]
 pub(crate) struct Summary {
-    pub(crate) failures: std::collections::BTreeMap<String, Option<String>>,
-    pub(crate) elapsed_s: Option<super::Elapsed>,
-
-    pub(crate) num_run: usize,
+    num_run: usize,
     /// Number of tests and benchmarks that were filtered out (either by the
     /// filter-in pattern or by `--skip` arguments).
-    pub(crate) num_filtered_out: usize,
+    num_filtered_out: usize,
 
-    /// Number of passed tests.
-    pub(crate) num_passed: usize,
-    /// Number of failed tests and benchmarks.
-    pub(crate) num_failed: usize,
-    /// Number of ignored tests and benchmarks.
-    pub(crate) num_ignored: usize,
+    status: std::collections::HashMap<String, CaseComplete>,
+    elapsed_s: Option<super::Elapsed>,
 }
 
 impl Summary {
-    pub(crate) fn has_failed(&self) -> bool {
-        0 < self.num_failed
+    pub(crate) fn get_status(&self, name: &str) -> Option<RunStatus> {
+        let event = self.status.get(name)?;
+        event.status
     }
 
     pub(crate) fn write_start(&self, writer: &mut dyn std::io::Write) -> std::io::Result<()> {
@@ -35,24 +30,38 @@ impl Summary {
     }
 
     pub(crate) fn write_complete(&self, writer: &mut dyn ::std::io::Write) -> std::io::Result<()> {
-        let (summary, summary_style) = if self.has_failed() {
+        let mut num_passed = 0;
+        let mut num_failed = 0;
+        let mut num_ignored = 0;
+        let mut failures = std::collections::BTreeMap::new();
+        for event in self.status.values() {
+            match event.status {
+                Some(RunStatus::Ignored) => num_ignored += 1,
+                Some(RunStatus::Failed) => {
+                    num_failed += 1;
+                    failures.insert(&event.name, &event.message);
+                }
+                None => num_passed += 1,
+            }
+        }
+
+        let has_failed = 0 < num_failed;
+
+        let (summary, summary_style) = if has_failed {
             ("FAILED", FAILED)
         } else {
             ("ok", OK)
         };
-        let num_passed = self.num_passed;
-        let num_failed = self.num_failed;
-        let num_ignored = self.num_ignored;
         let num_filtered_out = self.num_filtered_out;
         let elapsed_s = self.elapsed_s;
 
-        if self.has_failed() {
+        if has_failed {
             writeln!(writer)?;
             writeln!(writer, "failures:")?;
             writeln!(writer)?;
 
             // Print messages of all tests
-            for (name, msg) in &self.failures {
+            for (name, msg) in &failures {
                 if let Some(msg) = msg {
                     writeln!(writer, "---- {name} ----")?;
                     writeln!(writer, "{msg}")?;
@@ -63,7 +72,7 @@ impl Summary {
             // Print summary list of failed tests
             writeln!(writer)?;
             writeln!(writer, "failures:")?;
-            for name in self.failures.keys() {
+            for name in failures.keys() {
                 writeln!(writer, "    {name}")?;
             }
         }
@@ -98,18 +107,9 @@ impl super::Notifier for Summary {
             Event::DiscoverComplete(_) => {}
             Event::RunStart(_) => {}
             Event::CaseStart(_) => {}
-            Event::CaseComplete(inner) => match inner.status {
-                Some(RunStatus::Ignored) => {
-                    self.num_ignored += 1;
-                }
-                Some(RunStatus::Failed) => {
-                    self.num_failed += 1;
-                    self.failures.insert(inner.name, inner.message);
-                }
-                None => {
-                    self.num_passed += 1;
-                }
-            },
+            Event::CaseComplete(inner) => {
+                self.status.insert(inner.name.clone(), inner);
+            }
             Event::RunComplete(inner) => {
                 self.elapsed_s = inner.elapsed_s;
             }
