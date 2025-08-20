@@ -203,8 +203,8 @@
     "RunStatus": {
       "type": "string",
       "enum": [
-        "ignored",
-        "failed"
+        "failed",
+        "ignored"
       ]
     },
     "CaseComplete": {

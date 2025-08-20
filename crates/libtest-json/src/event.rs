@@ -431,20 +431,21 @@ impl RunMode {
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
 pub enum RunStatus {
-    Ignored,
+    // Highest precedent items for determining test status last
     Failed,
+    Ignored,
 }
 
 impl RunStatus {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::Ignored => "ignored",
             Self::Failed => "failed",
+            Self::Ignored => "ignored",
         }
     }
 }
