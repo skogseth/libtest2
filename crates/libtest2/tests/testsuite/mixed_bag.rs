@@ -9,40 +9,40 @@ fn test_cmd() -> snapbox::cmd::Command {
             r#"
 libtest2::libtest2_main!(cat, dog, fox, bunny, frog, owl, fly, bear);
 
-fn cat(_state: &libtest2::State) -> libtest2::RunResult {
+fn cat(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 
-fn dog(_state: &libtest2::State) -> libtest2::RunResult {
+fn dog(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Err(libtest2::RunError::fail("was not a good boy"))
 }
 
-fn fox(_state: &libtest2::State) -> libtest2::RunResult {
+fn fox(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 
-fn bunny(state: &libtest2::State) -> libtest2::RunResult {
-    state.ignore_for("fails")?;
+fn bunny(context: &libtest2::TestContext) -> libtest2::RunResult {
+    context.ignore_for("fails")?;
     Err(libtest2::RunError::fail("jumped too high"))
 }
 
-fn frog(state: &libtest2::State) -> libtest2::RunResult {
-    state.ignore_for("slow")?;
+fn frog(context: &libtest2::TestContext) -> libtest2::RunResult {
+    context.ignore_for("slow")?;
     Ok(())
 }
 
-fn owl(state: &libtest2::State) -> libtest2::RunResult {
-    state.ignore_for("fails")?;
+fn owl(context: &libtest2::TestContext) -> libtest2::RunResult {
+    context.ignore_for("fails")?;
     Err(libtest2::RunError::fail("broke neck"))
 }
 
-fn fly(state: &libtest2::State) -> libtest2::RunResult {
-    state.ignore_for("fails")?;
+fn fly(context: &libtest2::TestContext) -> libtest2::RunResult {
+    context.ignore_for("fails")?;
     Ok(())
 }
 
-fn bear(state: &libtest2::State) -> libtest2::RunResult {
-    state.ignore_for("fails")?;
+fn bear(context: &libtest2::TestContext) -> libtest2::RunResult {
+    context.ignore_for("fails")?;
     Err(libtest2::RunError::fail("no honey"))
 }
 "#,

@@ -26,16 +26,16 @@
 #![allow(clippy::todo)]
 
 mod case;
+mod context;
 mod harness;
 mod notify;
-mod state;
 
 pub mod cli;
 
 pub use case::*;
+pub use context::*;
 pub use harness::*;
 pub use notify::RunMode;
-pub use state::*;
 
 #[doc = include_str!("../README.md")]
 #[cfg(doctest)]

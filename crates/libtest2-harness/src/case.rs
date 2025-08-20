@@ -10,9 +10,9 @@ pub trait Case: Send + Sync + 'static {
     fn kind(&self) -> TestKind;
     fn source(&self) -> Option<&Source>;
     /// This case cannot run in parallel to other cases within this binary
-    fn exclusive(&self, state: &State) -> bool;
+    fn exclusive(&self, state: &TestContext) -> bool;
 
-    fn run(&self, state: &State) -> Result<(), RunError>;
+    fn run(&self, state: &TestContext) -> Result<(), RunError>;
 }
 
 /// Type of the test according to the [rust book](https://doc.rust-lang.org/cargo/guide/tests.html)

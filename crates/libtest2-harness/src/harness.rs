@@ -1,6 +1,6 @@
 use libtest_lexarg::OutputFormat;
 
-use crate::{cli, notify, Case, RunError, RunMode, State};
+use crate::{cli, notify, Case, RunError, RunMode, TestContext};
 
 pub struct Harness {
     raw: std::io::Result<Vec<std::ffi::OsString>>,
@@ -275,7 +275,7 @@ fn run(
 
     let threads = opts.test_threads.map(|t| t.get()).unwrap_or(1);
 
-    let mut state = State::new();
+    let mut context = TestContext::new();
     let run_ignored = match opts.run_ignored {
         libtest_lexarg::RunIgnored::Yes | libtest_lexarg::RunIgnored::Only => true,
         libtest_lexarg::RunIgnored::No => false,
@@ -290,9 +290,9 @@ fn run(
         (false, true) => RunMode::Bench,
         (false, false) => unreachable!("libtest-lexarg` should always ensure at least one is set"),
     };
-    state.set_mode(mode);
-    state.set_run_ignored(run_ignored);
-    let state = std::sync::Arc::new(state);
+    context.set_mode(mode);
+    context.set_run_ignored(run_ignored);
+    let context = std::sync::Arc::new(context);
 
     let mut success = true;
 
@@ -301,7 +301,7 @@ fn run(
     } else {
         cases
             .into_iter()
-            .partition::<Vec<_>, _>(|c| c.exclusive(&state))
+            .partition::<Vec<_>, _>(|c| c.exclusive(&context))
     };
     if !concurrent_cases.is_empty() {
         notifier.threaded(true);
@@ -355,14 +355,14 @@ fn run(
                 let tx = tx.clone();
                 let case = std::sync::Arc::new(case);
                 let case_fallback = case.clone();
-                let state = state.clone();
-                let state_fallback = state.clone();
+                let context = context.clone();
+                let context_fallback = context.clone();
                 let sync_success = sync_success.clone();
                 let sync_success_fallback = sync_success.clone();
                 let join_handle = cfg.spawn(move || {
                     let mut notifier = SenderNotifier { tx: tx.clone() };
                     let case_success =
-                        run_case(&start, case.as_ref().as_ref(), &state, &mut notifier)
+                        run_case(&start, case.as_ref().as_ref(), &context, &mut notifier)
                             .expect("`SenderNotifier` is infallible");
                     if !case_success {
                         sync_success.store(case_success, std::sync::atomic::Ordering::Relaxed);
@@ -379,7 +379,7 @@ fn run(
                         let case_success = run_case(
                             &start,
                             case_fallback.as_ref().as_ref(),
-                            &state_fallback,
+                            &context_fallback,
                             notifier,
                         )
                         .expect("`SenderNotifier` is infallible");
@@ -411,7 +411,7 @@ fn run(
     if !exclusive_cases.is_empty() {
         notifier.threaded(false);
         for case in exclusive_cases {
-            success &= run_case(start, case.as_ref(), &state, notifier)?;
+            success &= run_case(start, case.as_ref(), &context, notifier)?;
             if !success && opts.fail_fast {
                 break;
             }
@@ -431,7 +431,7 @@ fn run(
 fn run_case(
     start: &std::time::Instant,
     case: &dyn Case,
-    state: &State,
+    context: &TestContext,
     notifier: &mut dyn notify::Notifier,
 ) -> std::io::Result<bool> {
     notifier.notify(
@@ -443,7 +443,7 @@ fn run_case(
     )?;
 
     let outcome = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        __rust_begin_short_backtrace(|| case.run(state))
+        __rust_begin_short_backtrace(|| case.run(context))
     }))
     .unwrap_or_else(|e| {
         // The `panic` information is just an `Any` object representing the

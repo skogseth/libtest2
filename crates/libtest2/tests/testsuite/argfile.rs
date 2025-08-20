@@ -9,19 +9,19 @@ fn test_cmd() -> snapbox::cmd::Command {
             r#"
 libtest2::libtest2_main!(one, two, three, one_two);
 
-fn one(_state: &libtest2::State) -> libtest2::RunResult {
+fn one(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 
-fn two(_state: &libtest2::State) -> libtest2::RunResult {
+fn two(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 
-fn three(_state: &libtest2::State) -> libtest2::RunResult {
+fn three(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 
-fn one_two(_state: &libtest2::State) -> libtest2::RunResult {
+fn one_two(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 "#,
