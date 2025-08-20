@@ -38,17 +38,17 @@ impl Summary {
             let mut status = find_run_status(case_status);
             if !case_status.started {
                 // Even override `Ignored`
-                status = Some(MessageKind::Failed);
+                status = Some(MessageKind::Error);
                 failures.insert(name, Some("test found that never started"));
             }
             if !case_status.completed {
                 // Even override `Ignored`
-                status = Some(MessageKind::Failed);
+                status = Some(MessageKind::Error);
                 failures.insert(name, Some("test never completed"));
             }
             match status {
                 Some(MessageKind::Ignored) => num_ignored += 1,
-                Some(MessageKind::Failed) => {
+                Some(MessageKind::Error) => {
                     num_failed += 1;
                     for event in &case_status.messages {
                         if Some(event.kind) == status {

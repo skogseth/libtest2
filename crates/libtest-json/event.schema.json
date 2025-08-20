@@ -216,7 +216,7 @@
     "MessageKind": {
       "type": "string",
       "enum": [
-        "failed",
+        "error",
         "ignored"
       ]
     },

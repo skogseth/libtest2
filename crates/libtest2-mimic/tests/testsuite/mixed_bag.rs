@@ -1213,7 +1213,7 @@ fn fail_fast_json() {
   {
     "event": "case_message",
     "name": "dog",
-    "kind": "failed",
+    "kind": "error",
     "message": "was not a good boy",
     "elapsed_s": "[..]"
   },

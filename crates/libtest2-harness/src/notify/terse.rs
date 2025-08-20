@@ -74,7 +74,7 @@ impl<W: std::io::Write> super::Notifier for TerseRunNotifier<W> {
                 let status = self.summary.get_kind(&inner.name);
                 let (c, style) = match status {
                     Some(MessageKind::Ignored) => ('i', IGNORED),
-                    Some(MessageKind::Failed) => ('F', FAILED),
+                    Some(MessageKind::Error) => ('F', FAILED),
                     None => ('.', OK),
                 };
                 write!(self.writer, "{style}{c}{style:#}")?;

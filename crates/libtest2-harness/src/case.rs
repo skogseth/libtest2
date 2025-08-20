@@ -60,7 +60,7 @@ pub struct RunError {
 impl RunError {
     pub fn with_cause(cause: impl std::error::Error + Send + Sync + 'static) -> Self {
         Self {
-            status: notify::MessageKind::Failed,
+            status: notify::MessageKind::Error,
             cause: Some(Box::new(cause)),
         }
     }

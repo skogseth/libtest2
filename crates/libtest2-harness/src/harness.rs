@@ -317,7 +317,7 @@ fn run(
                 notifier: &mut dyn notify::Notifier,
             ) -> std::io::Result<()> {
                 if self.join_handle.join().is_err() {
-                    let kind = notify::MessageKind::Failed;
+                    let kind = notify::MessageKind::Error;
                     let message = Some("panicked after reporting success".to_owned());
                     notifier.notify(
                         notify::event::CaseMessage {
@@ -485,7 +485,7 @@ fn run_case(
         .into(),
     )?;
 
-    Ok(case_status != Some(notify::MessageKind::Failed))
+    Ok(case_status != Some(notify::MessageKind::Error))
 }
 
 /// Fixed frame used to clean the backtrace with `RUST_BACKTRACE=1`.

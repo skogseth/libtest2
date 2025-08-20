@@ -56,7 +56,7 @@ impl<W: std::io::Write> super::Notifier for PrettyRunNotifier<W> {
                 let status = self.summary.get_kind(&inner.name);
                 let (s, style) = match status {
                     Some(MessageKind::Ignored) => ("ignored", IGNORED),
-                    Some(MessageKind::Failed) => ("FAILED", FAILED),
+                    Some(MessageKind::Error) => ("FAILED", FAILED),
                     None => ("ok", OK),
                 };
 

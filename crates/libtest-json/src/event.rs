@@ -481,14 +481,14 @@ impl RunMode {
 #[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
 pub enum MessageKind {
     // Highest precedent items for determining test status last
-    Failed,
+    Error,
     Ignored,
 }
 
 impl MessageKind {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::Failed => "failed",
+            Self::Error => "error",
             Self::Ignored => "ignored",
         }
     }
