@@ -367,17 +367,6 @@ impl CaseMessage {
 #[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
 pub struct CaseComplete {
     pub name: String,
-    /// `None` means success
-    #[cfg_attr(
-        feature = "serde",
-        serde(default, skip_serializing_if = "Option::is_none")
-    )]
-    pub status: Option<RunStatus>,
-    #[cfg_attr(
-        feature = "serde",
-        serde(default, skip_serializing_if = "Option::is_none")
-    )]
-    pub message: Option<String>,
     #[cfg_attr(
         feature = "serde",
         serde(default, skip_serializing_if = "Option::is_none")
@@ -401,20 +390,6 @@ impl CaseComplete {
         buffer.key("name").unwrap();
         buffer.keyval_sep().unwrap();
         buffer.value(&self.name).unwrap();
-
-        if let Some(status) = self.status {
-            buffer.val_sep().unwrap();
-            buffer.key("status").unwrap();
-            buffer.keyval_sep().unwrap();
-            buffer.value(status.as_str()).unwrap();
-        }
-
-        if let Some(message) = &self.message {
-            buffer.val_sep().unwrap();
-            buffer.key("message").unwrap();
-            buffer.keyval_sep().unwrap();
-            buffer.value(message).unwrap();
-        }
 
         if let Some(elapsed_s) = self.elapsed_s {
             buffer.val_sep().unwrap();

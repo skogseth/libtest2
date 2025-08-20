@@ -257,23 +257,6 @@
         "name": {
           "type": "string"
         },
-        "status": {
-          "description": "`None` means success",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/RunStatus"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "message": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "elapsed_s": {
           "anyOf": [
             {

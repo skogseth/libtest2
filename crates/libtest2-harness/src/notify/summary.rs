@@ -132,18 +132,6 @@ impl super::Notifier for Summary {
                     .push(inner);
             }
             Event::CaseComplete(inner) => {
-                if let Some(status) = inner.status {
-                    self.status
-                        .entry(inner.name.clone())
-                        .or_default()
-                        .messages
-                        .push(CaseMessage {
-                            name: inner.name.clone(),
-                            status,
-                            message: inner.message.clone(),
-                            elapsed_s: inner.elapsed_s,
-                        });
-                }
                 self.status.entry(inner.name).or_default().completed = true;
             }
             Event::RunComplete(inner) => {

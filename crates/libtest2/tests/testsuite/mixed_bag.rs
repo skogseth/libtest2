@@ -905,10 +905,15 @@ fn test_json() {
     "elapsed_s": "[..]"
   },
   {
-    "event": "case_complete",
+    "event": "case_message",
     "name": "bear",
     "status": "ignored",
     "message": "fails",
+    "elapsed_s": "[..]"
+  },
+  {
+    "event": "case_complete",
+    "name": "bear",
     "elapsed_s": "[..]"
   },
   {
@@ -934,13 +939,6 @@ fn test_json() {
   {
     "elapsed_s": "[..]",
     "event": "discover_complete"
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "case_complete",
-    "message": "fails",
-    "name": "bear",
-    "status": "ignored"
   },
   {
     "elapsed_s": "[..]",
@@ -1013,6 +1011,18 @@ fn test_json() {
     "event": "discover_case",
     "name": "owl",
     "selected": false,
+    "elapsed_s": "[..]"
+  },
+  {
+    "event": "case_message",
+    "name": "bear",
+    "status": "ignored",
+    "message": "fails",
+    "elapsed_s": "[..]"
+  },
+  {
+    "event": "case_complete",
+    "name": "bear",
     "elapsed_s": "[..]"
   }
 ]
@@ -1164,25 +1174,35 @@ fn fail_fast_json() {
     "elapsed_s": "[..]"
   },
   {
-    "event": "case_complete",
+    "event": "case_message",
     "name": "bear",
     "status": "ignored",
     "message": "fails",
     "elapsed_s": "[..]"
   },
   {
+    "event": "case_complete",
+    "name": "bear",
+    "elapsed_s": "[..]"
+  },
+  {
     "event": "case_start",
     "name": "bunny",
     "elapsed_s": "[..]"
   },
   {
-    "event": "case_complete",
+    "event": "case_message",
     "name": "bunny",
     "status": "ignored",
     "message": "fails",
     "elapsed_s": "[..]"
   },
   {
+    "event": "case_complete",
+    "name": "bunny",
+    "elapsed_s": "[..]"
+  },
+  {
     "event": "case_start",
     "name": "cat",
     "elapsed_s": "[..]"
@@ -1198,10 +1218,15 @@ fn fail_fast_json() {
     "elapsed_s": "[..]"
   },
   {
-    "event": "case_complete",
+    "event": "case_message",
     "name": "dog",
     "status": "failed",
     "message": "was not a good boy",
+    "elapsed_s": "[..]"
+  },
+  {
+    "event": "case_complete",
+    "name": "dog",
     "elapsed_s": "[..]"
   },
   {
