@@ -1,5 +1,5 @@
 use super::Event;
-use super::RunStatus;
+use super::MessageKind;
 use super::FAILED;
 use super::IGNORED;
 use super::OK;
@@ -71,10 +71,10 @@ impl<W: std::io::Write> super::Notifier for TerseRunNotifier<W> {
             Event::CaseStart(_) => {}
             Event::CaseMessage(_) => {}
             Event::CaseComplete(inner) => {
-                let status = self.summary.get_status(&inner.name);
+                let status = self.summary.get_kind(&inner.name);
                 let (c, style) = match status {
-                    Some(RunStatus::Ignored) => ('i', IGNORED),
-                    Some(RunStatus::Failed) => ('F', FAILED),
+                    Some(MessageKind::Ignored) => ('i', IGNORED),
+                    Some(MessageKind::Failed) => ('F', FAILED),
                     None => ('.', OK),
                 };
                 write!(self.writer, "{style}{c}{style:#}")?;

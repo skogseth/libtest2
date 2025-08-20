@@ -1,5 +1,5 @@
 use super::Event;
-use super::RunStatus;
+use super::MessageKind;
 use super::FAILED;
 use super::IGNORED;
 use super::OK;
@@ -53,10 +53,10 @@ impl<W: std::io::Write> super::Notifier for PrettyRunNotifier<W> {
             }
             Event::CaseMessage(_) => {}
             Event::CaseComplete(inner) => {
-                let status = self.summary.get_status(&inner.name);
+                let status = self.summary.get_kind(&inner.name);
                 let (s, style) = match status {
-                    Some(RunStatus::Ignored) => ("ignored", IGNORED),
-                    Some(RunStatus::Failed) => ("FAILED", FAILED),
+                    Some(MessageKind::Ignored) => ("ignored", IGNORED),
+                    Some(MessageKind::Failed) => ("FAILED", FAILED),
                     None => ("ok", OK),
                 };
 

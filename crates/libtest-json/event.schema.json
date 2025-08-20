@@ -213,7 +213,7 @@
         "name"
       ]
     },
-    "RunStatus": {
+    "MessageKind": {
       "type": "string",
       "enum": [
         "failed",
@@ -226,8 +226,8 @@
         "name": {
           "type": "string"
         },
-        "status": {
-          "$ref": "#/$defs/RunStatus"
+        "kind": {
+          "$ref": "#/$defs/MessageKind"
         },
         "message": {
           "type": [
@@ -248,7 +248,7 @@
       },
       "required": [
         "name",
-        "status"
+        "kind"
       ]
     },
     "CaseComplete": {

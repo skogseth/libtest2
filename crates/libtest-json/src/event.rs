@@ -306,7 +306,7 @@ impl CaseStart {
 #[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
 pub struct CaseMessage {
     pub name: String,
-    pub status: RunStatus,
+    pub kind: MessageKind,
     #[cfg_attr(
         feature = "serde",
         serde(default, skip_serializing_if = "Option::is_none")
@@ -337,9 +337,9 @@ impl CaseMessage {
         buffer.value(&self.name).unwrap();
 
         buffer.val_sep().unwrap();
-        buffer.key("status").unwrap();
+        buffer.key("kind").unwrap();
         buffer.keyval_sep().unwrap();
-        buffer.value(self.status.as_str()).unwrap();
+        buffer.value(self.kind.as_str()).unwrap();
 
         if let Some(message) = &self.message {
             buffer.val_sep().unwrap();
@@ -479,13 +479,13 @@ impl RunMode {
 #[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
-pub enum RunStatus {
+pub enum MessageKind {
     // Highest precedent items for determining test status last
     Failed,
     Ignored,
 }
 
-impl RunStatus {
+impl MessageKind {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Failed => "failed",

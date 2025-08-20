@@ -106,23 +106,21 @@ fn case_message() {
     t(
         libtest_json::event::CaseMessage {
             name: "Hello\tworld!".to_owned(),
-            status: libtest_json::RunStatus::Failed,
+            kind: libtest_json::MessageKind::Failed,
             message: None,
             elapsed_s: None,
         },
-        str![[r#"{"event":"case_message","name":"Hello\tworld!","status":"failed"}"#]],
+        str![[r#"{"event":"case_message","name":"Hello\tworld!","kind":"failed"}"#]],
     );
 
     t(
         libtest_json::event::CaseMessage {
             name: "Hello\tworld!".to_owned(),
-            status: libtest_json::RunStatus::Ignored,
+            kind: libtest_json::MessageKind::Ignored,
             message: Some("This\tfailed".to_owned()),
             elapsed_s: Some(libtest_json::Elapsed(Default::default())),
         },
-        str![[
-            r#"{"event":"case_message","name":"Hello\tworld!","status":"ignored","message":"This\tfailed","elapsed_s":"0"}"#
-        ]],
+        str![[r#"{"event":"case_message","name":"Hello\tworld!","kind":"ignored","message":"This\tfailed","elapsed_s":"0"}"#]],
     );
 }
 

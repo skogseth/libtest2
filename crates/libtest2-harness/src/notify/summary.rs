@@ -1,6 +1,6 @@
 use super::event::CaseMessage;
 use super::Event;
-use super::RunStatus;
+use super::MessageKind;
 use super::FAILED;
 use super::OK;
 
@@ -16,7 +16,7 @@ pub(crate) struct Summary {
 }
 
 impl Summary {
-    pub(crate) fn get_status(&self, name: &str) -> Option<RunStatus> {
+    pub(crate) fn get_kind(&self, name: &str) -> Option<MessageKind> {
         let status = self.status.get(name)?;
         find_run_status(status)
     }
@@ -38,20 +38,20 @@ impl Summary {
             let mut status = find_run_status(case_status);
             if !case_status.started {
                 // Even override `Ignored`
-                status = Some(RunStatus::Failed);
+                status = Some(MessageKind::Failed);
                 failures.insert(name, Some("test found that never started"));
             }
             if !case_status.completed {
                 // Even override `Ignored`
-                status = Some(RunStatus::Failed);
+                status = Some(MessageKind::Failed);
                 failures.insert(name, Some("test never completed"));
             }
             match status {
-                Some(RunStatus::Ignored) => num_ignored += 1,
-                Some(RunStatus::Failed) => {
+                Some(MessageKind::Ignored) => num_ignored += 1,
+                Some(MessageKind::Failed) => {
                     num_failed += 1;
                     for event in &case_status.messages {
-                        if Some(event.status) == status {
+                        if Some(event.kind) == status {
                             failures.insert(name, event.message.as_deref());
                         }
                     }
@@ -142,10 +142,10 @@ impl super::Notifier for Summary {
     }
 }
 
-fn find_run_status(case_status: &CaseStatus) -> Option<RunStatus> {
+fn find_run_status(case_status: &CaseStatus) -> Option<MessageKind> {
     let mut status = None;
     for event in &case_status.messages {
-        status = status.max(Some(event.status));
+        status = status.max(Some(event.kind));
     }
     status
 }

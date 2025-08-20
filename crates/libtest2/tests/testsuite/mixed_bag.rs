@@ -907,7 +907,7 @@ fn test_json() {
   {
     "event": "case_message",
     "name": "bear",
-    "status": "ignored",
+    "kind": "ignored",
     "message": "fails",
     "elapsed_s": "[..]"
   },
@@ -1014,15 +1014,15 @@ fn test_json() {
     "elapsed_s": "[..]"
   },
   {
-    "event": "case_message",
+    "event": "case_complete",
     "name": "bear",
-    "status": "ignored",
-    "message": "fails",
     "elapsed_s": "[..]"
   },
   {
-    "event": "case_complete",
+    "event": "case_message",
     "name": "bear",
+    "kind": "ignored",
+    "message": "fails",
     "elapsed_s": "[..]"
   }
 ]
@@ -1176,7 +1176,7 @@ fn fail_fast_json() {
   {
     "event": "case_message",
     "name": "bear",
-    "status": "ignored",
+    "kind": "ignored",
     "message": "fails",
     "elapsed_s": "[..]"
   },
@@ -1193,7 +1193,7 @@ fn fail_fast_json() {
   {
     "event": "case_message",
     "name": "bunny",
-    "status": "ignored",
+    "kind": "ignored",
     "message": "fails",
     "elapsed_s": "[..]"
   },
@@ -1220,7 +1220,7 @@ fn fail_fast_json() {
   {
     "event": "case_message",
     "name": "dog",
-    "status": "failed",
+    "kind": "failed",
     "message": "was not a good boy",
     "elapsed_s": "[..]"
   },

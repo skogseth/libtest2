@@ -53,14 +53,14 @@ pub type RunResult = Result<(), RunError>;
 
 #[derive(Debug)]
 pub struct RunError {
-    status: notify::RunStatus,
+    status: notify::MessageKind,
     cause: Option<Box<dyn std::error::Error + Send + Sync + 'static>>,
 }
 
 impl RunError {
     pub fn with_cause(cause: impl std::error::Error + Send + Sync + 'static) -> Self {
         Self {
-            status: notify::RunStatus::Failed,
+            status: notify::MessageKind::Failed,
             cause: Some(Box::new(cause)),
         }
     }
@@ -71,19 +71,19 @@ impl RunError {
 
     pub(crate) fn ignore() -> Self {
         Self {
-            status: notify::RunStatus::Ignored,
+            status: notify::MessageKind::Ignored,
             cause: None,
         }
     }
 
     pub(crate) fn ignore_for(reason: String) -> Self {
         Self {
-            status: notify::RunStatus::Ignored,
+            status: notify::MessageKind::Ignored,
             cause: Some(Box::new(Message(reason))),
         }
     }
 
-    pub(crate) fn status(&self) -> notify::RunStatus {
+    pub(crate) fn status(&self) -> notify::MessageKind {
         self.status
     }
 

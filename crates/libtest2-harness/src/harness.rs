@@ -317,12 +317,12 @@ fn run(
                 notifier: &mut dyn notify::Notifier,
             ) -> std::io::Result<()> {
                 if self.join_handle.join().is_err() {
-                    let status = notify::RunStatus::Failed;
+                    let kind = notify::MessageKind::Failed;
                     let message = Some("panicked after reporting success".to_owned());
                     notifier.notify(
                         notify::event::CaseMessage {
                             name: event.name.clone(),
-                            status,
+                            kind,
                             message,
                             elapsed_s: Some(notify::Elapsed(start.elapsed())),
                         }
@@ -463,13 +463,13 @@ fn run_case(
 
     let mut case_status = None;
     if let Some(err) = outcome.as_ref().err() {
-        let status = err.status();
-        case_status = Some(status);
+        let kind = err.status();
+        case_status = Some(kind);
         let message = err.cause().map(|c| c.to_string());
         notifier.notify(
             notify::event::CaseMessage {
                 name: case.name().to_owned(),
-                status,
+                kind,
                 message,
                 elapsed_s: Some(notify::Elapsed(start.elapsed())),
             }
@@ -485,7 +485,7 @@ fn run_case(
         .into(),
     )?;
 
-    Ok(case_status != Some(notify::RunStatus::Failed))
+    Ok(case_status != Some(notify::MessageKind::Failed))
 }
 
 /// Fixed frame used to clean the backtrace with `RUST_BACKTRACE=1`.

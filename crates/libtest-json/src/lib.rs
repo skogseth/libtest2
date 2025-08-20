@@ -9,8 +9,8 @@ pub mod event;
 
 pub use event::Elapsed;
 pub use event::Event;
+pub use event::MessageKind;
 pub use event::RunMode;
-pub use event::RunStatus;
 
 #[doc = include_str!("../README.md")]
 #[cfg(doctest)]
