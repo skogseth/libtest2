@@ -14,7 +14,7 @@
 #![warn(missing_debug_implementations, elided_lifetimes_in_paths)]
 
 use lexarg::Arg;
-use lexarg_error::ErrorContext;
+use lexarg_error::LexError;
 
 /// Parsed command-line options
 ///
@@ -174,7 +174,7 @@ impl TestOptsBuilder {
         &mut self,
         parser: &mut lexarg::Parser<'a>,
         arg: Arg<'a>,
-    ) -> Result<Option<Arg<'a>>, ErrorContext<'a>> {
+    ) -> Result<Option<Arg<'a>>, LexError<'a>> {
         use lexarg::prelude::*;
 
         match arg {
@@ -257,7 +257,7 @@ impl TestOptsBuilder {
                     .string("FEATURE")
                     .within(arg)?;
                 if !is_nightly() {
-                    return Err(ErrorContext::msg("expected nightly compiler").unexpected(arg));
+                    return Err(LexError::msg("expected nightly compiler").unexpected(arg));
                 }
                 // Don't validate `feature` as other parsers might provide values
                 self.opts.allowed_unstable.push(feature.to_owned());
@@ -274,7 +274,7 @@ impl TestOptsBuilder {
     }
 
     /// Finish parsing, resolving to [`TestOpts`]
-    pub fn finish(mut self) -> Result<TestOpts, ErrorContext<'static>> {
+    pub fn finish(mut self) -> Result<TestOpts, LexError<'static>> {
         let allow_unstable_options = self
             .opts
             .allowed_unstable
@@ -282,9 +282,7 @@ impl TestOptsBuilder {
             .any(|f| f == UNSTABLE_OPTIONS);
 
         if self.format.is_some() && !allow_unstable_options {
-            return Err(ErrorContext::msg(
-                "`--format` requires `-Zunstable-options`",
-            ));
+            return Err(LexError::msg("`--format` requires `-Zunstable-options`"));
         }
         if let Some(format) = self.format {
             self.opts.format = format;
@@ -296,7 +294,7 @@ impl TestOptsBuilder {
 
         self.opts.run_ignored = match (self.include_ignored, self.ignored) {
             (true, true) => {
-                return Err(ErrorContext::msg(
+                return Err(LexError::msg(
                     "`--include-ignored` and `--ignored` are mutually exclusive",
                 ))
             }

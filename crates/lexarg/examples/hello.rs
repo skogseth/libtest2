@@ -1,4 +1,4 @@
-use lexarg::ErrorContext;
+use lexarg::LexError;
 use lexarg::Result;
 
 struct Args {
@@ -40,15 +40,13 @@ fn parse_args() -> Result<Args> {
                 std::process::exit(0);
             }
             Unexpected(_) => {
-                return Err(ErrorContext::msg("unexpected value")
+                return Err(LexError::msg("unexpected value")
                     .unexpected(arg)
                     .within(prev_arg)
                     .into());
             }
             _ => {
-                return Err(ErrorContext::msg("unexpected argument")
-                    .unexpected(arg)
-                    .into());
+                return Err(LexError::msg("unexpected argument").unexpected(arg).into());
             }
         }
         prev_arg = arg;

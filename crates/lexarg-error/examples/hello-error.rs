@@ -1,4 +1,4 @@
-use lexarg_error::ErrorContext;
+use lexarg_error::LexError;
 
 struct Args {
     thing: String,
@@ -23,21 +23,21 @@ fn parse_args() -> Result<Args, String> {
         match arg {
             Short("n") | Long("number") => {
                 let value = parser.next_flag_value().ok_or_else(|| {
-                    ErrorContext::msg("missing required value")
+                    LexError::msg("missing required value")
                         .within(arg)
                         .to_string()
                 })?;
                 number = value
                     .to_str()
                     .ok_or_else(|| {
-                        ErrorContext::msg("invalid number")
+                        LexError::msg("invalid number")
                             .unexpected(Value(value))
                             .within(arg)
                             .to_string()
                     })?
                     .parse()
                     .map_err(|e| {
-                        ErrorContext::msg(e)
+                        LexError::msg(e)
                             .unexpected(Value(value))
                             .within(arg)
                             .to_string()
@@ -47,18 +47,17 @@ fn parse_args() -> Result<Args, String> {
                 shout = true;
             }
             Value(val) if thing.is_none() => {
-                thing = Some(val.to_str().ok_or_else(|| {
-                    ErrorContext::msg("invalid string")
-                        .unexpected(arg)
-                        .to_string()
-                })?);
+                thing =
+                    Some(val.to_str().ok_or_else(|| {
+                        LexError::msg("invalid string").unexpected(arg).to_string()
+                    })?);
             }
             Short("h") | Long("help") => {
                 println!("Usage: hello [-n|--number=NUM] [--shout] THING");
                 std::process::exit(0);
             }
             _ => {
-                return Err(ErrorContext::msg("unexpected argument")
+                return Err(LexError::msg("unexpected argument")
                     .unexpected(arg)
                     .to_string());
             }
@@ -68,7 +67,7 @@ fn parse_args() -> Result<Args, String> {
     Ok(Args {
         thing: thing
             .ok_or_else(|| {
-                ErrorContext::msg("missing argument THING")
+                LexError::msg("missing argument THING")
                     .within(Value(bin_name))
                     .to_string()
             })?

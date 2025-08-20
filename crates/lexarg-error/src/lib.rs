@@ -17,13 +17,13 @@
 
 /// Collect context for creating an error
 #[derive(Debug)]
-pub struct ErrorContext<'a> {
+pub struct LexError<'a> {
     msg: String,
     within: Option<lexarg_parser::Arg<'a>>,
     unexpected: Option<lexarg_parser::Arg<'a>>,
 }
 
-impl<'a> ErrorContext<'a> {
+impl<'a> LexError<'a> {
     /// Create a new error object from a printable error message.
     #[cold]
     pub fn msg<M>(message: M) -> Self
@@ -52,7 +52,7 @@ impl<'a> ErrorContext<'a> {
     }
 }
 
-impl<E> From<E> for ErrorContext<'_>
+impl<E> From<E> for LexError<'_>
 where
     E: std::error::Error + Send + Sync + 'static,
 {
@@ -62,7 +62,7 @@ where
     }
 }
 
-impl std::fmt::Display for ErrorContext<'_> {
+impl std::fmt::Display for LexError<'_> {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.msg.fmt(formatter)?;
         if let Some(unexpected) = &self.unexpected {

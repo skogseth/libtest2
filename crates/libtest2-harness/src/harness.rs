@@ -81,9 +81,7 @@ impl Harness {
 
 const ERROR_EXIT_CODE: i32 = 101;
 
-fn parse<'p>(
-    parser: &mut cli::Parser<'p>,
-) -> Result<libtest_lexarg::TestOpts, cli::ErrorContext<'p>> {
+fn parse<'p>(parser: &mut cli::Parser<'p>) -> Result<libtest_lexarg::TestOpts, cli::LexError<'p>> {
     let mut test_opts = libtest_lexarg::TestOptsBuilder::new();
 
     let bin = parser
@@ -112,7 +110,7 @@ fn parse<'p>(
                 continue;
             }
             cli::Arg::Unexpected(_) => {
-                return Err(cli::ErrorContext::msg("unexpected value")
+                return Err(cli::LexError::msg("unexpected value")
                     .unexpected(arg)
                     .within(prev_arg));
             }
@@ -123,7 +121,7 @@ fn parse<'p>(
         let arg = test_opts.parse_next(parser, arg)?;
 
         if let Some(arg) = arg {
-            return Err(cli::ErrorContext::msg("unexpected argument").unexpected(arg));
+            return Err(cli::LexError::msg("unexpected argument").unexpected(arg));
         }
     }
 

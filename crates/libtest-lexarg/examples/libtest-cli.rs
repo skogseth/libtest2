@@ -31,7 +31,7 @@ fn main() -> lexarg::Result<()> {
                 continue;
             }
             Unexpected(_) => {
-                return Err(lexarg::ErrorContext::msg("unexpected value")
+                return Err(lexarg::LexError::msg("unexpected value")
                     .unexpected(arg)
                     .within(prev_arg)
                     .into());
@@ -43,7 +43,7 @@ fn main() -> lexarg::Result<()> {
         let arg = test_opts.parse_next(&mut parser, arg)?;
 
         if let Some(arg) = arg {
-            return Err(lexarg::ErrorContext::msg("unexpected argument")
+            return Err(lexarg::LexError::msg("unexpected argument")
                 .unexpected(arg)
                 .into());
         }
