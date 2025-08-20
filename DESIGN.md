@@ -37,6 +37,7 @@ Decisions
   - Terse and pretty progress indicators are too nebulous to render (see their notifiers)
   - There is likely not enough value add in the failure message
   - This puts more of a burden on custom test harnesses for their implementation than is strictly needed
+- Report failures separate from test-complete so we can have multiple
 
 ### Prior Art
 

@@ -72,6 +72,19 @@
       "properties": {
         "event": {
           "type": "string",
+          "const": "case_message"
+        }
+      },
+      "$ref": "#/$defs/CaseMessage",
+      "required": [
+        "event"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "string",
           "const": "case_complete"
         }
       },
@@ -200,11 +213,42 @@
         "name"
       ]
     },
-    "RunStatus": {
+    "MessageKind": {
       "type": "string",
       "enum": [
-        "ignored",
-        "failed"
+        "error",
+        "ignored"
+      ]
+    },
+    "CaseMessage": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/MessageKind"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "elapsed_s": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Elapsed"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "kind"
       ]
     },
     "CaseComplete": {
@@ -212,23 +256,6 @@
       "properties": {
         "name": {
           "type": "string"
-        },
-        "status": {
-          "description": "`None` means success",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/RunStatus"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "message": {
-          "type": [
-            "string",
-            "null"
-          ]
         },
         "elapsed_s": {
           "anyOf": [

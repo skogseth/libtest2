@@ -1,6 +1,6 @@
-use super::event::CaseComplete;
+use super::event::CaseMessage;
 use super::Event;
-use super::RunStatus;
+use super::MessageKind;
 use super::FAILED;
 use super::OK;
 
@@ -11,14 +11,14 @@ pub(crate) struct Summary {
     /// filter-in pattern or by `--skip` arguments).
     num_filtered_out: usize,
 
-    status: std::collections::HashMap<String, CaseComplete>,
+    status: std::collections::HashMap<String, CaseStatus>,
     elapsed_s: Option<super::Elapsed>,
 }
 
 impl Summary {
-    pub(crate) fn get_status(&self, name: &str) -> Option<RunStatus> {
-        let event = self.status.get(name)?;
-        event.status
+    pub(crate) fn get_kind(&self, name: &str) -> Option<MessageKind> {
+        let status = self.status.get(name)?;
+        find_run_status(status)
     }
 
     pub(crate) fn write_start(&self, writer: &mut dyn std::io::Write) -> std::io::Result<()> {
@@ -34,12 +34,27 @@ impl Summary {
         let mut num_failed = 0;
         let mut num_ignored = 0;
         let mut failures = std::collections::BTreeMap::new();
-        for event in self.status.values() {
-            match event.status {
-                Some(RunStatus::Ignored) => num_ignored += 1,
-                Some(RunStatus::Failed) => {
+        for (name, case_status) in &self.status {
+            let mut status = find_run_status(case_status);
+            if !case_status.started {
+                // Even override `Ignored`
+                status = Some(MessageKind::Error);
+                failures.insert(name, Some("test found that never started"));
+            }
+            if !case_status.completed {
+                // Even override `Ignored`
+                status = Some(MessageKind::Error);
+                failures.insert(name, Some("test never completed"));
+            }
+            match status {
+                Some(MessageKind::Ignored) => num_ignored += 1,
+                Some(MessageKind::Error) => {
                     num_failed += 1;
-                    failures.insert(&event.name, &event.message);
+                    for event in &case_status.messages {
+                        if Some(event.kind) == status {
+                            failures.insert(name, event.message.as_deref());
+                        }
+                    }
                 }
                 None => num_passed += 1,
             }
@@ -106,9 +121,18 @@ impl super::Notifier for Summary {
             }
             Event::DiscoverComplete(_) => {}
             Event::RunStart(_) => {}
-            Event::CaseStart(_) => {}
+            Event::CaseStart(inner) => {
+                self.status.entry(inner.name).or_default().started = true;
+            }
+            Event::CaseMessage(inner) => {
+                self.status
+                    .entry(inner.name.clone())
+                    .or_default()
+                    .messages
+                    .push(inner);
+            }
             Event::CaseComplete(inner) => {
-                self.status.insert(inner.name.clone(), inner);
+                self.status.entry(inner.name).or_default().completed = true;
             }
             Event::RunComplete(inner) => {
                 self.elapsed_s = inner.elapsed_s;
@@ -116,4 +140,19 @@ impl super::Notifier for Summary {
         }
         Ok(())
     }
+}
+
+fn find_run_status(case_status: &CaseStatus) -> Option<MessageKind> {
+    let mut status = None;
+    for event in &case_status.messages {
+        status = status.max(Some(event.kind));
+    }
+    status
+}
+
+#[derive(Default, Clone, Debug)]
+struct CaseStatus {
+    messages: Vec<CaseMessage>,
+    started: bool,
+    completed: bool,
 }

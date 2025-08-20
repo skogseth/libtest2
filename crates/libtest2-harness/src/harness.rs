@@ -310,11 +310,26 @@ fn run(
         }
 
         impl RunningTest {
-            fn join(self, event: &mut notify::event::CaseComplete) {
-                if self.join_handle.join().is_err() && event.status.is_none() {
-                    event.status = Some(notify::RunStatus::Failed);
-                    event.message = Some("panicked after reporting success".to_owned());
+            fn join(
+                self,
+                start: &std::time::Instant,
+                event: &notify::event::CaseComplete,
+                notifier: &mut dyn notify::Notifier,
+            ) -> std::io::Result<()> {
+                if self.join_handle.join().is_err() {
+                    let kind = notify::MessageKind::Error;
+                    let message = Some("panicked after reporting success".to_owned());
+                    notifier.notify(
+                        notify::event::CaseMessage {
+                            name: event.name.clone(),
+                            kind,
+                            message,
+                            elapsed_s: Some(notify::Elapsed(start.elapsed())),
+                        }
+                        .into(),
+                    )?;
                 }
+                Ok(())
             }
         }
 
@@ -379,10 +394,10 @@ fn run(
                 }
             }
 
-            let mut event = rx.recv().unwrap();
-            if let notify::Event::CaseComplete(event) = &mut event {
+            let event = rx.recv().unwrap();
+            if let notify::Event::CaseComplete(event) = &event {
                 let running_test = running_tests.remove(&event.name).unwrap();
-                running_test.join(event);
+                running_test.join(start, event, notifier)?;
                 pending -= 1;
             }
             notifier.notify(event)?;
@@ -446,20 +461,31 @@ fn run_case(
         Err(RunError::fail(msg))
     });
 
-    let err = outcome.as_ref().err();
-    let status = err.map(|e| e.status());
-    let message = err.and_then(|e| e.cause().map(|c| c.to_string()));
+    let mut case_status = None;
+    if let Some(err) = outcome.as_ref().err() {
+        let kind = err.status();
+        case_status = Some(kind);
+        let message = err.cause().map(|c| c.to_string());
+        notifier.notify(
+            notify::event::CaseMessage {
+                name: case.name().to_owned(),
+                kind,
+                message,
+                elapsed_s: Some(notify::Elapsed(start.elapsed())),
+            }
+            .into(),
+        )?;
+    }
+
     notifier.notify(
         notify::event::CaseComplete {
             name: case.name().to_owned(),
-            status,
-            message,
             elapsed_s: Some(notify::Elapsed(start.elapsed())),
         }
         .into(),
     )?;
 
-    Ok(status != Some(notify::RunStatus::Failed))
+    Ok(case_status != Some(notify::MessageKind::Error))
 }
 
 /// Fixed frame used to clean the backtrace with `RUST_BACKTRACE=1`.

@@ -9,6 +9,7 @@ pub enum Event {
     DiscoverComplete(DiscoverComplete),
     RunStart(RunStart),
     CaseStart(CaseStart),
+    CaseMessage(CaseMessage),
     CaseComplete(CaseComplete),
     RunComplete(RunComplete),
 }
@@ -22,6 +23,7 @@ impl Event {
             Self::DiscoverComplete(event) => event.to_jsonline(),
             Self::RunStart(event) => event.to_jsonline(),
             Self::CaseStart(event) => event.to_jsonline(),
+            Self::CaseMessage(event) => event.to_jsonline(),
             Self::CaseComplete(event) => event.to_jsonline(),
             Self::RunComplete(event) => event.to_jsonline(),
         }
@@ -55,6 +57,12 @@ impl From<RunStart> for Event {
 impl From<CaseStart> for Event {
     fn from(inner: CaseStart) -> Self {
         Self::CaseStart(inner)
+    }
+}
+
+impl From<CaseMessage> for Event {
+    fn from(inner: CaseMessage) -> Self {
+        Self::CaseMessage(inner)
     }
 }
 
@@ -296,19 +304,69 @@ impl CaseStart {
 #[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
-pub struct CaseComplete {
+pub struct CaseMessage {
     pub name: String,
-    /// `None` means success
-    #[cfg_attr(
-        feature = "serde",
-        serde(default, skip_serializing_if = "Option::is_none")
-    )]
-    pub status: Option<RunStatus>,
+    pub kind: MessageKind,
     #[cfg_attr(
         feature = "serde",
         serde(default, skip_serializing_if = "Option::is_none")
     )]
     pub message: Option<String>,
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, skip_serializing_if = "Option::is_none")
+    )]
+    pub elapsed_s: Option<Elapsed>,
+}
+
+impl CaseMessage {
+    #[cfg(feature = "json")]
+    pub fn to_jsonline(&self) -> String {
+        use json_write::JsonWrite as _;
+
+        let mut buffer = String::new();
+        buffer.open_object().unwrap();
+
+        buffer.key("event").unwrap();
+        buffer.keyval_sep().unwrap();
+        buffer.value("case_message").unwrap();
+
+        buffer.val_sep().unwrap();
+        buffer.key("name").unwrap();
+        buffer.keyval_sep().unwrap();
+        buffer.value(&self.name).unwrap();
+
+        buffer.val_sep().unwrap();
+        buffer.key("kind").unwrap();
+        buffer.keyval_sep().unwrap();
+        buffer.value(self.kind.as_str()).unwrap();
+
+        if let Some(message) = &self.message {
+            buffer.val_sep().unwrap();
+            buffer.key("message").unwrap();
+            buffer.keyval_sep().unwrap();
+            buffer.value(message).unwrap();
+        }
+
+        if let Some(elapsed_s) = self.elapsed_s {
+            buffer.val_sep().unwrap();
+            buffer.key("elapsed_s").unwrap();
+            buffer.keyval_sep().unwrap();
+            buffer.value(String::from(elapsed_s)).unwrap();
+        }
+
+        buffer.close_object().unwrap();
+
+        buffer
+    }
+}
+
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
+pub struct CaseComplete {
+    pub name: String,
     #[cfg_attr(
         feature = "serde",
         serde(default, skip_serializing_if = "Option::is_none")
@@ -332,20 +390,6 @@ impl CaseComplete {
         buffer.key("name").unwrap();
         buffer.keyval_sep().unwrap();
         buffer.value(&self.name).unwrap();
-
-        if let Some(status) = self.status {
-            buffer.val_sep().unwrap();
-            buffer.key("status").unwrap();
-            buffer.keyval_sep().unwrap();
-            buffer.value(status.as_str()).unwrap();
-        }
-
-        if let Some(message) = &self.message {
-            buffer.val_sep().unwrap();
-            buffer.key("message").unwrap();
-            buffer.keyval_sep().unwrap();
-            buffer.value(message).unwrap();
-        }
 
         if let Some(elapsed_s) = self.elapsed_s {
             buffer.val_sep().unwrap();
@@ -397,10 +441,12 @@ impl RunComplete {
     }
 }
 
+#[cfg(feature = "serde")]
 fn true_default() -> bool {
     true
 }
 
+#[cfg(feature = "serde")]
 fn is_true(yes: &bool) -> bool {
     *yes
 }
@@ -423,25 +469,27 @@ impl RunMode {
         }
     }
 
+    #[cfg(any(feature = "serde", feature = "json"))]
     fn is_default(&self) -> bool {
         *self == Default::default()
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
-pub enum RunStatus {
+pub enum MessageKind {
+    // Highest precedent items for determining test status last
+    Error,
     Ignored,
-    Failed,
 }
 
-impl RunStatus {
+impl MessageKind {
     pub fn as_str(&self) -> &str {
         match self {
+            Self::Error => "error",
             Self::Ignored => "ignored",
-            Self::Failed => "failed",
         }
     }
 }
