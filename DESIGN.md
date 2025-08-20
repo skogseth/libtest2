@@ -142,10 +142,15 @@ TAP uses indices for tests.
 #### pytest-json-report
 
 [pytest-json-report](https://github.com/numirias/pytest-json-report)
+- Tracks the test environment
+
+[example](https://github.com/numirias/pytest-json-report/blob/master/sample_report.json)
 
 #### pytest-reportlog
 
 [pytest-reportlog](https://github.com/pytest-dev/pytest-reportlog)
+- Uses `$report_type` for each jsonline message
+- Full output is delimited by "session start" and "session end"
 
 Endorsed in [pytest's docs](https://docs.pytest.org/en/latest/deprecations.html#result-log-result-log)
 
