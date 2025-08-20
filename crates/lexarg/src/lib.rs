@@ -19,12 +19,12 @@
 /// Simplify parsing of arguments
 pub mod prelude {
     pub use crate::Arg::*;
-    pub use crate::OptionContextExt as _;
-    pub use crate::ResultContextExt as _;
+    pub use crate::OptionLexErrorExt as _;
+    pub use crate::ResultLexErrorExt as _;
     pub use crate::ValueExt as _;
 }
 
-pub use lexarg_error::ErrorContext;
+pub use lexarg_error::LexError;
 pub use lexarg_parser::Arg;
 pub use lexarg_parser::Parser;
 pub use lexarg_parser::RawArgs;
@@ -50,9 +50,9 @@ impl Error {
     }
 }
 
-impl From<ErrorContext<'_>> for Error {
+impl From<LexError<'_>> for Error {
     #[cold]
-    fn from(error: ErrorContext<'_>) -> Self {
+    fn from(error: LexError<'_>) -> Self {
         Self::msg(error.to_string())
     }
 }
@@ -72,32 +72,32 @@ impl std::fmt::Display for Error {
 /// Extensions for parsing [`Arg::Value`]
 pub trait ValueExt<'a> {
     /// Convert [`Arg::Value`]
-    fn path(self) -> Result<&'a std::path::Path, ErrorContext<'a>>;
+    fn path(self) -> Result<&'a std::path::Path, LexError<'a>>;
     /// Convert [`Arg::Value`] with a description of the intended format
-    fn string(self, description: &str) -> Result<&'a str, ErrorContext<'a>>;
+    fn string(self, description: &str) -> Result<&'a str, LexError<'a>>;
     /// Ensure [`Arg::Value`] is from a closed set of values
-    fn one_of(self, possible: &[&str]) -> Result<&'a str, ErrorContext<'a>>;
+    fn one_of(self, possible: &[&str]) -> Result<&'a str, LexError<'a>>;
     /// Parse [`Arg::Value`]
-    fn parse<T: std::str::FromStr>(self) -> Result<T, ErrorContext<'a>>
+    fn parse<T: std::str::FromStr>(self) -> Result<T, LexError<'a>>
     where
         T::Err: std::fmt::Display;
     /// Custom conversion for [`Arg::Value`]
-    fn try_map<F, T, E>(self, op: F) -> Result<T, ErrorContext<'a>>
+    fn try_map<F, T, E>(self, op: F) -> Result<T, LexError<'a>>
     where
         F: FnOnce(&'a std::ffi::OsStr) -> Result<T, E>,
         E: std::fmt::Display;
 }
 
 impl<'a> ValueExt<'a> for &'a std::ffi::OsStr {
-    fn path(self) -> Result<&'a std::path::Path, ErrorContext<'a>> {
+    fn path(self) -> Result<&'a std::path::Path, LexError<'a>> {
         Ok(std::path::Path::new(self))
     }
-    fn string(self, description: &str) -> Result<&'a str, ErrorContext<'a>> {
+    fn string(self, description: &str) -> Result<&'a str, LexError<'a>> {
         self.to_str().ok_or_else(|| {
-            ErrorContext::msg(format_args!("invalid {description}")).unexpected(Arg::Value(self))
+            LexError::msg(format_args!("invalid {description}")).unexpected(Arg::Value(self))
         })
     }
-    fn one_of(self, possible: &[&str]) -> Result<&'a str, ErrorContext<'a>> {
+    fn one_of(self, possible: &[&str]) -> Result<&'a str, LexError<'a>> {
         self.to_str()
             .filter(|v| possible.contains(v))
             .ok_or_else(|| {
@@ -108,43 +108,43 @@ impl<'a> ValueExt<'a> for &'a std::ffi::OsStr {
                     use std::fmt::Write as _;
                     let _ = write!(&mut error, ", `{possible}`");
                 }
-                ErrorContext::msg(error)
+                LexError::msg(error)
             })
     }
-    fn parse<T: std::str::FromStr>(self) -> Result<T, ErrorContext<'a>>
+    fn parse<T: std::str::FromStr>(self) -> Result<T, LexError<'a>>
     where
         T::Err: std::fmt::Display,
     {
         self.string(std::any::type_name::<T>())?
             .parse::<T>()
-            .map_err(|err| ErrorContext::msg(err).unexpected(Arg::Value(self)))
+            .map_err(|err| LexError::msg(err).unexpected(Arg::Value(self)))
     }
-    fn try_map<F, T, E>(self, op: F) -> Result<T, ErrorContext<'a>>
+    fn try_map<F, T, E>(self, op: F) -> Result<T, LexError<'a>>
     where
         F: FnOnce(&'a std::ffi::OsStr) -> Result<T, E>,
         E: std::fmt::Display,
     {
-        op(self).map_err(|err| ErrorContext::msg(err).unexpected(Arg::Value(self)))
+        op(self).map_err(|err| LexError::msg(err).unexpected(Arg::Value(self)))
     }
 }
 
-impl<'a> ValueExt<'a> for Result<&'a std::ffi::OsStr, ErrorContext<'a>> {
-    fn path(self) -> Result<&'a std::path::Path, ErrorContext<'a>> {
+impl<'a> ValueExt<'a> for Result<&'a std::ffi::OsStr, LexError<'a>> {
+    fn path(self) -> Result<&'a std::path::Path, LexError<'a>> {
         self.and_then(|os| os.path())
     }
-    fn string(self, description: &str) -> Result<&'a str, ErrorContext<'a>> {
+    fn string(self, description: &str) -> Result<&'a str, LexError<'a>> {
         self.and_then(|os| os.string(description))
     }
-    fn one_of(self, possible: &[&str]) -> Result<&'a str, ErrorContext<'a>> {
+    fn one_of(self, possible: &[&str]) -> Result<&'a str, LexError<'a>> {
         self.and_then(|os| os.one_of(possible))
     }
-    fn parse<T: std::str::FromStr>(self) -> Result<T, ErrorContext<'a>>
+    fn parse<T: std::str::FromStr>(self) -> Result<T, LexError<'a>>
     where
         T::Err: std::fmt::Display,
     {
         self.and_then(|os| os.parse())
     }
-    fn try_map<F, T, E>(self, op: F) -> Result<T, ErrorContext<'a>>
+    fn try_map<F, T, E>(self, op: F) -> Result<T, LexError<'a>>
     where
         F: FnOnce(&'a std::ffi::OsStr) -> Result<T, E>,
         E: std::fmt::Display,
@@ -153,33 +153,33 @@ impl<'a> ValueExt<'a> for Result<&'a std::ffi::OsStr, ErrorContext<'a>> {
     }
 }
 
-/// Extensions for extending [`ErrorContext`]
-pub trait ResultContextExt<'a> {
+/// Extensions for extending [`LexError`]
+pub trait ResultLexErrorExt<'a> {
     /// [`Arg`] the error occurred within
     fn within(self, within: Arg<'a>) -> Self;
 }
 
-impl<'a, T> ResultContextExt<'a> for Result<T, ErrorContext<'a>> {
+impl<'a, T> ResultLexErrorExt<'a> for Result<T, LexError<'a>> {
     fn within(self, within: Arg<'a>) -> Self {
         self.map_err(|err| err.within(within))
     }
 }
 
-/// Extensions for creating an [`ErrorContext`]
-pub trait OptionContextExt<T> {
+/// Extensions for creating an [`LexError`]
+pub trait OptionLexErrorExt<T> {
     /// [`Arg`] that was expected
     ///
     /// For [`Arg::Value`], the contents are assumed to be a placeholder
-    fn ok_or_missing(self, expected: Arg<'static>) -> Result<T, ErrorContext<'static>>;
+    fn ok_or_missing(self, expected: Arg<'static>) -> Result<T, LexError<'static>>;
 }
 
-impl<T> OptionContextExt<T> for Option<T> {
-    fn ok_or_missing(self, expected: Arg<'static>) -> Result<T, ErrorContext<'static>> {
+impl<T> OptionLexErrorExt<T> for Option<T> {
+    fn ok_or_missing(self, expected: Arg<'static>) -> Result<T, LexError<'static>> {
         self.ok_or_else(|| match expected {
-            Arg::Short(short) => ErrorContext::msg(format_args!("missing required `-{short}`")),
-            Arg::Long(long) => ErrorContext::msg(format_args!("missing required `--{long}`")),
-            Arg::Escape(escape) => ErrorContext::msg(format_args!("missing required `{escape}`")),
-            Arg::Value(value) | Arg::Unexpected(value) => ErrorContext::msg(format_args!(
+            Arg::Short(short) => LexError::msg(format_args!("missing required `-{short}`")),
+            Arg::Long(long) => LexError::msg(format_args!("missing required `--{long}`")),
+            Arg::Escape(escape) => LexError::msg(format_args!("missing required `{escape}`")),
+            Arg::Value(value) | Arg::Unexpected(value) => LexError::msg(format_args!(
                 "missing required `{}`",
                 value.to_string_lossy()
             )),

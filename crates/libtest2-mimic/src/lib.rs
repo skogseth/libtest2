@@ -27,7 +27,7 @@
 pub use libtest2_harness::Harness;
 pub use libtest2_harness::RunError;
 pub use libtest2_harness::RunResult;
-pub use libtest2_harness::State;
+pub use libtest2_harness::TestContext;
 pub use libtest2_harness::TestKind;
 
 use libtest2_harness::Case;
@@ -36,13 +36,13 @@ use libtest2_harness::Source;
 pub struct Trial {
     name: String,
     #[allow(clippy::type_complexity)]
-    runner: Box<dyn Fn(&State) -> Result<(), RunError> + Send + Sync>,
+    runner: Box<dyn Fn(&TestContext) -> Result<(), RunError> + Send + Sync>,
 }
 
 impl Trial {
     pub fn test(
         name: impl Into<String>,
-        runner: impl Fn(&State) -> Result<(), RunError> + Send + Sync + 'static,
+        runner: impl Fn(&TestContext) -> Result<(), RunError> + Send + Sync + 'static,
     ) -> Self {
         Self {
             name: name.into(),
@@ -61,12 +61,12 @@ impl Case for Trial {
     fn source(&self) -> Option<&Source> {
         None
     }
-    fn exclusive(&self, _: &State) -> bool {
+    fn exclusive(&self, _: &TestContext) -> bool {
         false
     }
 
-    fn run(&self, state: &State) -> Result<(), RunError> {
-        (self.runner)(state)
+    fn run(&self, context: &TestContext) -> Result<(), RunError> {
+        (self.runner)(context)
     }
 }
 

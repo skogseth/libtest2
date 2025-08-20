@@ -9,15 +9,15 @@ fn test_cmd() -> snapbox::cmd::Command {
             r#"
 libtest2::libtest2_main!(foo, bar, barro);
 
-fn foo(_state: &libtest2::State) -> libtest2::RunResult {
+fn foo(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 
-fn bar(_state: &libtest2::State) -> libtest2::RunResult {
+fn bar(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 
-fn barro(_state: &libtest2::State) -> libtest2::RunResult {
+fn barro(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 "#,

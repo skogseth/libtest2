@@ -1,12 +1,12 @@
 pub(crate) use crate::*;
 
 #[derive(Debug)]
-pub struct State {
+pub struct TestContext {
     mode: RunMode,
     run_ignored: bool,
 }
 
-impl State {
+impl TestContext {
     pub fn ignore(&self) -> Result<(), RunError> {
         if self.run_ignored {
             Ok(())
@@ -28,7 +28,7 @@ impl State {
     }
 }
 
-impl State {
+impl TestContext {
     pub(crate) fn new() -> Self {
         Self {
             mode: Default::default(),

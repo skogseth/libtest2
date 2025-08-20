@@ -1,6 +1,6 @@
 use libtest2_mimic::RunError;
 use libtest2_mimic::RunResult;
-use libtest2_mimic::State;
+use libtest2_mimic::TestContext;
 use libtest2_mimic::Trial;
 
 fn main() {
@@ -15,21 +15,21 @@ fn main() {
 
 // Tests
 
-fn check_toph(_state: &State) -> RunResult {
+fn check_toph(_context: &TestContext) -> RunResult {
     Ok(())
 }
-fn check_katara(_state: &State) -> RunResult {
+fn check_katara(_context: &TestContext) -> RunResult {
     Ok(())
 }
-fn check_sokka(_state: &State) -> RunResult {
+fn check_sokka(_context: &TestContext) -> RunResult {
     Err(RunError::fail("Sokka tripped and fell :("))
 }
-fn long_computation(state: &State) -> RunResult {
-    state.ignore_for("slow")?;
+fn long_computation(context: &TestContext) -> RunResult {
+    context.ignore_for("slow")?;
 
     std::thread::sleep(std::time::Duration::from_secs(1));
     Ok(())
 }
-fn compile_fail_dummy(_state: &State) -> RunResult {
+fn compile_fail_dummy(_context: &TestContext) -> RunResult {
     Ok(())
 }
