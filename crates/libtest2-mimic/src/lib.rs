@@ -24,7 +24,6 @@
 #![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 
-pub use libtest2_harness::Harness;
 pub use libtest2_harness::RunError;
 pub use libtest2_harness::RunResult;
 pub use libtest2_harness::TestContext;
@@ -32,6 +31,36 @@ pub use libtest2_harness::TestKind;
 
 use libtest2_harness::Case;
 use libtest2_harness::Source;
+
+pub struct Harness {
+    harness: libtest2_harness::Harness,
+}
+
+impl Harness {
+    pub fn with_args(args: impl IntoIterator<Item = impl Into<std::ffi::OsString>>) -> Self {
+        Self {
+            harness: libtest2_harness::Harness::with_args(args),
+        }
+    }
+
+    pub fn with_env() -> Self {
+        Self {
+            harness: libtest2_harness::Harness::with_env(),
+        }
+    }
+
+    pub fn case(&mut self, case: Trial) {
+        self.harness.case(case)
+    }
+
+    pub fn cases(&mut self, cases: impl IntoIterator<Item = Trial>) {
+        self.harness.cases(cases)
+    }
+
+    pub fn main(self) -> ! {
+        self.harness.main()
+    }
+}
 
 pub struct Trial {
     name: String,
