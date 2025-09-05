@@ -4,9 +4,7 @@ use libtest2_mimic::Trial;
 
 fn main() -> std::io::Result<()> {
     let tests = collect_tests()?;
-    let mut harness = libtest2_mimic::Harness::with_env();
-    harness.cases(tests);
-    harness.main()
+    libtest2_mimic::Harness::with_env().cases(tests).main()
 }
 
 /// Creates one test for each `.rs` file in the current directory or

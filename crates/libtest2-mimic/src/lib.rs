@@ -49,12 +49,14 @@ impl Harness {
         }
     }
 
-    pub fn case(&mut self, case: Trial) {
-        self.harness.case(case)
+    pub fn case(mut self, case: Trial) -> Self {
+        self.harness.case(case);
+        self
     }
 
-    pub fn cases(&mut self, cases: impl IntoIterator<Item = Trial>) {
-        self.harness.cases(cases)
+    pub fn cases(mut self, cases: impl IntoIterator<Item = Trial>) -> Self {
+        self.harness.cases(cases);
+        self
     }
 
     pub fn main(self) -> ! {

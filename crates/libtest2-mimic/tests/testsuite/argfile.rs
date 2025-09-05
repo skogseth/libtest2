@@ -10,14 +10,14 @@ fn test_cmd() -> snapbox::cmd::Command {
 fn main() {
     use libtest2_mimic::Trial;
     use libtest2_mimic::RunError;
-    let mut harness = libtest2_mimic::Harness::with_env();
-    harness.cases(vec![
-        Trial::test("one", |_| Ok(())),
-        Trial::test("two", |_| Ok(())),
-        Trial::test("three", |_| Ok(())),
-        Trial::test("one_two", |_| Ok(())),
-    ]);
-    harness.main();
+    libtest2_mimic::Harness::with_env()
+        .cases(vec![
+            Trial::test("one", |_| Ok(())),
+            Trial::test("two", |_| Ok(())),
+            Trial::test("three", |_| Ok(())),
+            Trial::test("one_two", |_| Ok(())),
+        ])
+        .main();
 }
 "#,
             false,

@@ -4,13 +4,13 @@ use libtest2_mimic::TestContext;
 use libtest2_mimic::Trial;
 
 fn main() {
-    let mut harness = libtest2_mimic::Harness::with_env();
-    harness.case(Trial::test("check_toph", check_toph));
-    harness.case(Trial::test("check_katara", check_katara));
-    harness.case(Trial::test("check_sokka", check_sokka));
-    harness.case(Trial::test("long_computation", long_computation));
-    harness.case(Trial::test("compile_fail_dummy", compile_fail_dummy));
-    harness.main();
+    libtest2_mimic::Harness::with_env()
+        .case(Trial::test("check_toph", check_toph))
+        .case(Trial::test("check_katara", check_katara))
+        .case(Trial::test("check_sokka", check_sokka))
+        .case(Trial::test("long_computation", long_computation))
+        .case(Trial::test("compile_fail_dummy", compile_fail_dummy))
+        .main();
 }
 
 // Tests
