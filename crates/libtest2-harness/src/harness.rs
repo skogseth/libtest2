@@ -265,10 +265,16 @@ fn run(
     )?;
 
     if opts.no_capture {
-        todo!("`--no-capture` is not yet supported");
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Unsupported,
+            "`--no-capture` is not supported at this time",
+        ));
     }
     if opts.show_output {
-        todo!("`--show-output` is not yet supported");
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Unsupported,
+            "`--show-output` is not supported at this time",
+        ));
     }
 
     let threads = opts.test_threads.map(|t| t.get()).unwrap_or(1);
