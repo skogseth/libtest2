@@ -9,13 +9,13 @@ fn test_cmd() -> snapbox::cmd::Command {
             r#"
 fn main() {
     use libtest2_mimic::Trial;
-    libtest2_mimic::Harness::with_env()
-        .cases(vec![
-            Trial::test("foo", |_| Ok(())),
-            Trial::test("bar", |_| Ok(())),
-            Trial::test("barro", |_| Ok(())),
-        ])
-        .main();
+    let mut harness = libtest2_mimic::Harness::with_env();
+    harness.cases(vec![
+        Trial::test("foo", |_| Ok(())),
+        Trial::test("bar", |_| Ok(())),
+        Trial::test("barro", |_| Ok(())),
+    ]);
+    harness.main();
 }
 "#,
             false,

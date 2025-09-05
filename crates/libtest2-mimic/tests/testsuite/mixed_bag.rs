@@ -10,33 +10,33 @@ fn test_cmd() -> snapbox::cmd::Command {
 fn main() {
     use libtest2_mimic::Trial;
     use libtest2_mimic::RunError;
-    libtest2_mimic::Harness::with_env()
-        .cases(vec![
-            Trial::test("cat", |_| Ok(())),
-            Trial::test("dog", |_| Err(RunError::fail("was not a good boy"))),
-            Trial::test("fox", |_| Ok(())),
-            Trial::test("bunny", |state| {
-                state.ignore_for("fails")?;
-                Err(RunError::fail("jumped too high"))
-            }),
-            Trial::test("frog", |state| {
-                state.ignore_for("slow")?;
-                Ok(())
-            }),
-            Trial::test("owl", |state| {
-                state.ignore_for("fails")?;
-                Err(RunError::fail("broke neck"))
-            }),
-            Trial::test("fly", |state| {
-                state.ignore_for("fails")?;
-                Ok(())
-            }),
-            Trial::test("bear", |state| {
-                state.ignore_for("fails")?;
-                Err(RunError::fail("no honey"))
-            }),
-        ])
-        .main();
+    let mut harness = libtest2_mimic::Harness::with_env();
+    harness.cases(vec![
+        Trial::test("cat", |_| Ok(())),
+        Trial::test("dog", |_| Err(RunError::fail("was not a good boy"))),
+        Trial::test("fox", |_| Ok(())),
+        Trial::test("bunny", |state| {
+            state.ignore_for("fails")?;
+            Err(RunError::fail("jumped too high"))
+        }),
+        Trial::test("frog", |state| {
+            state.ignore_for("slow")?;
+            Ok(())
+        }),
+        Trial::test("owl", |state| {
+            state.ignore_for("fails")?;
+            Err(RunError::fail("broke neck"))
+        }),
+        Trial::test("fly", |state| {
+            state.ignore_for("fails")?;
+            Ok(())
+        }),
+        Trial::test("bear", |state| {
+            state.ignore_for("fails")?;
+            Err(RunError::fail("no honey"))
+        }),
+    ]);
+    harness.main();
 }
 "#,
             false,

@@ -7,14 +7,14 @@ fn check_test_on_main_thread() {
 fn main() {
     use libtest2_mimic::Trial;
     let outer_thread = std::thread::current().id();
-    libtest2_mimic::Harness::with_env()
-        .cases(vec![
-            Trial::test("check", move |_| {
-                assert_eq!(outer_thread, std::thread::current().id());
-                Ok(())
-            })
-        ])
-        .main();
+    let mut harness = libtest2_mimic::Harness::with_env();
+    harness.cases(vec![
+        Trial::test("check", move |_| {
+            assert_eq!(outer_thread, std::thread::current().id());
+            Ok(())
+        })
+    ]);
+    harness.main();
 }
 "#,
         false,
