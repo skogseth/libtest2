@@ -29,9 +29,6 @@ pub use libtest2_harness::RunResult;
 pub use libtest2_harness::TestContext;
 pub use libtest2_harness::TestKind;
 
-use libtest2_harness::Case;
-use libtest2_harness::Source;
-
 pub struct Harness {
     harness: libtest2_harness::Harness,
 }
@@ -82,14 +79,14 @@ impl Trial {
     }
 }
 
-impl Case for Trial {
+impl libtest2_harness::Case for Trial {
     fn name(&self) -> &str {
         &self.name
     }
     fn kind(&self) -> TestKind {
         Default::default()
     }
-    fn source(&self) -> Option<&Source> {
+    fn source(&self) -> Option<&libtest2_harness::Source> {
         None
     }
     fn exclusive(&self, _: &TestContext) -> bool {
