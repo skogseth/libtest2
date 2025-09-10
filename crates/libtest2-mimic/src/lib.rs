@@ -26,6 +26,7 @@
 
 pub use libtest2_harness::RunError;
 pub use libtest2_harness::RunResult;
+pub use libtest_json::RunMode;
 
 pub struct Harness {
     harness: libtest2_harness::Harness,
@@ -110,7 +111,7 @@ impl<'t> TestContext<'t> {
         self.inner.ignore_for(reason)
     }
 
-    pub fn current_mode(&self) -> libtest2_harness::RunMode {
+    pub fn current_mode(&self) -> RunMode {
         self.inner.current_mode()
     }
 }

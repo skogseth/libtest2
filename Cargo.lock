@@ -265,6 +265,7 @@ version = "0.0.1"
 dependencies = [
  "dunce",
  "escargot",
+ "libtest-json",
  "libtest2-harness",
  "once_cell_polyfill",
  "pathdiff",
