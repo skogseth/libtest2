@@ -26,7 +26,6 @@
 
 pub use libtest2_harness::RunError;
 pub use libtest2_harness::RunResult;
-pub use libtest2_harness::TestContext;
 
 pub struct Harness {
     harness: libtest2_harness::Harness,
@@ -63,13 +62,13 @@ impl Harness {
 pub struct Trial {
     name: String,
     #[allow(clippy::type_complexity)]
-    runner: Box<dyn Fn(&TestContext) -> Result<(), RunError> + Send + Sync>,
+    runner: Box<dyn Fn(TestContext<'_>) -> Result<(), RunError> + Send + Sync>,
 }
 
 impl Trial {
     pub fn test(
         name: impl Into<String>,
-        runner: impl Fn(&TestContext) -> Result<(), RunError> + Send + Sync + 'static,
+        runner: impl Fn(TestContext<'_>) -> Result<(), RunError> + Send + Sync + 'static,
     ) -> Self {
         Self {
             name: name.into(),
@@ -88,12 +87,31 @@ impl libtest2_harness::Case for Trial {
     fn source(&self) -> Option<&libtest2_harness::Source> {
         None
     }
-    fn exclusive(&self, _: &TestContext) -> bool {
+    fn exclusive(&self, _: &libtest2_harness::TestContext) -> bool {
         false
     }
 
-    fn run(&self, context: &TestContext) -> Result<(), RunError> {
-        (self.runner)(context)
+    fn run(&self, context: &libtest2_harness::TestContext) -> Result<(), RunError> {
+        (self.runner)(TestContext { inner: context })
+    }
+}
+
+#[derive(Debug)]
+pub struct TestContext<'t> {
+    inner: &'t libtest2_harness::TestContext,
+}
+
+impl<'t> TestContext<'t> {
+    pub fn ignore(&self) -> Result<(), RunError> {
+        self.inner.ignore()
+    }
+
+    pub fn ignore_for(&self, reason: impl std::fmt::Display) -> Result<(), RunError> {
+        self.inner.ignore_for(reason)
+    }
+
+    pub fn current_mode(&self) -> libtest2_harness::RunMode {
+        self.inner.current_mode()
     }
 }
 
