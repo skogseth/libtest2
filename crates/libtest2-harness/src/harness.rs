@@ -2,81 +2,152 @@ use libtest_lexarg::OutputFormat;
 
 use crate::{cli, notify, Case, RunError, RunMode, TestContext};
 
-pub struct Harness {
-    raw: std::io::Result<Vec<std::ffi::OsString>>,
-    cases: Vec<Box<dyn Case>>,
+pub trait HarnessState: sealed::_HarnessState_is_Sealed {}
+
+pub struct Harness<State: HarnessState> {
+    state: State,
 }
 
-impl Harness {
-    pub fn with_env() -> Self {
-        let raw = std::env::args_os();
-        Self::with_args(raw)
-    }
+pub struct StateInitial {
+    start: std::time::Instant,
+}
+impl HarnessState for StateInitial {}
+impl sealed::_HarnessState_is_Sealed for StateInitial {}
 
-    pub fn with_args(args: impl IntoIterator<Item = impl Into<std::ffi::OsString>>) -> Self {
-        let raw = expand_args(args);
-        Self { raw, cases: vec![] }
-    }
-
-    pub fn discover(&mut self, cases: impl IntoIterator<Item = impl Case + 'static>) {
-        for case in cases {
-            self.cases.push(Box::new(case));
+impl Harness<StateInitial> {
+    pub fn new() -> Self {
+        Self {
+            state: StateInitial {
+                start: std::time::Instant::now(),
+            },
         }
     }
 
-    pub fn main(self) -> ! {
-        main(self.raw, self.cases)
+    pub fn with_env(self) -> std::io::Result<Harness<StateArgs>> {
+        let raw = std::env::args_os();
+        self.with_args(raw)
+    }
+
+    pub fn with_args(
+        self,
+        args: impl IntoIterator<Item = impl Into<std::ffi::OsString>>,
+    ) -> std::io::Result<Harness<StateArgs>> {
+        let raw = expand_args(args)?;
+        Ok(Harness {
+            state: StateArgs {
+                start: self.state.start,
+                raw,
+            },
+        })
     }
 }
 
-const ERROR_EXIT_CODE: i32 = 101;
+impl Default for Harness<StateInitial> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
-fn main(raw: std::io::Result<Vec<std::ffi::OsString>>, mut cases: Vec<Box<dyn Case>>) -> ! {
-    let start = std::time::Instant::now();
+pub struct StateArgs {
+    start: std::time::Instant,
+    raw: Vec<std::ffi::OsString>,
+}
+impl HarnessState for StateArgs {}
+impl sealed::_HarnessState_is_Sealed for StateArgs {}
 
-    let raw = match raw {
-        Ok(raw) => raw,
-        Err(err) => {
+impl Harness<StateArgs> {
+    pub fn parse(&self) -> Result<Harness<StateParsed>, cli::LexError<'_>> {
+        let mut parser = cli::Parser::new(&self.state.raw);
+        let opts = parse(&mut parser)?;
+
+        #[cfg(feature = "color")]
+        match opts.color {
+            libtest_lexarg::ColorConfig::AutoColor => anstream::ColorChoice::Auto,
+            libtest_lexarg::ColorConfig::AlwaysColor => anstream::ColorChoice::Always,
+            libtest_lexarg::ColorConfig::NeverColor => anstream::ColorChoice::Never,
+        }
+        .write_global();
+
+        let notifier = notifier(&opts).unwrap_or_else(|err| {
             eprintln!("{err}");
             std::process::exit(1)
-        }
-    };
-    let mut parser = cli::Parser::new(&raw);
-    let opts = parse(&mut parser).unwrap_or_else(|err| {
-        eprintln!("{err}");
-        std::process::exit(1)
-    });
+        });
 
-    #[cfg(feature = "color")]
-    match opts.color {
-        libtest_lexarg::ColorConfig::AutoColor => anstream::ColorChoice::Auto,
-        libtest_lexarg::ColorConfig::AlwaysColor => anstream::ColorChoice::Always,
-        libtest_lexarg::ColorConfig::NeverColor => anstream::ColorChoice::Never,
+        Ok(Harness {
+            state: StateParsed {
+                start: self.state.start,
+                opts,
+                notifier,
+            },
+        })
     }
-    .write_global();
-
-    let mut notifier = notifier(&opts).unwrap_or_else(|err| {
-        eprintln!("{err}");
-        std::process::exit(1)
-    });
-    discover(&start, &opts, &mut cases, notifier.as_mut()).unwrap_or_else(|err| {
-        eprintln!("{err}");
-        std::process::exit(1)
-    });
-
-    if !opts.list {
-        match run(&start, &opts, cases, notifier.as_mut()) {
-            Ok(true) => {}
-            Ok(false) => std::process::exit(ERROR_EXIT_CODE),
-            Err(e) => {
-                eprintln!("error: io error when listing tests: {e:?}");
-                std::process::exit(ERROR_EXIT_CODE)
-            }
-        }
-    }
-
-    std::process::exit(0)
 }
+
+pub struct StateParsed {
+    start: std::time::Instant,
+    opts: libtest_lexarg::TestOpts,
+    notifier: Box<dyn notify::Notifier>,
+}
+impl HarnessState for StateParsed {}
+impl sealed::_HarnessState_is_Sealed for StateParsed {}
+
+impl Harness<StateParsed> {
+    pub fn discover(
+        mut self,
+        cases: impl IntoIterator<Item = impl Case + 'static>,
+    ) -> std::io::Result<Harness<StateDiscovered>> {
+        let mut cases = cases
+            .into_iter()
+            .map(|c| Box::new(c) as Box<dyn Case>)
+            .collect();
+        discover(
+            &self.state.start,
+            &self.state.opts,
+            &mut cases,
+            self.state.notifier.as_mut(),
+        )?;
+        Ok(Harness {
+            state: StateDiscovered {
+                start: self.state.start,
+                opts: self.state.opts,
+                notifier: self.state.notifier,
+                cases,
+            },
+        })
+    }
+}
+
+pub struct StateDiscovered {
+    start: std::time::Instant,
+    opts: libtest_lexarg::TestOpts,
+    notifier: Box<dyn notify::Notifier>,
+    cases: Vec<Box<dyn Case>>,
+}
+impl HarnessState for StateDiscovered {}
+impl sealed::_HarnessState_is_Sealed for StateDiscovered {}
+
+impl Harness<StateDiscovered> {
+    pub fn run(mut self) -> std::io::Result<bool> {
+        if self.state.opts.list {
+            Ok(true)
+        } else {
+            run(
+                &self.state.start,
+                &self.state.opts,
+                self.state.cases,
+                self.state.notifier.as_mut(),
+            )
+        }
+    }
+}
+
+mod sealed {
+    #[allow(unnameable_types)]
+    #[allow(non_camel_case_types)]
+    pub trait _HarnessState_is_Sealed {}
+}
+
+pub const ERROR_EXIT_CODE: i32 = 101;
 
 fn parse<'p>(parser: &mut cli::Parser<'p>) -> Result<libtest_lexarg::TestOpts, cli::LexError<'p>> {
     let mut test_opts = libtest_lexarg::TestOptsBuilder::new();

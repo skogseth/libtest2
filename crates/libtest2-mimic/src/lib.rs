@@ -21,36 +21,63 @@
 //!
 
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
-#![warn(clippy::print_stderr)]
+//#![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 
 pub use libtest_json::RunMode;
 
 pub struct Harness {
-    harness: libtest2_harness::Harness,
+    raw: Vec<std::ffi::OsString>,
+    cases: Vec<Trial>,
 }
 
 impl Harness {
     pub fn with_args(args: impl IntoIterator<Item = impl Into<std::ffi::OsString>>) -> Self {
         Self {
-            harness: libtest2_harness::Harness::with_args(args),
+            raw: args.into_iter().map(|a| a.into()).collect(),
+            cases: Vec::new(),
         }
     }
 
     pub fn with_env() -> Self {
-        Self {
-            harness: libtest2_harness::Harness::with_env(),
-        }
+        let raw = std::env::args_os();
+        Self::with_args(raw)
     }
 
     pub fn discover(mut self, cases: impl IntoIterator<Item = Trial>) -> Self {
-        self.harness
-            .discover(cases.into_iter().map(|c| TrialCase { inner: c }));
+        self.cases.extend(cases);
         self
     }
 
     pub fn main(self) -> ! {
-        self.harness.main()
+        match self.run() {
+            Ok(true) => std::process::exit(0),
+            Ok(false) => std::process::exit(libtest2_harness::ERROR_EXIT_CODE),
+            Err(err) => {
+                eprintln!("{err}");
+                std::process::exit(libtest2_harness::ERROR_EXIT_CODE)
+            }
+        }
+    }
+
+    fn run(self) -> std::io::Result<bool> {
+        let harness = libtest2_harness::Harness::new();
+        let harness = match harness.with_args(self.raw) {
+            Ok(harness) => harness,
+            Err(err) => {
+                eprintln!("{err}");
+                std::process::exit(1);
+            }
+        };
+        let harness = match harness.parse() {
+            Ok(harness) => harness,
+            Err(err) => {
+                eprintln!("{err}");
+                std::process::exit(1);
+            }
+        };
+        let harness = harness.discover(self.cases.into_iter().map(|t| TrialCase { inner: t }))?;
+        harness.run()
     }
 }
 
