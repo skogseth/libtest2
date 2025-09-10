@@ -24,8 +24,6 @@
 #![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 
-pub use libtest2_harness::RunError;
-pub use libtest2_harness::RunResult;
 pub use libtest_json::RunMode;
 
 pub struct Harness {
@@ -92,8 +90,32 @@ impl libtest2_harness::Case for Trial {
         false
     }
 
-    fn run(&self, context: &libtest2_harness::TestContext) -> Result<(), RunError> {
-        (self.runner)(TestContext { inner: context })
+    fn run(
+        &self,
+        context: &libtest2_harness::TestContext,
+    ) -> Result<(), libtest2_harness::RunError> {
+        (self.runner)(TestContext { inner: context }).map_err(|e| e.inner)
+    }
+}
+
+pub type RunResult = Result<(), RunError>;
+
+#[derive(Debug)]
+pub struct RunError {
+    inner: libtest2_harness::RunError,
+}
+
+impl RunError {
+    pub fn with_cause(cause: impl std::error::Error + Send + Sync + 'static) -> Self {
+        Self {
+            inner: libtest2_harness::RunError::with_cause(cause),
+        }
+    }
+
+    pub fn fail(cause: impl std::fmt::Display) -> Self {
+        Self {
+            inner: libtest2_harness::RunError::fail(cause),
+        }
     }
 }
 
@@ -104,11 +126,13 @@ pub struct TestContext<'t> {
 
 impl<'t> TestContext<'t> {
     pub fn ignore(&self) -> Result<(), RunError> {
-        self.inner.ignore()
+        self.inner.ignore().map_err(|e| RunError { inner: e })
     }
 
     pub fn ignore_for(&self, reason: impl std::fmt::Display) -> Result<(), RunError> {
-        self.inner.ignore_for(reason)
+        self.inner
+            .ignore_for(reason)
+            .map_err(|e| RunError { inner: e })
     }
 
     pub fn current_mode(&self) -> RunMode {
