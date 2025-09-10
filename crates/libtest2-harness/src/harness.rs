@@ -19,67 +19,69 @@ impl Harness {
         Self { raw, cases: vec![] }
     }
 
-    pub fn case(mut self, case: impl Case + 'static) -> Self {
+    pub fn case(&mut self, case: impl Case + 'static) {
         self.cases.push(Box::new(case));
-        self
     }
 
-    pub fn cases(mut self, cases: impl IntoIterator<Item = impl Case + 'static>) -> Self {
+    pub fn cases(&mut self, cases: impl IntoIterator<Item = impl Case + 'static>) {
         for case in cases {
             self.cases.push(Box::new(case));
         }
-        self
     }
 
-    pub fn main(mut self) -> ! {
-        let start = std::time::Instant::now();
-
-        let raw = match self.raw {
-            Ok(raw) => raw,
-            Err(err) => {
-                eprintln!("{err}");
-                std::process::exit(1)
-            }
-        };
-        let mut parser = cli::Parser::new(&raw);
-        let opts = parse(&mut parser).unwrap_or_else(|err| {
-            eprintln!("{err}");
-            std::process::exit(1)
-        });
-
-        #[cfg(feature = "color")]
-        match opts.color {
-            libtest_lexarg::ColorConfig::AutoColor => anstream::ColorChoice::Auto,
-            libtest_lexarg::ColorConfig::AlwaysColor => anstream::ColorChoice::Always,
-            libtest_lexarg::ColorConfig::NeverColor => anstream::ColorChoice::Never,
-        }
-        .write_global();
-
-        let mut notifier = notifier(&opts).unwrap_or_else(|err| {
-            eprintln!("{err}");
-            std::process::exit(1)
-        });
-        discover(&start, &opts, &mut self.cases, notifier.as_mut()).unwrap_or_else(|err| {
-            eprintln!("{err}");
-            std::process::exit(1)
-        });
-
-        if !opts.list {
-            match run(&start, &opts, self.cases, notifier.as_mut()) {
-                Ok(true) => {}
-                Ok(false) => std::process::exit(ERROR_EXIT_CODE),
-                Err(e) => {
-                    eprintln!("error: io error when listing tests: {e:?}");
-                    std::process::exit(ERROR_EXIT_CODE)
-                }
-            }
-        }
-
-        std::process::exit(0)
+    pub fn main(self) -> ! {
+        main(self.raw, self.cases)
     }
 }
 
 const ERROR_EXIT_CODE: i32 = 101;
+
+fn main(raw: std::io::Result<Vec<std::ffi::OsString>>, mut cases: Vec<Box<dyn Case>>) -> ! {
+    let start = std::time::Instant::now();
+
+    let raw = match raw {
+        Ok(raw) => raw,
+        Err(err) => {
+            eprintln!("{err}");
+            std::process::exit(1)
+        }
+    };
+    let mut parser = cli::Parser::new(&raw);
+    let opts = parse(&mut parser).unwrap_or_else(|err| {
+        eprintln!("{err}");
+        std::process::exit(1)
+    });
+
+    #[cfg(feature = "color")]
+    match opts.color {
+        libtest_lexarg::ColorConfig::AutoColor => anstream::ColorChoice::Auto,
+        libtest_lexarg::ColorConfig::AlwaysColor => anstream::ColorChoice::Always,
+        libtest_lexarg::ColorConfig::NeverColor => anstream::ColorChoice::Never,
+    }
+    .write_global();
+
+    let mut notifier = notifier(&opts).unwrap_or_else(|err| {
+        eprintln!("{err}");
+        std::process::exit(1)
+    });
+    discover(&start, &opts, &mut cases, notifier.as_mut()).unwrap_or_else(|err| {
+        eprintln!("{err}");
+        std::process::exit(1)
+    });
+
+    if !opts.list {
+        match run(&start, &opts, cases, notifier.as_mut()) {
+            Ok(true) => {}
+            Ok(false) => std::process::exit(ERROR_EXIT_CODE),
+            Err(e) => {
+                eprintln!("error: io error when listing tests: {e:?}");
+                std::process::exit(ERROR_EXIT_CODE)
+            }
+        }
+    }
+
+    std::process::exit(0)
+}
 
 fn parse<'p>(parser: &mut cli::Parser<'p>) -> Result<libtest_lexarg::TestOpts, cli::LexError<'p>> {
     let mut test_opts = libtest_lexarg::TestOptsBuilder::new();

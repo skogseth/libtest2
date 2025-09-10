@@ -4,7 +4,9 @@ use libtest2::Trial;
 
 fn main() -> std::io::Result<()> {
     let tests = collect_tests()?;
-    libtest2::Harness::with_env().cases(tests).main()
+    let mut harness = libtest2::Harness::with_env();
+    harness.cases(tests);
+    harness.main()
 }
 
 /// Creates one test for each `.rs` file in the current directory or

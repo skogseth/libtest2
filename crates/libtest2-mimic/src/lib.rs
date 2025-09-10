@@ -24,25 +24,51 @@
 #![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 
-pub use libtest2_harness::Harness;
-pub use libtest2_harness::RunError;
-pub use libtest2_harness::RunResult;
-pub use libtest2_harness::TestContext;
-pub use libtest2_harness::TestKind;
+pub use libtest_json::RunMode;
 
-use libtest2_harness::Case;
-use libtest2_harness::Source;
+pub struct Harness {
+    harness: libtest2_harness::Harness,
+}
+
+impl Harness {
+    pub fn with_args(args: impl IntoIterator<Item = impl Into<std::ffi::OsString>>) -> Self {
+        Self {
+            harness: libtest2_harness::Harness::with_args(args),
+        }
+    }
+
+    pub fn with_env() -> Self {
+        Self {
+            harness: libtest2_harness::Harness::with_env(),
+        }
+    }
+
+    pub fn case(mut self, case: Trial) -> Self {
+        self.harness.case(TrialCase { inner: case });
+        self
+    }
+
+    pub fn cases(mut self, cases: impl IntoIterator<Item = Trial>) -> Self {
+        self.harness
+            .cases(cases.into_iter().map(|c| TrialCase { inner: c }));
+        self
+    }
+
+    pub fn main(self) -> ! {
+        self.harness.main()
+    }
+}
 
 pub struct Trial {
     name: String,
     #[allow(clippy::type_complexity)]
-    runner: Box<dyn Fn(&TestContext) -> Result<(), RunError> + Send + Sync>,
+    runner: Box<dyn Fn(TestContext<'_>) -> Result<(), RunError> + Send + Sync>,
 }
 
 impl Trial {
     pub fn test(
         name: impl Into<String>,
-        runner: impl Fn(&TestContext) -> Result<(), RunError> + Send + Sync + 'static,
+        runner: impl Fn(TestContext<'_>) -> Result<(), RunError> + Send + Sync + 'static,
     ) -> Self {
         Self {
             name: name.into(),
@@ -51,22 +77,71 @@ impl Trial {
     }
 }
 
-impl Case for Trial {
+struct TrialCase {
+    inner: Trial,
+}
+
+impl libtest2_harness::Case for TrialCase {
     fn name(&self) -> &str {
-        &self.name
+        &self.inner.name
     }
-    fn kind(&self) -> TestKind {
+    fn kind(&self) -> libtest2_harness::TestKind {
         Default::default()
     }
-    fn source(&self) -> Option<&Source> {
+    fn source(&self) -> Option<&libtest2_harness::Source> {
         None
     }
-    fn exclusive(&self, _: &TestContext) -> bool {
+    fn exclusive(&self, _: &libtest2_harness::TestContext) -> bool {
         false
     }
 
-    fn run(&self, context: &TestContext) -> Result<(), RunError> {
-        (self.runner)(context)
+    fn run(
+        &self,
+        context: &libtest2_harness::TestContext,
+    ) -> Result<(), libtest2_harness::RunError> {
+        (self.inner.runner)(TestContext { inner: context }).map_err(|e| e.inner)
+    }
+}
+
+pub type RunResult = Result<(), RunError>;
+
+#[derive(Debug)]
+pub struct RunError {
+    inner: libtest2_harness::RunError,
+}
+
+impl RunError {
+    pub fn with_cause(cause: impl std::error::Error + Send + Sync + 'static) -> Self {
+        Self {
+            inner: libtest2_harness::RunError::with_cause(cause),
+        }
+    }
+
+    pub fn fail(cause: impl std::fmt::Display) -> Self {
+        Self {
+            inner: libtest2_harness::RunError::fail(cause),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TestContext<'t> {
+    inner: &'t libtest2_harness::TestContext,
+}
+
+impl<'t> TestContext<'t> {
+    pub fn ignore(&self) -> Result<(), RunError> {
+        self.inner.ignore().map_err(|e| RunError { inner: e })
+    }
+
+    pub fn ignore_for(&self, reason: impl std::fmt::Display) -> Result<(), RunError> {
+        self.inner
+            .ignore_for(reason)
+            .map_err(|e| RunError { inner: e })
+    }
+
+    pub fn current_mode(&self) -> RunMode {
+        self.inner.current_mode()
     }
 }
 

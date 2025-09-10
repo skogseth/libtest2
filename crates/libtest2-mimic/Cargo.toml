@@ -30,6 +30,7 @@ json = ["libtest2-harness/json"]
 threads = ["libtest2-harness/threads"]
 
 [dependencies]
+libtest-json = { version = "0.0.1", path = "../libtest-json" }
 libtest2-harness = { version = "0.0.1", path = "../libtest2-harness" }
 
 [dev-dependencies]
