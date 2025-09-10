@@ -15,8 +15,7 @@ impl Harness {
 
     pub fn with_env() -> Self {
         let raw = std::env::args_os();
-        let raw = expand_args(raw);
-        Self { raw, cases: vec![] }
+        Self::with_args(raw)
     }
 
     pub fn case(&mut self, case: impl Case + 'static) {
