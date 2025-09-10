@@ -76,8 +76,10 @@ macro_rules! libtest2_main {
     ( $( $test:path ),* $(,)*) => {
         fn main() {
             let mut harness = ::libtest2::Harness::with_env();
-                $(harness.case(::libtest2::Trial::test(::std::stringify!($test), $test));)*
-                harness.main();
+            harness.cases([
+                $(::libtest2::Trial::test(::std::stringify!($test), $test)),*
+            ]);
+            harness.main();
         }
     }
 }
