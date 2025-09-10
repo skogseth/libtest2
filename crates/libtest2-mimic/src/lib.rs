@@ -44,12 +44,13 @@ impl Harness {
     }
 
     pub fn case(mut self, case: Trial) -> Self {
-        self.harness.case(case);
+        self.harness.case(TrialCase { inner: case });
         self
     }
 
     pub fn cases(mut self, cases: impl IntoIterator<Item = Trial>) -> Self {
-        self.harness.cases(cases);
+        self.harness
+            .cases(cases.into_iter().map(|c| TrialCase { inner: c }));
         self
     }
 
@@ -76,9 +77,13 @@ impl Trial {
     }
 }
 
-impl libtest2_harness::Case for Trial {
+struct TrialCase {
+    inner: Trial,
+}
+
+impl libtest2_harness::Case for TrialCase {
     fn name(&self) -> &str {
-        &self.name
+        &self.inner.name
     }
     fn kind(&self) -> libtest2_harness::TestKind {
         Default::default()
@@ -94,7 +99,7 @@ impl libtest2_harness::Case for Trial {
         &self,
         context: &libtest2_harness::TestContext,
     ) -> Result<(), libtest2_harness::RunError> {
-        (self.runner)(TestContext { inner: context }).map_err(|e| e.inner)
+        (self.inner.runner)(TestContext { inner: context }).map_err(|e| e.inner)
     }
 }
 
