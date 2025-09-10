@@ -10,7 +10,7 @@ fn test_cmd() -> snapbox::cmd::Command {
 fn main() {
     use libtest2_mimic::Trial;
     libtest2_mimic::Harness::with_env()
-        .cases(vec![
+        .discover([
             Trial::test("passes", |_| Ok(())),
             Trial::test("panics", |_| panic!("uh oh")),
         ])

@@ -18,7 +18,7 @@ impl Harness {
         Self { raw, cases: vec![] }
     }
 
-    pub fn cases(&mut self, cases: impl IntoIterator<Item = impl Case + 'static>) {
+    pub fn discover(&mut self, cases: impl IntoIterator<Item = impl Case + 'static>) {
         for case in cases {
             self.cases.push(Box::new(case));
         }

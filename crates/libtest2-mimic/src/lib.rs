@@ -43,9 +43,9 @@ impl Harness {
         }
     }
 
-    pub fn cases(mut self, cases: impl IntoIterator<Item = Trial>) -> Self {
+    pub fn discover(mut self, cases: impl IntoIterator<Item = Trial>) -> Self {
         self.harness
-            .cases(cases.into_iter().map(|c| TrialCase { inner: c }));
+            .discover(cases.into_iter().map(|c| TrialCase { inner: c }));
         self
     }
 

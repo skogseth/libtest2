@@ -5,7 +5,7 @@ use libtest2_mimic::Trial;
 
 fn main() {
     libtest2_mimic::Harness::with_env()
-        .cases([
+        .discover([
             Trial::test("check_toph", check_toph),
             Trial::test("check_katara", check_katara),
             Trial::test("check_sokka", check_sokka),
