@@ -69,14 +69,16 @@ impl RunError {
         Self::with_cause(Message(cause.to_string()))
     }
 
-    pub(crate) fn ignore() -> Self {
+    /// Should not be called with `libtest_lexarg::RunIgnored::Yes`
+    pub fn ignore() -> Self {
         Self {
             status: notify::MessageKind::Ignored,
             cause: None,
         }
     }
 
-    pub(crate) fn ignore_for(reason: String) -> Self {
+    /// Should not be called with `libtest_lexarg::RunIgnored::Yes`
+    pub fn ignore_for(reason: String) -> Self {
         Self {
             status: notify::MessageKind::Ignored,
             cause: Some(Box::new(Message(reason))),
