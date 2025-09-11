@@ -8,7 +8,7 @@ fn main() {
     use libtest2_mimic::Trial;
     let outer_thread = std::thread::current().id();
     libtest2_mimic::Harness::with_env()
-        .cases(vec![
+        .discover([
             Trial::test("check", move |_| {
                 assert_eq!(outer_thread, std::thread::current().id());
                 Ok(())

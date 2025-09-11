@@ -11,7 +11,7 @@ fn main() {
     use libtest2_mimic::Trial;
     use libtest2_mimic::RunError;
     libtest2_mimic::Harness::with_env()
-        .cases(vec![
+        .discover([
             Trial::test("cat", |_| Ok(())),
             Trial::test("dog", |_| Err(RunError::fail("was not a good boy"))),
             Trial::test("fox", |_| Ok(())),

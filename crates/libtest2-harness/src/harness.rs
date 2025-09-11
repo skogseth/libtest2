@@ -8,22 +8,17 @@ pub struct Harness {
 }
 
 impl Harness {
+    pub fn with_env() -> Self {
+        let raw = std::env::args_os();
+        Self::with_args(raw)
+    }
+
     pub fn with_args(args: impl IntoIterator<Item = impl Into<std::ffi::OsString>>) -> Self {
         let raw = expand_args(args);
         Self { raw, cases: vec![] }
     }
 
-    pub fn with_env() -> Self {
-        let raw = std::env::args_os();
-        let raw = expand_args(raw);
-        Self { raw, cases: vec![] }
-    }
-
-    pub fn case(&mut self, case: impl Case + 'static) {
-        self.cases.push(Box::new(case));
-    }
-
-    pub fn cases(&mut self, cases: impl IntoIterator<Item = impl Case + 'static>) {
+    pub fn discover(&mut self, cases: impl IntoIterator<Item = impl Case + 'static>) {
         for case in cases {
             self.cases.push(Box::new(case));
         }

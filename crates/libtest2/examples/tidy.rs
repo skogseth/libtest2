@@ -5,7 +5,7 @@ use libtest2::Trial;
 fn main() -> std::io::Result<()> {
     let tests = collect_tests()?;
     let mut harness = libtest2::Harness::with_env();
-    harness.cases(tests);
+    harness.discover(tests);
     harness.main()
 }
 
