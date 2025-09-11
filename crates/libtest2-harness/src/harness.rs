@@ -93,6 +93,13 @@ impl Harness<StateParsed> {
         mut self,
         cases: impl IntoIterator<Item = impl Case + 'static>,
     ) -> std::io::Result<Harness<StateDiscovered>> {
+        self.state.notifier.notify(
+            notify::event::DiscoverStart {
+                elapsed_s: Some(notify::Elapsed(self.state.start.elapsed())),
+            }
+            .into(),
+        )?;
+
         let mut cases = cases
             .into_iter()
             .map(|c| Box::new(c) as Box<dyn Case>)
@@ -103,6 +110,14 @@ impl Harness<StateParsed> {
             &mut cases,
             self.state.notifier.as_mut(),
         )?;
+
+        self.state.notifier.notify(
+            notify::event::DiscoverComplete {
+                elapsed_s: Some(notify::Elapsed(self.state.start.elapsed())),
+            }
+            .into(),
+        )?;
+
         Ok(Harness {
             state: StateDiscovered {
                 start: self.state.start,
@@ -244,13 +259,6 @@ fn discover(
     cases: &mut Vec<Box<dyn Case>>,
     notifier: &mut dyn notify::Notifier,
 ) -> std::io::Result<()> {
-    notifier.notify(
-        notify::event::DiscoverStart {
-            elapsed_s: Some(notify::Elapsed(start.elapsed())),
-        }
-        .into(),
-    )?;
-
     let matches_filter = |case: &dyn Case, filter: &str| {
         let test_name = case.name();
 
@@ -296,13 +304,6 @@ fn discover(
     }
     let mut retain_cases = retain_cases.into_iter();
     cases.retain(|_| retain_cases.next().unwrap());
-
-    notifier.notify(
-        notify::event::DiscoverComplete {
-            elapsed_s: Some(notify::Elapsed(start.elapsed())),
-        }
-        .into(),
-    )?;
 
     Ok(())
 }
