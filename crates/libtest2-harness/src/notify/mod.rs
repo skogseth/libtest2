@@ -1,4 +1,3 @@
-#[cfg(feature = "json")]
 mod json;
 #[cfg(not(feature = "color"))]
 mod no_style;
@@ -8,7 +7,6 @@ mod style;
 mod summary;
 mod terse;
 
-#[cfg(feature = "json")]
 pub(crate) use json::*;
 #[cfg(not(feature = "color"))]
 pub(crate) use no_style::*;

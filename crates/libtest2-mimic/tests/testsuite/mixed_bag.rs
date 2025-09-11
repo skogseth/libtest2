@@ -698,7 +698,6 @@ test result: FAILED. 1 passed; 1 failed; 0 ignored; 6 filtered out; finished in 
 }
 
 #[test]
-#[cfg(feature = "json")]
 fn list_json() {
     check(
         &["-Zunstable-options", "--format=json", "--list", "a"],
@@ -827,7 +826,6 @@ fn list_json() {
 }
 
 #[test]
-#[cfg(feature = "json")]
 fn test_json() {
     check(
         &["-Zunstable-options", "--format=json", "a"],
@@ -1102,7 +1100,6 @@ test result: FAILED. 1 passed; 1 failed; 2 ignored; 0 filtered out; finished in 
 }
 
 #[test]
-#[cfg(feature = "json")]
 fn fail_fast_json() {
     check(
         &["-Zunstable-options", "--format=json", "--fail-fast"],
