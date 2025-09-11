@@ -24,8 +24,6 @@
 //#![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 
-pub use libtest_json::RunMode;
-
 pub struct Harness {
     raw: Vec<std::ffi::OsString>,
     cases: Vec<Trial>,
@@ -160,10 +158,6 @@ impl<'t> TestContext<'t> {
         self.inner
             .ignore_for(reason)
             .map_err(|e| RunError { inner: e })
-    }
-
-    pub fn current_mode(&self) -> RunMode {
-        self.inner.current_mode()
     }
 }
 
