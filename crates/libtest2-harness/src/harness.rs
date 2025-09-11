@@ -100,28 +100,24 @@ impl Harness<StateParsed> {
             .into(),
         )?;
 
-        let mut cases = cases
-            .into_iter()
-            .map(|c| Box::new(c) as Box<dyn Case>)
-            .collect::<Vec<_>>();
-        let mut retain_cases = Vec::with_capacity(cases.len());
-        for case in cases.iter() {
-            let retain_case = case_priority(case.as_ref(), &self.state.opts).is_some();
-            retain_cases.push(retain_case);
+        let mut selected_cases = Vec::new();
+        for case in cases {
+            let selected = case_priority(&case, &self.state.opts).is_some();
             self.state.notifier.notify(
                 notify::event::DiscoverCase {
                     name: case.name().to_owned(),
                     mode: RunMode::Test,
-                    selected: retain_case,
+                    selected,
                     elapsed_s: Some(notify::Elapsed(self.state.start.elapsed())),
                 }
                 .into(),
             )?;
+            if selected {
+                selected_cases.push(Box::new(case) as Box<dyn Case>);
+            }
         }
-        let mut retain_cases = retain_cases.into_iter();
-        cases.retain(|_| retain_cases.next().unwrap());
 
-        cases.sort_unstable_by_key(|case| {
+        selected_cases.sort_unstable_by_key(|case| {
             let priority = case_priority(case.as_ref(), &self.state.opts);
             let name = case.name().to_owned();
             (priority, name)
@@ -139,7 +135,7 @@ impl Harness<StateParsed> {
                 start: self.state.start,
                 opts: self.state.opts,
                 notifier: self.state.notifier,
-                cases,
+                cases: selected_cases,
             },
         })
     }
