@@ -268,19 +268,6 @@ fn discover(
         }
     };
 
-    // Do this first so it applies to both discover and running
-    cases.sort_unstable_by_key(|case| {
-        let priority = if opts.filters.is_empty() {
-            Some(0)
-        } else {
-            opts.filters
-                .iter()
-                .position(|filter| matches_filter(case.as_ref(), filter))
-        };
-        let name = case.name().to_owned();
-        (priority, name)
-    });
-
     let mut retain_cases = Vec::with_capacity(cases.len());
     for case in cases.iter() {
         let filtered_in = opts.filters.is_empty()
@@ -304,6 +291,18 @@ fn discover(
     }
     let mut retain_cases = retain_cases.into_iter();
     cases.retain(|_| retain_cases.next().unwrap());
+
+    cases.sort_unstable_by_key(|case| {
+        let priority = if opts.filters.is_empty() {
+            Some(0)
+        } else {
+            opts.filters
+                .iter()
+                .position(|filter| matches_filter(case.as_ref(), filter))
+        };
+        let name = case.name().to_owned();
+        (priority, name)
+    });
 
     Ok(())
 }

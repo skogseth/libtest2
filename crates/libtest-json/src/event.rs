@@ -115,6 +115,9 @@ impl DiscoverStart {
     }
 }
 
+/// A test case was found
+///
+/// The order these are returned in is unspecified and is unrelated to the order they are run in.
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "unstable-schema", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
