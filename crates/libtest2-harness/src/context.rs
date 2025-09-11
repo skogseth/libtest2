@@ -4,6 +4,7 @@ pub struct TestContext {
     pub(crate) start: std::time::Instant,
     pub(crate) mode: RunMode,
     pub(crate) run_ignored: bool,
+    pub(crate) notifier: std::sync::Mutex<Box<dyn notify::Notifier + Send>>,
 }
 
 impl TestContext {
@@ -27,7 +28,15 @@ impl TestContext {
         self.mode
     }
 
+    pub fn notify(&self, event: notify::Event) -> std::io::Result<()> {
+        self.notifier().notify(event)
+    }
+
     pub fn elapased_s(&self) -> notify::Elapsed {
         notify::Elapsed(self.start.elapsed())
+    }
+
+    pub(crate) fn notifier(&self) -> std::sync::MutexGuard<'_, Box<dyn notify::Notifier + Send>> {
+        self.notifier.lock().unwrap()
     }
 }

@@ -83,7 +83,7 @@ impl Harness<StateArgs> {
 pub struct StateParsed {
     start: std::time::Instant,
     opts: libtest_lexarg::TestOpts,
-    notifier: Box<dyn notify::Notifier>,
+    notifier: Box<dyn notify::Notifier + Send>,
 }
 impl HarnessState for StateParsed {}
 impl sealed::_HarnessState_is_Sealed for StateParsed {}
@@ -144,14 +144,14 @@ impl Harness<StateParsed> {
 pub struct StateDiscovered {
     start: std::time::Instant,
     opts: libtest_lexarg::TestOpts,
-    notifier: Box<dyn notify::Notifier>,
+    notifier: Box<dyn notify::Notifier + Send>,
     cases: Vec<Box<dyn Case>>,
 }
 impl HarnessState for StateDiscovered {}
 impl sealed::_HarnessState_is_Sealed for StateDiscovered {}
 
 impl Harness<StateDiscovered> {
-    pub fn run(mut self) -> std::io::Result<bool> {
+    pub fn run(self) -> std::io::Result<bool> {
         if self.state.opts.list {
             Ok(true)
         } else {
@@ -159,7 +159,7 @@ impl Harness<StateDiscovered> {
                 &self.state.start,
                 &self.state.opts,
                 self.state.cases,
-                self.state.notifier.as_mut(),
+                self.state.notifier,
             )
         }
     }
@@ -252,7 +252,7 @@ fn parse<'p>(parser: &mut cli::Parser<'p>) -> Result<libtest_lexarg::TestOpts, c
     Ok(opts)
 }
 
-fn notifier(opts: &libtest_lexarg::TestOpts) -> Box<dyn notify::Notifier> {
+fn notifier(opts: &libtest_lexarg::TestOpts) -> Box<dyn notify::Notifier + Send> {
     #[cfg(feature = "color")]
     let stdout = anstream::stdout();
     #[cfg(not(feature = "color"))]
@@ -292,7 +292,7 @@ fn run(
     start: &std::time::Instant,
     opts: &libtest_lexarg::TestOpts,
     cases: Vec<Box<dyn Case>>,
-    notifier: &mut dyn notify::Notifier,
+    mut notifier: Box<dyn notify::Notifier + Send>,
 ) -> std::io::Result<bool> {
     notifier.notify(
         notify::event::RunStart {
@@ -334,6 +334,7 @@ fn run(
         start: *start,
         mode,
         run_ignored,
+        notifier: std::sync::Mutex::new(notifier),
     };
     let context = std::sync::Arc::new(context);
 
@@ -347,45 +348,18 @@ fn run(
             .partition::<Vec<_>, _>(|c| c.exclusive(&context))
     };
     if !concurrent_cases.is_empty() {
-        notifier.threaded(true);
-        struct RunningTest {
-            join_handle: std::thread::JoinHandle<()>,
-        }
-
-        impl RunningTest {
-            fn join(
-                self,
-                start: &std::time::Instant,
-                event: &notify::event::CaseComplete,
-                notifier: &mut dyn notify::Notifier,
-            ) -> std::io::Result<()> {
-                if self.join_handle.join().is_err() {
-                    let kind = notify::MessageKind::Error;
-                    let message = Some("panicked after reporting success".to_owned());
-                    notifier.notify(
-                        notify::event::CaseMessage {
-                            name: event.name.clone(),
-                            kind,
-                            message,
-                            elapsed_s: Some(notify::Elapsed(start.elapsed())),
-                        }
-                        .into(),
-                    )?;
-                }
-                Ok(())
-            }
-        }
+        context.notifier().threaded(true);
 
         // Use a deterministic hasher
         type TestMap = std::collections::HashMap<
             String,
-            RunningTest,
+            std::thread::JoinHandle<std::io::Result<bool>>,
             std::hash::BuildHasherDefault<std::collections::hash_map::DefaultHasher>,
         >;
 
         let sync_success = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(success));
         let mut running: TestMap = Default::default();
-        let (tx, rx) = std::sync::mpsc::channel::<notify::Event>();
+        let (tx, rx) = std::sync::mpsc::channel::<String>();
         let mut remaining = std::collections::VecDeque::from(concurrent_cases);
         while !running.is_empty() || !remaining.is_empty() {
             while running.len() < threads && !remaining.is_empty() {
@@ -399,27 +373,21 @@ fn run(
                 let thread_context = context.clone();
                 let thread_sync_success = sync_success.clone();
                 let join_handle = cfg.spawn(move || {
-                    let mut notifier = SenderNotifier { tx: thread_tx };
-                    let case_success = run_case(
-                        thread_case.as_ref().as_ref(),
-                        &thread_context,
-                        &mut notifier,
-                    )
-                    .expect("`SenderNotifier` is infallible");
-                    if !case_success {
-                        thread_sync_success
-                            .store(case_success, std::sync::atomic::Ordering::Relaxed);
+                    let status = run_case(thread_case.as_ref().as_ref(), &thread_context);
+                    if !matches!(status, Ok(true)) {
+                        thread_sync_success.store(false, std::sync::atomic::Ordering::Relaxed);
                     }
+                    let _ = thread_tx.send(thread_case.name().to_owned());
+                    status
                 });
                 match join_handle {
                     Ok(join_handle) => {
-                        running.insert(name.clone(), RunningTest { join_handle });
+                        running.insert(name.clone(), join_handle);
                     }
                     Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => {
                         // `ErrorKind::WouldBlock` means hitting the thread limit on some
                         // platforms, so run the test synchronously here instead.
-                        let case_success = run_case(case.as_ref().as_ref(), &context, notifier)
-                            .expect("`SenderNotifier` is infallible");
+                        let case_success = run_case(case.as_ref().as_ref(), &context)?;
                         if !case_success {
                             sync_success.store(case_success, std::sync::atomic::Ordering::Relaxed);
                         }
@@ -430,12 +398,9 @@ fn run(
                 }
             }
 
-            let event = rx.recv().unwrap();
-            if let notify::Event::CaseComplete(event) = &event {
-                let running_test = running.remove(&event.name).unwrap();
-                running_test.join(start, event, notifier)?;
-            }
-            notifier.notify(event)?;
+            let test_name = rx.recv().unwrap();
+            let running_test = running.remove(&test_name).unwrap();
+            let _ = running_test.join();
             success &= sync_success.load(std::sync::atomic::Ordering::SeqCst);
             if !success && opts.fail_fast {
                 break;
@@ -444,16 +409,16 @@ fn run(
     }
 
     if !exclusive_cases.is_empty() {
-        notifier.threaded(false);
+        context.notifier().threaded(false);
         for case in exclusive_cases {
-            success &= run_case(case.as_ref(), &context, notifier)?;
+            success &= run_case(case.as_ref(), &context)?;
             if !success && opts.fail_fast {
                 break;
             }
         }
     }
 
-    notifier.notify(
+    context.notifier().notify(
         notify::event::RunComplete {
             elapsed_s: Some(notify::Elapsed(start.elapsed())),
         }
@@ -463,12 +428,8 @@ fn run(
     Ok(success)
 }
 
-fn run_case(
-    case: &dyn Case,
-    context: &TestContext,
-    notifier: &mut dyn notify::Notifier,
-) -> std::io::Result<bool> {
-    notifier.notify(
+fn run_case(case: &dyn Case, context: &TestContext) -> std::io::Result<bool> {
+    context.notifier().notify(
         notify::event::CaseStart {
             name: case.name().to_owned(),
             elapsed_s: Some(context.elapased_s()),
@@ -500,7 +461,7 @@ fn run_case(
         let kind = err.status();
         case_status = Some(kind);
         let message = err.cause().map(|c| c.to_string());
-        notifier.notify(
+        context.notifier().notify(
             notify::event::CaseMessage {
                 name: case.name().to_owned(),
                 kind,
@@ -511,7 +472,7 @@ fn run_case(
         )?;
     }
 
-    notifier.notify(
+    context.notifier().notify(
         notify::event::CaseComplete {
             name: case.name().to_owned(),
             elapsed_s: Some(context.elapased_s()),
@@ -529,17 +490,4 @@ fn __rust_begin_short_backtrace<T, F: FnOnce() -> T>(f: F) -> T {
 
     // prevent this frame from being tail-call optimised away
     std::hint::black_box(result)
-}
-
-#[derive(Clone, Debug)]
-struct SenderNotifier {
-    tx: std::sync::mpsc::Sender<notify::Event>,
-}
-
-impl notify::Notifier for SenderNotifier {
-    fn notify(&mut self, event: notify::Event) -> std::io::Result<()> {
-        // If the sender doesn't care, neither do we
-        let _ = self.tx.send(event);
-        Ok(())
-    }
 }
