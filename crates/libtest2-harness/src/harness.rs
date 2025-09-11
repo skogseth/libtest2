@@ -111,6 +111,12 @@ impl Harness<StateParsed> {
             self.state.notifier.as_mut(),
         )?;
 
+        cases.sort_unstable_by_key(|case| {
+            let priority = case_priority(case.as_ref(), &self.state.opts);
+            let name = case.name().to_owned();
+            (priority, name)
+        });
+
         self.state.notifier.notify(
             notify::event::DiscoverComplete {
                 elapsed_s: Some(notify::Elapsed(self.state.start.elapsed())),
@@ -275,12 +281,6 @@ fn discover(
     }
     let mut retain_cases = retain_cases.into_iter();
     cases.retain(|_| retain_cases.next().unwrap());
-
-    cases.sort_unstable_by_key(|case| {
-        let priority = case_priority(case.as_ref(), opts);
-        let name = case.name().to_owned();
-        (priority, name)
-    });
 
     Ok(())
 }
