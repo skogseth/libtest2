@@ -26,7 +26,6 @@ pre-release-replacements = [
 [features]
 default = []
 color = ["dep:anstream", "dep:anstyle"]
-json = ["libtest-json/json"]
 threads = []
 
 [dependencies]
@@ -35,7 +34,7 @@ lexarg-error = { version = "0.0.1", path = "../lexarg-error" }
 libtest-lexarg = { version = "0.0.1", path = "../libtest-lexarg" }
 anstream = { version = "0.6.4", optional = true }
 anstyle = { version = "1.0.10", optional = true }
-libtest-json = { version = "0.0.1", path = "../libtest-json" }
+libtest-json = { version = "0.0.1", path = "../libtest-json", features = ["json"] }
 
 [dev-dependencies]
 

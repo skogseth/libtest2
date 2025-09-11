@@ -68,10 +68,7 @@ impl Harness<StateArgs> {
         }
         .write_global();
 
-        let notifier = notifier(&opts).unwrap_or_else(|err| {
-            eprintln!("{err}");
-            std::process::exit(1)
-        });
+        let notifier = notifier(&opts);
 
         Ok(Harness {
             state: StateParsed {
@@ -228,26 +225,17 @@ fn parse_argfile(path: &std::path::Path) -> std::io::Result<Vec<std::ffi::OsStri
     Ok(content.lines().map(|s| s.into()).collect())
 }
 
-fn notifier(opts: &libtest_lexarg::TestOpts) -> std::io::Result<Box<dyn notify::Notifier>> {
+fn notifier(opts: &libtest_lexarg::TestOpts) -> Box<dyn notify::Notifier> {
     #[cfg(feature = "color")]
     let stdout = anstream::stdout();
     #[cfg(not(feature = "color"))]
     let stdout = std::io::stdout();
-    let notifier: Box<dyn notify::Notifier> = match opts.format {
-        #[cfg(feature = "json")]
+    match opts.format {
         OutputFormat::Json => Box::new(notify::JsonNotifier::new(stdout)),
-        #[cfg(not(feature = "json"))]
-        OutputFormat::Json => {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                "`--format=json` is not supported",
-            ));
-        }
         _ if opts.list => Box::new(notify::TerseListNotifier::new(stdout)),
         OutputFormat::Pretty => Box::new(notify::PrettyRunNotifier::new(stdout)),
         OutputFormat::Terse => Box::new(notify::TerseRunNotifier::new(stdout)),
-    };
-    Ok(notifier)
+    }
 }
 
 fn discover(
