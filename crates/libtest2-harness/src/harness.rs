@@ -146,6 +146,27 @@ mod sealed {
 
 pub const ERROR_EXIT_CODE: i32 = 101;
 
+fn expand_args(
+    args: impl IntoIterator<Item = impl Into<std::ffi::OsString>>,
+) -> std::io::Result<Vec<std::ffi::OsString>> {
+    let mut expanded = Vec::new();
+    for arg in args {
+        let arg = arg.into();
+        if let Some(argfile) = arg.to_str().and_then(|s| s.strip_prefix("@")) {
+            expanded.extend(parse_argfile(std::path::Path::new(argfile))?);
+        } else {
+            expanded.push(arg);
+        }
+    }
+    Ok(expanded)
+}
+
+fn parse_argfile(path: &std::path::Path) -> std::io::Result<Vec<std::ffi::OsString>> {
+    // Logic taken from rust-lang/rust's `compiler/rustc_driver_impl/src/args.rs`
+    let content = std::fs::read_to_string(path)?;
+    Ok(content.lines().map(|s| s.into()).collect())
+}
+
 fn parse<'p>(parser: &mut cli::Parser<'p>) -> Result<libtest_lexarg::TestOpts, cli::LexError<'p>> {
     let mut test_opts = libtest_lexarg::TestOptsBuilder::new();
 
@@ -202,27 +223,6 @@ fn parse<'p>(parser: &mut cli::Parser<'p>) -> Result<libtest_lexarg::TestOpts, c
         None
     };
     Ok(opts)
-}
-
-fn expand_args(
-    args: impl IntoIterator<Item = impl Into<std::ffi::OsString>>,
-) -> std::io::Result<Vec<std::ffi::OsString>> {
-    let mut expanded = Vec::new();
-    for arg in args {
-        let arg = arg.into();
-        if let Some(argfile) = arg.to_str().and_then(|s| s.strip_prefix("@")) {
-            expanded.extend(parse_argfile(std::path::Path::new(argfile))?);
-        } else {
-            expanded.push(arg);
-        }
-    }
-    Ok(expanded)
-}
-
-fn parse_argfile(path: &std::path::Path) -> std::io::Result<Vec<std::ffi::OsString>> {
-    // Logic taken from rust-lang/rust's `compiler/rustc_driver_impl/src/args.rs`
-    let content = std::fs::read_to_string(path)?;
-    Ok(content.lines().map(|s| s.into()).collect())
 }
 
 fn notifier(opts: &libtest_lexarg::TestOpts) -> Box<dyn notify::Notifier> {
