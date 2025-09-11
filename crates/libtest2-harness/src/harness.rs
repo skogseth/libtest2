@@ -93,22 +93,49 @@ impl Harness<StateParsed> {
         mut self,
         cases: impl IntoIterator<Item = impl Case + 'static>,
     ) -> std::io::Result<Harness<StateDiscovered>> {
-        let mut cases = cases
-            .into_iter()
-            .map(|c| Box::new(c) as Box<dyn Case>)
-            .collect();
-        discover(
-            &self.state.start,
-            &self.state.opts,
-            &mut cases,
-            self.state.notifier.as_mut(),
+        self.state.notifier.notify(
+            notify::event::DiscoverStart {
+                elapsed_s: Some(notify::Elapsed(self.state.start.elapsed())),
+            }
+            .into(),
         )?;
+
+        let mut selected_cases = Vec::new();
+        for case in cases {
+            let selected = case_priority(&case, &self.state.opts).is_some();
+            self.state.notifier.notify(
+                notify::event::DiscoverCase {
+                    name: case.name().to_owned(),
+                    mode: RunMode::Test,
+                    selected,
+                    elapsed_s: Some(notify::Elapsed(self.state.start.elapsed())),
+                }
+                .into(),
+            )?;
+            if selected {
+                selected_cases.push(Box::new(case) as Box<dyn Case>);
+            }
+        }
+
+        selected_cases.sort_unstable_by_key(|case| {
+            let priority = case_priority(case.as_ref(), &self.state.opts);
+            let name = case.name().to_owned();
+            (priority, name)
+        });
+
+        self.state.notifier.notify(
+            notify::event::DiscoverComplete {
+                elapsed_s: Some(notify::Elapsed(self.state.start.elapsed())),
+            }
+            .into(),
+        )?;
+
         Ok(Harness {
             state: StateDiscovered {
                 start: self.state.start,
                 opts: self.state.opts,
                 notifier: self.state.notifier,
-                cases,
+                cases: selected_cases,
             },
         })
     }
@@ -238,73 +265,27 @@ fn notifier(opts: &libtest_lexarg::TestOpts) -> Box<dyn notify::Notifier> {
     }
 }
 
-fn discover(
-    start: &std::time::Instant,
-    opts: &libtest_lexarg::TestOpts,
-    cases: &mut Vec<Box<dyn Case>>,
-    notifier: &mut dyn notify::Notifier,
-) -> std::io::Result<()> {
-    notifier.notify(
-        notify::event::DiscoverStart {
-            elapsed_s: Some(notify::Elapsed(start.elapsed())),
-        }
-        .into(),
-    )?;
-
-    let matches_filter = |case: &dyn Case, filter: &str| {
-        let test_name = case.name();
-
-        match opts.filter_exact {
-            true => test_name == filter,
-            false => test_name.contains(filter),
-        }
-    };
-
-    // Do this first so it applies to both discover and running
-    cases.sort_unstable_by_key(|case| {
-        let priority = if opts.filters.is_empty() {
-            Some(0)
-        } else {
-            opts.filters
-                .iter()
-                .position(|filter| matches_filter(case.as_ref(), filter))
-        };
-        let name = case.name().to_owned();
-        (priority, name)
-    });
-
-    let mut retain_cases = Vec::with_capacity(cases.len());
-    for case in cases.iter() {
-        let filtered_in = opts.filters.is_empty()
-            || opts
-                .filters
-                .iter()
-                .any(|filter| matches_filter(case.as_ref(), filter));
-        let filtered_out =
-            !opts.skip.is_empty() && opts.skip.iter().any(|sf| matches_filter(case.as_ref(), sf));
-        let retain_case = filtered_in && !filtered_out;
-        retain_cases.push(retain_case);
-        notifier.notify(
-            notify::event::DiscoverCase {
-                name: case.name().to_owned(),
-                mode: RunMode::Test,
-                selected: retain_case,
-                elapsed_s: Some(notify::Elapsed(start.elapsed())),
-            }
-            .into(),
-        )?;
+fn case_priority(case: &dyn Case, opts: &libtest_lexarg::TestOpts) -> Option<usize> {
+    let filtered_out =
+        !opts.skip.is_empty() && opts.skip.iter().any(|sf| matches_filter(case, sf, opts));
+    if filtered_out {
+        None
+    } else if opts.filters.is_empty() {
+        Some(0)
+    } else {
+        opts.filters
+            .iter()
+            .position(|filter| matches_filter(case, filter, opts))
     }
-    let mut retain_cases = retain_cases.into_iter();
-    cases.retain(|_| retain_cases.next().unwrap());
+}
 
-    notifier.notify(
-        notify::event::DiscoverComplete {
-            elapsed_s: Some(notify::Elapsed(start.elapsed())),
-        }
-        .into(),
-    )?;
+fn matches_filter(case: &dyn Case, filter: &str, opts: &libtest_lexarg::TestOpts) -> bool {
+    let test_name = case.name();
 
-    Ok(())
+    match opts.filter_exact {
+        true => test_name == filter,
+        false => test_name.contains(filter),
+    }
 }
 
 fn run(

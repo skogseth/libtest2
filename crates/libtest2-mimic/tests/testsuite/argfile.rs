@@ -90,9 +90,9 @@ fn list() {
         0,
         str![[r#"
 one: test
-one_two: test
-three: test
 two: test
+three: test
+one_two: test
 
 4 tests
 
@@ -100,7 +100,7 @@ two: test
 "#]],
         str![[r#"
 one: test
-one_two: test
+two: test
 ...
 
 4 tests
