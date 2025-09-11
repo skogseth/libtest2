@@ -383,11 +383,10 @@ fn run(
 
         let sync_success = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(success));
         let mut running_tests: TestMap = Default::default();
-        let mut running = 0;
         let (tx, rx) = std::sync::mpsc::channel::<notify::Event>();
         let mut remaining = std::collections::VecDeque::from(concurrent_cases);
-        while running > 0 || !remaining.is_empty() {
-            while running < threads && !remaining.is_empty() {
+        while !running_tests.is_empty() || !remaining.is_empty() {
+            while running_tests.len() < threads && !remaining.is_empty() {
                 let case = remaining.pop_front().unwrap();
                 let name = case.name().to_owned();
 
@@ -412,7 +411,6 @@ fn run(
                 match join_handle {
                     Ok(join_handle) => {
                         running_tests.insert(name.clone(), RunningTest { join_handle });
-                        running += 1;
                     }
                     Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => {
                         // `ErrorKind::WouldBlock` means hitting the thread limit on some
@@ -439,7 +437,6 @@ fn run(
             if let notify::Event::CaseComplete(event) = &event {
                 let running_test = running_tests.remove(&event.name).unwrap();
                 running_test.join(start, event, notifier)?;
-                running -= 1;
             }
             notifier.notify(event)?;
             success &= sync_success.load(std::sync::atomic::Ordering::SeqCst);
