@@ -261,17 +261,7 @@ fn discover(
 ) -> std::io::Result<()> {
     let mut retain_cases = Vec::with_capacity(cases.len());
     for case in cases.iter() {
-        let filtered_in = opts.filters.is_empty()
-            || opts
-                .filters
-                .iter()
-                .any(|filter| matches_filter(case.as_ref(), filter, opts));
-        let filtered_out = !opts.skip.is_empty()
-            && opts
-                .skip
-                .iter()
-                .any(|sf| matches_filter(case.as_ref(), sf, opts));
-        let retain_case = filtered_in && !filtered_out;
+        let retain_case = case_priority(case.as_ref(), opts).is_some();
         retain_cases.push(retain_case);
         notifier.notify(
             notify::event::DiscoverCase {
@@ -287,18 +277,26 @@ fn discover(
     cases.retain(|_| retain_cases.next().unwrap());
 
     cases.sort_unstable_by_key(|case| {
-        let priority = if opts.filters.is_empty() {
-            Some(0)
-        } else {
-            opts.filters
-                .iter()
-                .position(|filter| matches_filter(case.as_ref(), filter, opts))
-        };
+        let priority = case_priority(case.as_ref(), opts);
         let name = case.name().to_owned();
         (priority, name)
     });
 
     Ok(())
+}
+
+fn case_priority(case: &dyn Case, opts: &libtest_lexarg::TestOpts) -> Option<usize> {
+    let filtered_out =
+        !opts.skip.is_empty() && opts.skip.iter().any(|sf| matches_filter(case, sf, opts));
+    if filtered_out {
+        None
+    } else if opts.filters.is_empty() {
+        Some(0)
+    } else {
+        opts.filters
+            .iter()
+            .position(|filter| matches_filter(case, filter, opts))
+    }
 }
 
 fn matches_filter(case: &dyn Case, filter: &str, opts: &libtest_lexarg::TestOpts) -> bool {
