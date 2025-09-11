@@ -259,24 +259,18 @@ fn discover(
     cases: &mut Vec<Box<dyn Case>>,
     notifier: &mut dyn notify::Notifier,
 ) -> std::io::Result<()> {
-    let matches_filter = |case: &dyn Case, filter: &str| {
-        let test_name = case.name();
-
-        match opts.filter_exact {
-            true => test_name == filter,
-            false => test_name.contains(filter),
-        }
-    };
-
     let mut retain_cases = Vec::with_capacity(cases.len());
     for case in cases.iter() {
         let filtered_in = opts.filters.is_empty()
             || opts
                 .filters
                 .iter()
-                .any(|filter| matches_filter(case.as_ref(), filter));
-        let filtered_out =
-            !opts.skip.is_empty() && opts.skip.iter().any(|sf| matches_filter(case.as_ref(), sf));
+                .any(|filter| matches_filter(case.as_ref(), filter, opts));
+        let filtered_out = !opts.skip.is_empty()
+            && opts
+                .skip
+                .iter()
+                .any(|sf| matches_filter(case.as_ref(), sf, opts));
         let retain_case = filtered_in && !filtered_out;
         retain_cases.push(retain_case);
         notifier.notify(
@@ -298,13 +292,22 @@ fn discover(
         } else {
             opts.filters
                 .iter()
-                .position(|filter| matches_filter(case.as_ref(), filter))
+                .position(|filter| matches_filter(case.as_ref(), filter, opts))
         };
         let name = case.name().to_owned();
         (priority, name)
     });
 
     Ok(())
+}
+
+fn matches_filter(case: &dyn Case, filter: &str, opts: &libtest_lexarg::TestOpts) -> bool {
+    let test_name = case.name();
+
+    match opts.filter_exact {
+        true => test_name == filter,
+        false => test_name.contains(filter),
+    }
 }
 
 fn run(
