@@ -144,7 +144,6 @@ impl RunError {
     }
 }
 
-#[derive(Debug)]
 pub struct TestContext<'t> {
     inner: &'t libtest2_harness::TestContext,
 }

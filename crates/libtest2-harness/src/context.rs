@@ -1,6 +1,5 @@
 pub(crate) use crate::*;
 
-#[derive(Debug)]
 pub struct TestContext {
     mode: RunMode,
     run_ignored: bool,
