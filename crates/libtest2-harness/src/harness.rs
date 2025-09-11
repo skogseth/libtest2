@@ -103,13 +103,23 @@ impl Harness<StateParsed> {
         let mut cases = cases
             .into_iter()
             .map(|c| Box::new(c) as Box<dyn Case>)
-            .collect();
-        discover(
-            &self.state.start,
-            &self.state.opts,
-            &mut cases,
-            self.state.notifier.as_mut(),
-        )?;
+            .collect::<Vec<_>>();
+        let mut retain_cases = Vec::with_capacity(cases.len());
+        for case in cases.iter() {
+            let retain_case = case_priority(case.as_ref(), &self.state.opts).is_some();
+            retain_cases.push(retain_case);
+            self.state.notifier.notify(
+                notify::event::DiscoverCase {
+                    name: case.name().to_owned(),
+                    mode: RunMode::Test,
+                    selected: retain_case,
+                    elapsed_s: Some(notify::Elapsed(self.state.start.elapsed())),
+                }
+                .into(),
+            )?;
+        }
+        let mut retain_cases = retain_cases.into_iter();
+        cases.retain(|_| retain_cases.next().unwrap());
 
         cases.sort_unstable_by_key(|case| {
             let priority = case_priority(case.as_ref(), &self.state.opts);
@@ -257,32 +267,6 @@ fn notifier(opts: &libtest_lexarg::TestOpts) -> Box<dyn notify::Notifier> {
         OutputFormat::Pretty => Box::new(notify::PrettyRunNotifier::new(stdout)),
         OutputFormat::Terse => Box::new(notify::TerseRunNotifier::new(stdout)),
     }
-}
-
-fn discover(
-    start: &std::time::Instant,
-    opts: &libtest_lexarg::TestOpts,
-    cases: &mut Vec<Box<dyn Case>>,
-    notifier: &mut dyn notify::Notifier,
-) -> std::io::Result<()> {
-    let mut retain_cases = Vec::with_capacity(cases.len());
-    for case in cases.iter() {
-        let retain_case = case_priority(case.as_ref(), opts).is_some();
-        retain_cases.push(retain_case);
-        notifier.notify(
-            notify::event::DiscoverCase {
-                name: case.name().to_owned(),
-                mode: RunMode::Test,
-                selected: retain_case,
-                elapsed_s: Some(notify::Elapsed(start.elapsed())),
-            }
-            .into(),
-        )?;
-    }
-    let mut retain_cases = retain_cases.into_iter();
-    cases.retain(|_| retain_cases.next().unwrap());
-
-    Ok(())
 }
 
 fn case_priority(case: &dyn Case, opts: &libtest_lexarg::TestOpts) -> Option<usize> {
