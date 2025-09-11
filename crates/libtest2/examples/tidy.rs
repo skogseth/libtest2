@@ -3,10 +3,22 @@ use libtest2::RunResult;
 use libtest2::Trial;
 
 fn main() -> std::io::Result<()> {
+    let harness = ::libtest2_harness::Harness::new();
+    let harness = harness.with_env()?;
+    let harness = match harness.parse() {
+        Ok(harness) => harness,
+        Err(err) => {
+            eprintln!("{err}");
+            ::std::process::exit(1);
+        }
+    };
     let tests = collect_tests()?;
-    let mut harness = libtest2::Harness::with_env();
-    harness.discover(tests);
-    harness.main()
+    let harness = harness.discover(tests)?;
+    if !harness.run()? {
+        std::process::exit(libtest2_harness::ERROR_EXIT_CODE)
+    }
+
+    Ok(())
 }
 
 /// Creates one test for each `.rs` file in the current directory or
