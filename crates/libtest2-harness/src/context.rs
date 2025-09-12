@@ -1,9 +1,11 @@
 pub(crate) use crate::*;
 
-#[derive(Debug)]
 pub struct TestContext {
-    mode: RunMode,
-    run_ignored: bool,
+    pub(crate) start: std::time::Instant,
+    pub(crate) mode: RunMode,
+    pub(crate) run_ignored: bool,
+    pub(crate) notifier: notify::ArcNotifier,
+    pub(crate) test_name: String,
 }
 
 impl TestContext {
@@ -26,21 +28,30 @@ impl TestContext {
     pub fn current_mode(&self) -> RunMode {
         self.mode
     }
-}
 
-impl TestContext {
-    pub(crate) fn new() -> Self {
+    pub fn notify(&self, event: notify::Event) -> std::io::Result<()> {
+        self.notifier().notify(event)
+    }
+
+    pub fn elapased_s(&self) -> notify::Elapsed {
+        notify::Elapsed(self.start.elapsed())
+    }
+
+    pub fn test_name(&self) -> &str {
+        &self.test_name
+    }
+
+    pub(crate) fn notifier(&self) -> &notify::ArcNotifier {
+        &self.notifier
+    }
+
+    pub(crate) fn clone(&self) -> Self {
         Self {
-            mode: Default::default(),
-            run_ignored: false,
+            start: self.start,
+            mode: self.mode,
+            run_ignored: self.run_ignored,
+            notifier: self.notifier.clone(),
+            test_name: self.test_name.clone(),
         }
-    }
-
-    pub(crate) fn set_mode(&mut self, mode: RunMode) {
-        self.mode = mode;
-    }
-
-    pub(crate) fn set_run_ignored(&mut self, yes: bool) {
-        self.run_ignored = yes;
     }
 }

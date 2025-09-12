@@ -82,13 +82,13 @@ impl Harness {
 pub struct Trial {
     name: String,
     #[allow(clippy::type_complexity)]
-    runner: Box<dyn Fn(TestContext<'_>) -> Result<(), RunError> + Send + Sync>,
+    runner: Box<dyn Fn(RunContext<'_>) -> Result<(), RunError> + Send + Sync>,
 }
 
 impl Trial {
     pub fn test(
         name: impl Into<String>,
-        runner: impl Fn(TestContext<'_>) -> Result<(), RunError> + Send + Sync + 'static,
+        runner: impl Fn(RunContext<'_>) -> Result<(), RunError> + Send + Sync + 'static,
     ) -> Self {
         Self {
             name: name.into(),
@@ -119,7 +119,7 @@ impl libtest2_harness::Case for TrialCase {
         &self,
         context: &libtest2_harness::TestContext,
     ) -> Result<(), libtest2_harness::RunError> {
-        (self.inner.runner)(TestContext { inner: context }).map_err(|e| e.inner)
+        (self.inner.runner)(RunContext { inner: context }).map_err(|e| e.inner)
     }
 }
 
@@ -144,12 +144,11 @@ impl RunError {
     }
 }
 
-#[derive(Debug)]
-pub struct TestContext<'t> {
+pub struct RunContext<'t> {
     inner: &'t libtest2_harness::TestContext,
 }
 
-impl<'t> TestContext<'t> {
+impl<'t> RunContext<'t> {
     pub fn ignore(&self) -> Result<(), RunError> {
         self.inner.ignore().map_err(|e| RunError { inner: e })
     }
