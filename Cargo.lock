@@ -177,7 +177,7 @@ checksum = "453ad9f582a441959e5f0d088b02ce04cfe8d51a8eaf077f12ac6d3e94164ca6"
 
 [[package]]
 name = "json-write"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "proptest",
  "serde",
@@ -193,7 +193,7 @@ checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 
 [[package]]
 name = "lexarg"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "lexarg-error",
  "lexarg-parser",
@@ -201,14 +201,14 @@ dependencies = [
 
 [[package]]
 name = "lexarg-error"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "lexarg-parser",
 ]
 
 [[package]]
 name = "lexarg-parser"
-version = "0.0.1"
+version = "0.0.2"
 
 [[package]]
 name = "libc"
@@ -218,7 +218,7 @@ checksum = "1171693293099992e19cddea4e8b849964e9846f4acee11b3948bcc337be8776"
 
 [[package]]
 name = "libtest-json"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "json-write",
  "schemars",
@@ -229,7 +229,7 @@ dependencies = [
 
 [[package]]
 name = "libtest-lexarg"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "lexarg",
  "lexarg-error",
@@ -237,7 +237,7 @@ dependencies = [
 
 [[package]]
 name = "libtest2"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "dunce",
  "escargot",
@@ -249,7 +249,7 @@ dependencies = [
 
 [[package]]
 name = "libtest2-harness"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "anstream",
  "anstyle",
@@ -261,7 +261,7 @@ dependencies = [
 
 [[package]]
 name = "libtest2-mimic"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "dunce",
  "escargot",

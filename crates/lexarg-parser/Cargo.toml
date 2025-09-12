@@ -1,6 +1,6 @@
 [package]
 name = "lexarg-parser"
-version = "0.0.1"
+version = "0.0.2"
 description = "Minimal, API stable CLI parser"
 categories = ["command-line-interface"]
 keywords = ["args", "arguments", "cli", "parser", "getopt"]
