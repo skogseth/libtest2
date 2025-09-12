@@ -22,6 +22,7 @@ pub(crate) trait Notifier {
     fn notify(&mut self, event: Event) -> std::io::Result<()>;
 }
 
+#[derive(Clone)]
 pub(crate) struct ArcNotifier {
     inner: std::sync::Arc<std::sync::Mutex<dyn Notifier + Send>>,
 }

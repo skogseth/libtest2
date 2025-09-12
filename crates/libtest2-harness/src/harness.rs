@@ -336,7 +336,6 @@ fn run(
         run_ignored,
         notifier,
     };
-    let context = std::sync::Arc::new(context);
 
     let mut success = true;
 

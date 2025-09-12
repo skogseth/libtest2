@@ -39,4 +39,13 @@ impl TestContext {
     pub(crate) fn notifier(&self) -> &notify::ArcNotifier {
         &self.notifier
     }
+
+    pub(crate) fn clone(&self) -> Self {
+        Self {
+            start: self.start,
+            mode: self.mode,
+            run_ignored: self.run_ignored,
+            notifier: self.notifier.clone(),
+        }
+    }
 }
