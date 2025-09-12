@@ -83,14 +83,14 @@ impl Harness<StateArgs> {
 pub struct StateParsed {
     start: std::time::Instant,
     opts: libtest_lexarg::TestOpts,
-    notifier: Box<dyn notify::Notifier + Send>,
+    notifier: notify::ArcNotifier,
 }
 impl HarnessState for StateParsed {}
 impl sealed::_HarnessState_is_Sealed for StateParsed {}
 
 impl Harness<StateParsed> {
     pub fn discover(
-        mut self,
+        self,
         cases: impl IntoIterator<Item = impl Case + 'static>,
     ) -> std::io::Result<Harness<StateDiscovered>> {
         self.state.notifier.notify(
@@ -144,7 +144,7 @@ impl Harness<StateParsed> {
 pub struct StateDiscovered {
     start: std::time::Instant,
     opts: libtest_lexarg::TestOpts,
-    notifier: Box<dyn notify::Notifier + Send>,
+    notifier: notify::ArcNotifier,
     cases: Vec<Box<dyn Case>>,
 }
 impl HarnessState for StateDiscovered {}
@@ -252,16 +252,16 @@ fn parse<'p>(parser: &mut cli::Parser<'p>) -> Result<libtest_lexarg::TestOpts, c
     Ok(opts)
 }
 
-fn notifier(opts: &libtest_lexarg::TestOpts) -> Box<dyn notify::Notifier + Send> {
+fn notifier(opts: &libtest_lexarg::TestOpts) -> notify::ArcNotifier {
     #[cfg(feature = "color")]
     let stdout = anstream::stdout();
     #[cfg(not(feature = "color"))]
     let stdout = std::io::stdout();
     match opts.format {
-        OutputFormat::Json => Box::new(notify::JsonNotifier::new(stdout)),
-        _ if opts.list => Box::new(notify::TerseListNotifier::new(stdout)),
-        OutputFormat::Pretty => Box::new(notify::PrettyRunNotifier::new(stdout)),
-        OutputFormat::Terse => Box::new(notify::TerseRunNotifier::new(stdout)),
+        OutputFormat::Json => notify::ArcNotifier::new(notify::JsonNotifier::new(stdout)),
+        _ if opts.list => notify::ArcNotifier::new(notify::TerseListNotifier::new(stdout)),
+        OutputFormat::Pretty => notify::ArcNotifier::new(notify::PrettyRunNotifier::new(stdout)),
+        OutputFormat::Terse => notify::ArcNotifier::new(notify::TerseRunNotifier::new(stdout)),
     }
 }
 
@@ -292,7 +292,7 @@ fn run(
     start: &std::time::Instant,
     opts: &libtest_lexarg::TestOpts,
     cases: Vec<Box<dyn Case>>,
-    mut notifier: Box<dyn notify::Notifier + Send>,
+    notifier: notify::ArcNotifier,
 ) -> std::io::Result<bool> {
     notifier.notify(
         notify::event::RunStart {
@@ -334,7 +334,7 @@ fn run(
         start: *start,
         mode,
         run_ignored,
-        notifier: std::sync::Mutex::new(notifier),
+        notifier,
     };
     let context = std::sync::Arc::new(context);
 

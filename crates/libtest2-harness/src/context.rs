@@ -4,7 +4,7 @@ pub struct TestContext {
     pub(crate) start: std::time::Instant,
     pub(crate) mode: RunMode,
     pub(crate) run_ignored: bool,
-    pub(crate) notifier: std::sync::Mutex<Box<dyn notify::Notifier + Send>>,
+    pub(crate) notifier: notify::ArcNotifier,
 }
 
 impl TestContext {
@@ -36,7 +36,7 @@ impl TestContext {
         notify::Elapsed(self.start.elapsed())
     }
 
-    pub(crate) fn notifier(&self) -> std::sync::MutexGuard<'_, Box<dyn notify::Notifier + Send>> {
-        self.notifier.lock().unwrap()
+    pub(crate) fn notifier(&self) -> &notify::ArcNotifier {
+        &self.notifier
     }
 }
