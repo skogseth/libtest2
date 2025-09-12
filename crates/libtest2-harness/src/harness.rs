@@ -335,6 +335,7 @@ fn run(
         mode,
         run_ignored,
         notifier,
+        test_name: String::new(),
     };
 
     let mut success = true;
@@ -369,7 +370,8 @@ fn run(
                 let cfg = std::thread::Builder::new().name(name.clone());
                 let thread_tx = tx.clone();
                 let thread_case = case.clone();
-                let thread_context = context.clone();
+                let mut thread_context = context.clone();
+                thread_context.test_name = name.clone();
                 let thread_sync_success = sync_success.clone();
                 let join_handle = cfg.spawn(move || {
                     let status = run_case(thread_case.as_ref().as_ref(), &thread_context);

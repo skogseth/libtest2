@@ -5,6 +5,7 @@ pub struct TestContext {
     pub(crate) mode: RunMode,
     pub(crate) run_ignored: bool,
     pub(crate) notifier: notify::ArcNotifier,
+    pub(crate) test_name: String,
 }
 
 impl TestContext {
@@ -36,6 +37,10 @@ impl TestContext {
         notify::Elapsed(self.start.elapsed())
     }
 
+    pub fn test_name(&self) -> &str {
+        &self.test_name
+    }
+
     pub(crate) fn notifier(&self) -> &notify::ArcNotifier {
         &self.notifier
     }
@@ -46,6 +51,7 @@ impl TestContext {
             mode: self.mode,
             run_ignored: self.run_ignored,
             notifier: self.notifier.clone(),
+            test_name: self.test_name.clone(),
         }
     }
 }
