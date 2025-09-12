@@ -330,7 +330,11 @@ fn run(
         (false, true) => RunMode::Bench,
         (false, false) => unreachable!("libtest-lexarg` should always ensure at least one is set"),
     };
-    let context = TestContext { mode, run_ignored };
+    let context = TestContext {
+        start: *start,
+        mode,
+        run_ignored,
+    };
     let context = std::sync::Arc::new(context);
 
     let mut success = true;
@@ -389,7 +393,6 @@ fn run(
                 let name = case.name().to_owned();
 
                 let cfg = std::thread::Builder::new().name(name.clone());
-                let start = *start;
                 let tx = tx.clone();
                 let case = std::sync::Arc::new(case);
                 let case_fallback = case.clone();
@@ -399,9 +402,8 @@ fn run(
                 let sync_success_fallback = sync_success.clone();
                 let join_handle = cfg.spawn(move || {
                     let mut notifier = SenderNotifier { tx: tx.clone() };
-                    let case_success =
-                        run_case(&start, case.as_ref().as_ref(), &context, &mut notifier)
-                            .expect("`SenderNotifier` is infallible");
+                    let case_success = run_case(case.as_ref().as_ref(), &context, &mut notifier)
+                        .expect("`SenderNotifier` is infallible");
                     if !case_success {
                         sync_success.store(case_success, std::sync::atomic::Ordering::Relaxed);
                     }
@@ -413,13 +415,9 @@ fn run(
                     Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => {
                         // `ErrorKind::WouldBlock` means hitting the thread limit on some
                         // platforms, so run the test synchronously here instead.
-                        let case_success = run_case(
-                            &start,
-                            case_fallback.as_ref().as_ref(),
-                            &context_fallback,
-                            notifier,
-                        )
-                        .expect("`SenderNotifier` is infallible");
+                        let case_success =
+                            run_case(case_fallback.as_ref().as_ref(), &context_fallback, notifier)
+                                .expect("`SenderNotifier` is infallible");
                         if !case_success {
                             sync_success_fallback
                                 .store(case_success, std::sync::atomic::Ordering::Relaxed);
@@ -447,7 +445,7 @@ fn run(
     if !exclusive_cases.is_empty() {
         notifier.threaded(false);
         for case in exclusive_cases {
-            success &= run_case(start, case.as_ref(), &context, notifier)?;
+            success &= run_case(case.as_ref(), &context, notifier)?;
             if !success && opts.fail_fast {
                 break;
             }
@@ -465,7 +463,6 @@ fn run(
 }
 
 fn run_case(
-    start: &std::time::Instant,
     case: &dyn Case,
     context: &TestContext,
     notifier: &mut dyn notify::Notifier,
@@ -473,7 +470,7 @@ fn run_case(
     notifier.notify(
         notify::event::CaseStart {
             name: case.name().to_owned(),
-            elapsed_s: Some(notify::Elapsed(start.elapsed())),
+            elapsed_s: Some(context.elapased_s()),
         }
         .into(),
     )?;
@@ -507,7 +504,7 @@ fn run_case(
                 name: case.name().to_owned(),
                 kind,
                 message,
-                elapsed_s: Some(notify::Elapsed(start.elapsed())),
+                elapsed_s: Some(context.elapased_s()),
             }
             .into(),
         )?;
@@ -516,7 +513,7 @@ fn run_case(
     notifier.notify(
         notify::event::CaseComplete {
             name: case.name().to_owned(),
-            elapsed_s: Some(notify::Elapsed(start.elapsed())),
+            elapsed_s: Some(context.elapased_s()),
         }
         .into(),
     )?;
