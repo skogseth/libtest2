@@ -390,22 +390,25 @@ fn run(
         while !running.is_empty() || !remaining.is_empty() {
             while running.len() < threads && !remaining.is_empty() {
                 let case = remaining.pop_front().unwrap();
+                let case = std::sync::Arc::new(case);
                 let name = case.name().to_owned();
 
                 let cfg = std::thread::Builder::new().name(name.clone());
-                let tx = tx.clone();
-                let case = std::sync::Arc::new(case);
-                let case_fallback = case.clone();
-                let context = context.clone();
-                let context_fallback = context.clone();
-                let sync_success = sync_success.clone();
-                let sync_success_fallback = sync_success.clone();
+                let thread_tx = tx.clone();
+                let thread_case = case.clone();
+                let thread_context = context.clone();
+                let thread_sync_success = sync_success.clone();
                 let join_handle = cfg.spawn(move || {
-                    let mut notifier = SenderNotifier { tx: tx.clone() };
-                    let case_success = run_case(case.as_ref().as_ref(), &context, &mut notifier)
-                        .expect("`SenderNotifier` is infallible");
+                    let mut notifier = SenderNotifier { tx: thread_tx };
+                    let case_success = run_case(
+                        thread_case.as_ref().as_ref(),
+                        &thread_context,
+                        &mut notifier,
+                    )
+                    .expect("`SenderNotifier` is infallible");
                     if !case_success {
-                        sync_success.store(case_success, std::sync::atomic::Ordering::Relaxed);
+                        thread_sync_success
+                            .store(case_success, std::sync::atomic::Ordering::Relaxed);
                     }
                 });
                 match join_handle {
@@ -415,12 +418,10 @@ fn run(
                     Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => {
                         // `ErrorKind::WouldBlock` means hitting the thread limit on some
                         // platforms, so run the test synchronously here instead.
-                        let case_success =
-                            run_case(case_fallback.as_ref().as_ref(), &context_fallback, notifier)
-                                .expect("`SenderNotifier` is infallible");
+                        let case_success = run_case(case.as_ref().as_ref(), &context, notifier)
+                            .expect("`SenderNotifier` is infallible");
                         if !case_success {
-                            sync_success_fallback
-                                .store(case_success, std::sync::atomic::Ordering::Relaxed);
+                            sync_success.store(case_success, std::sync::atomic::Ordering::Relaxed);
                         }
                     }
                     Err(e) => {
