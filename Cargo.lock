@@ -261,7 +261,7 @@ dependencies = [
 
 [[package]]
 name = "libtest2-mimic"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "dunce",
  "escargot",

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [0.0.3] - 2025-09-12
+
 ## [0.0.2] - 2025-09-12
 
 - Rename `State` to `RunContext`
@@ -15,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.0.1] - 2025-07-18
 
 <!-- next-url -->
-[Unreleased]: https://github.com/epage/pytest-rs/compare/libtest2-mimic-v0.0.2...HEAD
+[Unreleased]: https://github.com/epage/pytest-rs/compare/libtest2-mimic-v0.0.3...HEAD
+[0.0.3]: https://github.com/epage/pytest-rs/compare/libtest2-mimic-v0.0.2...libtest2-mimic-v0.0.3
 [0.0.2]: https://github.com/epage/pytest-rs/compare/libtest2-mimic-v0.0.1...libtest2-mimic-v0.0.2
 [0.0.1]: https://github.com/rust-cli/argfile/compare/4c90b451737fda8cdb965a665d86d5a5ba06a9b4...libtest2-mimic-v0.0.1
