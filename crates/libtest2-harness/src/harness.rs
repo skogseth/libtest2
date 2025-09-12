@@ -316,7 +316,6 @@ fn run(
 
     let threads = opts.test_threads.map(|t| t.get()).unwrap_or(1);
 
-    let mut context = TestContext::new();
     let run_ignored = match opts.run_ignored {
         libtest_lexarg::RunIgnored::Yes | libtest_lexarg::RunIgnored::Only => true,
         libtest_lexarg::RunIgnored::No => false,
@@ -331,8 +330,7 @@ fn run(
         (false, true) => RunMode::Bench,
         (false, false) => unreachable!("libtest-lexarg` should always ensure at least one is set"),
     };
-    context.set_mode(mode);
-    context.set_run_ignored(run_ignored);
+    let context = TestContext { mode, run_ignored };
     let context = std::sync::Arc::new(context);
 
     let mut success = true;

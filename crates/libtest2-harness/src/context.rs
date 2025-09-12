@@ -1,8 +1,8 @@
 pub(crate) use crate::*;
 
 pub struct TestContext {
-    mode: RunMode,
-    run_ignored: bool,
+    pub(crate) mode: RunMode,
+    pub(crate) run_ignored: bool,
 }
 
 impl TestContext {
@@ -24,22 +24,5 @@ impl TestContext {
 
     pub fn current_mode(&self) -> RunMode {
         self.mode
-    }
-}
-
-impl TestContext {
-    pub(crate) fn new() -> Self {
-        Self {
-            mode: Default::default(),
-            run_ignored: false,
-        }
-    }
-
-    pub(crate) fn set_mode(&mut self, mode: RunMode) {
-        self.mode = mode;
-    }
-
-    pub(crate) fn set_run_ignored(&mut self, yes: bool) {
-        self.run_ignored = yes;
     }
 }
