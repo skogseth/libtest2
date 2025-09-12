@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+- Rename `State` to `RunContext`
+- Renamed `Harness::cases` to `Harness::discover`
+
 ## [0.0.1] - 2025-07-18
 
 <!-- next-url -->

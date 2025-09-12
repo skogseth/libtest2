@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+- Make schema `snake_case`
+- Timing is optional and is time since test start
+- Made fields with well known defaults to be optional
+- Made `DiscoverCase` order unspecified
+- Renamed `DiscoverCase::run` to `selected`
+- Rename `Suite` to `Run`
+- Rename `RunStatus` to `MessageKind`
+- Rename `MessageKind::Fail` to `MessageKind::Error`
+- Moved content from `CaseComplete` to `CaseMessage`
+
 ## [0.0.1] - 2025-07-18
 
 <!-- next-url -->

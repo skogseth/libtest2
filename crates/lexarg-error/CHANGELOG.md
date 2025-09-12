@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+- Rename `ErrorContext` to `LexError`
+
 ## [0.0.1] - 2025-07-18
 
 <!-- next-url -->

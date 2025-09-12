@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+- Add `--fail-fast`
+- Rename `--nocapture` to `--no-capture`
+- Removed env variables
+- Removed unstable libtest features
+- Rename `ErrorContext` to `LexError`
+- Allow tests to multiple errors
+- Reworked builder to be in phases of creation
+
 ## [0.0.1] - 2025-07-18
 
 <!-- next-url -->
