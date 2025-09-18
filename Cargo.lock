@@ -236,7 +236,7 @@ dependencies = [
 
 [[package]]
 name = "libtest-lexarg"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "lexarg",
  "lexarg-error",
@@ -244,7 +244,7 @@ dependencies = [
 
 [[package]]
 name = "libtest2"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "dunce",
  "escargot",
@@ -256,7 +256,7 @@ dependencies = [
 
 [[package]]
 name = "libtest2-harness"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "anstream",
  "anstyle",
@@ -268,7 +268,7 @@ dependencies = [
 
 [[package]]
 name = "libtest2-mimic"
-version = "0.0.3"
+version = "0.0.4"
 dependencies = [
  "dunce",
  "escargot",

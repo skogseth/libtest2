@@ -1,6 +1,6 @@
 [package]
 name = "libtest2"
-version = "0.0.2"
+version = "0.0.3"
 description = "An experimental replacement for libtest"
 categories = ["development-tools::testing"]
 keywords = ["libtest"]
@@ -29,7 +29,7 @@ color = ["libtest2-harness/color"]
 threads = ["libtest2-harness/threads"]
 
 [dependencies]
-libtest2-harness = { version = "0.0.2", path = "../libtest2-harness" }
+libtest2-harness = { version = "0.0.3", path = "../libtest2-harness" }
 
 [dev-dependencies]
 dunce = "1.0.4"

@@ -1,6 +1,6 @@
 [package]
 name = "libtest2-mimic"
-version = "0.0.3"
+version = "0.0.4"
 description = "An experimental replacement for libtest-mimic"
 categories = ["development-tools::testing"]
 keywords = ["libtest"]
@@ -30,7 +30,7 @@ threads = ["libtest2-harness/threads"]
 
 [dependencies]
 libtest-json = { version = "0.0.2", path = "../libtest-json" }
-libtest2-harness = { version = "0.0.2", path = "../libtest2-harness" }
+libtest2-harness = { version = "0.0.3", path = "../libtest2-harness" }
 
 [dev-dependencies]
 dunce = "1.0.4"
