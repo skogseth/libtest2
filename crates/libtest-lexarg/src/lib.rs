@@ -92,16 +92,16 @@ pub const UNSTABLE_OPTIONS: &str = "unstable-options";
 pub const OPTIONS_HELP: &str = r#"
 Options:
       --fail-fast     Don't start new tests after the first failure
-      --skip FILTER   Skip tests whose names contain FILTER (this flag can
-                      be used multiple times)
+      --skip FILTER   Skip tests whose names contain FILTER
+                      (this flag can be used multiple times)
       --exact         Exactly match filters rather than by substring
       --ignored       Run only ignored tests
       --include-ignored 
                       Run ignored and not ignored tests
       --test          Run tests and not benchmarks
       --bench         Run benchmarks instead of tests
-      --no-capture    don't capture stdout/stderr of each task, allow
-                      printing directly
+      --no-capture    don't capture stdout/stderr of each task,
+                      allow printing directly
       --show-output   Show captured stdout of successful tests
       --list          List all tests and benchmarks
       --test-threads NUM
