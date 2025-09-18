@@ -205,6 +205,11 @@ fn parse<'p>(parser: &mut cli::Parser<'p>) -> Result<libtest_lexarg::TestOpts, c
     while let Some(arg) = parser.next_arg() {
         match arg {
             cli::Arg::Short("h") | cli::Arg::Long("help") => {
+                let mut bin = std::path::Path::new(bin);
+                if let Ok(current_dir) = std::env::current_dir() {
+                    // abbreviate the path because cargo always uses absolute paths
+                    bin = bin.strip_prefix(&current_dir).unwrap_or(bin);
+                }
                 let bin = bin.to_string_lossy();
                 let options_help = libtest_lexarg::OPTIONS_HELP.trim();
                 let after_help = libtest_lexarg::AFTER_HELP.trim();
