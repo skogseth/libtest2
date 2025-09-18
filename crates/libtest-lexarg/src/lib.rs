@@ -130,25 +130,6 @@ be passed, which will run all tests matching any of the filters.
 
 By default, all tests are run in parallel. This can be altered with the
 --test-threads flag when running tests (set it to 1).
-
-All tests have their standard output and standard error captured by default.
-This can be overridden with the --no-capture flag to a value other than "0".
-Logging is not captured by default.
-
-Test Attributes:
-
-    `#[test]`        - Indicates a function is a test to be run. This function
-                       takes no arguments.
-    `#[bench]`       - Indicates a function is a benchmark to be run. This
-                       function takes one argument (test::Bencher).
-    `#[should_panic]` - This function (also labeled with `#[test]`) will only pass if
-                        the code causes a panic (an assertion failure or panic!)
-                        A message may be provided, which the failure string must
-                        contain: #[should_panic(expected = "foo")].
-    `#[ignore]`       - When applied to a function which is already attributed as a
-                        test, then the test runner will ignore these tests during
-                        normal test runs. Running with --ignored or --include-ignored will run
-                        these tests.
 "#;
 
 /// Intermediate CLI parser state for [`TestOpts`]
