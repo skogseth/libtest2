@@ -90,6 +90,9 @@ impl Default for OutputFormat {
 pub const UNSTABLE_OPTIONS: &str = "unstable-options";
 
 pub const OPTIONS_HELP: &str = r#"
+Arguments:
+      [FILTER]...     Skip tests whose name does not match one of the filters
+
 Options:
       --fail-fast     Don't start new tests after the first failure
       --skip FILTER   Skip tests whose names contain FILTER
@@ -123,11 +126,7 @@ Options:
                       - unstable-options: Allow use of experimental features
 "#;
 
-pub const AFTER_HELP: &str = r#"
-The FILTER string is tested against the name of all tests, and only those
-tests whose names contain the filter are run. Multiple filter strings may
-be passed, which will run all tests matching any of the filters.
-"#;
+pub const AFTER_HELP: &str = r#""#;
 
 /// Intermediate CLI parser state for [`TestOpts`]
 ///
