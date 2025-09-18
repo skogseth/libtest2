@@ -115,8 +115,7 @@ Options:
                         Alias to --format=terse
         --color <auto|always|never>
                         Configure coloring of output:
-                        auto = colorize if stdout is a tty and tests are run
-                        on serially (default);
+                        auto = detect terminal support (default);
                         always = always colorize output;
                         never = never colorize output;
     -Z FLAG             Enable nightly-only flags:
