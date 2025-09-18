@@ -90,67 +90,43 @@ impl Default for OutputFormat {
 pub const UNSTABLE_OPTIONS: &str = "unstable-options";
 
 pub const OPTIONS_HELP: &str = r#"
+Arguments:
+      [FILTER]...     Skip tests whose name does not match one of the filters
+
 Options:
-        --skip FILTER   Skip tests whose names contain FILTER (this flag can
-                        be used multiple times)
-        --exact         Exactly match filters rather than by substring
-        --test          Run tests and not benchmarks
-        --bench         Run benchmarks instead of tests
-        --ignored       Run only ignored tests
-        --include-ignored 
-                        Run ignored and not ignored tests
-        --fail-fast     Don't start new tests after the first failure
-        --no-capture    don't capture stdout/stderr of each task, allow
-                        printing directly
-        --show-output   Show captured stdout of successful tests
-        --test-threads n_threads
-                        Number of threads used for running tests in parallel
-        --color auto|always|never
-                        Configure coloring of output:
-                        auto = colorize if stdout is a tty and tests are run
-                        on serially (default);
-                        always = always colorize output;
-                        never = never colorize output;
-        --format pretty|terse|json
-                        Configure formatting of output:
-                        pretty = Print verbose output;
-                        terse = Display one character per test;
-                        json = Output a json document;
-        --list          List all tests and benchmarks
-    -q, --quiet         Display one character per test instead of one line.
-                        Alias to --format=terse
-    -Z unstable-options Enable nightly-only flags:
-                        unstable-options = Allow use of experimental features
+      --fail-fast     Don't start new tests after the first failure
+      --skip FILTER   Skip tests whose names contain FILTER
+                      (this flag can be used multiple times)
+      --exact         Exactly match filters rather than by substring
+      --ignored       Run only ignored tests
+      --include-ignored 
+                      Run ignored and not ignored tests
+      --test          Run tests and not benchmarks
+      --bench         Run benchmarks instead of tests
+      --no-capture    don't capture stdout/stderr of each task,
+                      allow printing directly
+      --show-output   Show captured stdout of successful tests
+      --list          List all tests and benchmarks
+      --test-threads NUM
+                      Number of threads used for running tests in parallel
+                      (default is >1)
+      --format <pretty|terse|json>
+                      Configure formatting of output:
+                      - pretty: Print verbose output
+                      - terse: Display one character per test
+                      - json: Output a json document
+  -q, --quiet         Display one character per test instead of one line
+                      (alias to --format=terse)
+      --color <auto|always|never>
+                      Configure coloring of output:
+                      - auto: detect terminal support (default)
+                      - always: always colorize output
+                      - never: never colorize output
+  -Z FLAG             Enable nightly-only flags:
+                      - unstable-options: Allow use of experimental features
 "#;
 
-pub const AFTER_HELP: &str = r#"
-The FILTER string is tested against the name of all tests, and only those
-tests whose names contain the filter are run. Multiple filter strings may
-be passed, which will run all tests matching any of the filters.
-
-By default, all tests are run in parallel. This can be altered with the
---test-threads flag when running
-tests (set it to 1).
-
-All tests have their standard output and standard error captured by default.
-This can be overridden with the --no-capture flag to a value other than "0".
-Logging is not captured by default.
-
-Test Attributes:
-
-    `#[test]`        - Indicates a function is a test to be run. This function
-                       takes no arguments.
-    `#[bench]`       - Indicates a function is a benchmark to be run. This
-                       function takes one argument (test::Bencher).
-    `#[should_panic]` - This function (also labeled with `#[test]`) will only pass if
-                        the code causes a panic (an assertion failure or panic!)
-                        A message may be provided, which the failure string must
-                        contain: #[should_panic(expected = "foo")].
-    `#[ignore]`       - When applied to a function which is already attributed as a
-                        test, then the test runner will ignore these tests during
-                        normal test runs. Running with --ignored or --include-ignored will run
-                        these tests.
-"#;
+pub const AFTER_HELP: &str = r#""#;
 
 /// Intermediate CLI parser state for [`TestOpts`]
 ///
