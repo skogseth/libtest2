@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Fixes
+
+- Clean up help output
+
 ## [0.0.2] - 2025-09-12
 
 - Add `--fail-fast`
