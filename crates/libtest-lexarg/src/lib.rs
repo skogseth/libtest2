@@ -104,22 +104,22 @@ Options:
                         printing directly
         --show-output   Show captured stdout of successful tests
         --list          List all tests and benchmarks
-        --test-threads n_threads
+        --test-threads NUM
                         Number of threads used for running tests in parallel
-        --format pretty|terse|json
+        --format <pretty|terse|json>
                         Configure formatting of output:
                         pretty = Print verbose output;
                         terse = Display one character per test;
                         json = Output a json document;
     -q, --quiet         Display one character per test instead of one line.
                         Alias to --format=terse
-        --color auto|always|never
+        --color <auto|always|never>
                         Configure coloring of output:
                         auto = colorize if stdout is a tty and tests are run
                         on serially (default);
                         always = always colorize output;
                         never = never colorize output;
-    -Z unstable-options Enable nightly-only flags:
+    -Z FLAG             Enable nightly-only flags:
                         unstable-options = Allow use of experimental features
 "#;
 
