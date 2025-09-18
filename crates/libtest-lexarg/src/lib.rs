@@ -111,8 +111,8 @@ Options:
                       - pretty: Print verbose output
                       - terse: Display one character per test
                       - json: Output a json document
-  -q, --quiet         Display one character per test instead of one line.
-                      Alias to --format=terse
+  -q, --quiet         Display one character per test instead of one line
+                      (alias to --format=terse)
       --color <auto|always|never>
                       Configure coloring of output:
                       - auto: detect terminal support (default)
