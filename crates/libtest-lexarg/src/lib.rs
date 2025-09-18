@@ -91,35 +91,35 @@ pub const UNSTABLE_OPTIONS: &str = "unstable-options";
 
 pub const OPTIONS_HELP: &str = r#"
 Options:
-        --fail-fast     Don't start new tests after the first failure
-        --skip FILTER   Skip tests whose names contain FILTER (this flag can
-                        be used multiple times)
-        --exact         Exactly match filters rather than by substring
-        --ignored       Run only ignored tests
-        --include-ignored 
-                        Run ignored and not ignored tests
-        --test          Run tests and not benchmarks
-        --bench         Run benchmarks instead of tests
-        --no-capture    don't capture stdout/stderr of each task, allow
-                        printing directly
-        --show-output   Show captured stdout of successful tests
-        --list          List all tests and benchmarks
-        --test-threads NUM
-                        Number of threads used for running tests in parallel
-        --format <pretty|terse|json>
-                        Configure formatting of output:
-                        - pretty: Print verbose output
-                        - terse: Display one character per test
-                        - json: Output a json document
-    -q, --quiet         Display one character per test instead of one line.
-                        Alias to --format=terse
-        --color <auto|always|never>
-                        Configure coloring of output:
-                        - auto: detect terminal support (default)
-                        - always: always colorize output
-                        - never: never colorize output
-    -Z FLAG             Enable nightly-only flags:
-                        - unstable-options: Allow use of experimental features
+      --fail-fast     Don't start new tests after the first failure
+      --skip FILTER   Skip tests whose names contain FILTER (this flag can
+                      be used multiple times)
+      --exact         Exactly match filters rather than by substring
+      --ignored       Run only ignored tests
+      --include-ignored 
+                      Run ignored and not ignored tests
+      --test          Run tests and not benchmarks
+      --bench         Run benchmarks instead of tests
+      --no-capture    don't capture stdout/stderr of each task, allow
+                      printing directly
+      --show-output   Show captured stdout of successful tests
+      --list          List all tests and benchmarks
+      --test-threads NUM
+                      Number of threads used for running tests in parallel
+      --format <pretty|terse|json>
+                      Configure formatting of output:
+                      - pretty: Print verbose output
+                      - terse: Display one character per test
+                      - json: Output a json document
+  -q, --quiet         Display one character per test instead of one line.
+                      Alias to --format=terse
+      --color <auto|always|never>
+                      Configure coloring of output:
+                      - auto: detect terminal support (default)
+                      - always: always colorize output
+                      - never: never colorize output
+  -Z FLAG             Enable nightly-only flags:
+                      - unstable-options: Allow use of experimental features
 "#;
 
 pub const AFTER_HELP: &str = r#"
