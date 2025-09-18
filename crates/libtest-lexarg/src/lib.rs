@@ -106,6 +106,7 @@ Options:
       --list          List all tests and benchmarks
       --test-threads NUM
                       Number of threads used for running tests in parallel
+                      (default is >1)
       --format <pretty|terse|json>
                       Configure formatting of output:
                       - pretty: Print verbose output
@@ -126,9 +127,6 @@ pub const AFTER_HELP: &str = r#"
 The FILTER string is tested against the name of all tests, and only those
 tests whose names contain the filter are run. Multiple filter strings may
 be passed, which will run all tests matching any of the filters.
-
-By default, all tests are run in parallel. This can be altered with the
---test-threads flag when running tests (set it to 1).
 "#;
 
 /// Intermediate CLI parser state for [`TestOpts`]
