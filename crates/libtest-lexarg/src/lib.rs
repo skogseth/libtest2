@@ -108,18 +108,18 @@ Options:
                         Number of threads used for running tests in parallel
         --format <pretty|terse|json>
                         Configure formatting of output:
-                        pretty = Print verbose output;
-                        terse = Display one character per test;
-                        json = Output a json document;
+                        - pretty: Print verbose output
+                        - terse: Display one character per test
+                        - json: Output a json document
     -q, --quiet         Display one character per test instead of one line.
                         Alias to --format=terse
         --color <auto|always|never>
                         Configure coloring of output:
-                        auto = detect terminal support (default);
-                        always = always colorize output;
-                        never = never colorize output;
+                        - auto: detect terminal support (default)
+                        - always: always colorize output
+                        - never: never colorize output
     -Z FLAG             Enable nightly-only flags:
-                        unstable-options = Allow use of experimental features
+                        - unstable-options: Allow use of experimental features
 "#;
 
 pub const AFTER_HELP: &str = r#"
