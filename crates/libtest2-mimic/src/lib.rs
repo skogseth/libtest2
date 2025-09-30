@@ -60,7 +60,7 @@
 //! - `--format=json` (unstable): our schema is part of an experiment to see what should be
 //!   stabilized for `libtest`, see also [libtest2#42](https://github.com/assert-rs/libtest2/issues/42)
 
-#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 //#![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 

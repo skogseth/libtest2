@@ -9,7 +9,7 @@
 #![doc = include_str!("../examples/hello.rs")]
 //! ```
 
-#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 #![allow(clippy::result_unit_err)]
 #![warn(missing_debug_implementations)]
 #![warn(missing_docs)]
