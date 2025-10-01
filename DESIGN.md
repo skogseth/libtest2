@@ -178,7 +178,7 @@ This comes at the cost of:
 - Requires every plugin to cooperate
 - More manual help construction
 
-### Decision: iteraton model
+### Decision: iteration model
 
 Potential design directions
 - `lexopt` exposes a single iterator type that walks over both longs and shorts.
