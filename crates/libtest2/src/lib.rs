@@ -85,6 +85,39 @@ impl Case for Trial {
     }
 }
 
+pub fn main(cases: impl IntoIterator<Item = impl Case + 'static>) {
+    let harness = libtest2_harness::Harness::new();
+    let harness = match harness.with_env() {
+        Ok(harness) => harness,
+        Err(err) => {
+            eprintln!("{err}");
+            ::std::process::exit(1);
+        }
+    };
+    let harness = match harness.parse() {
+        Ok(harness) => harness,
+        Err(err) => {
+            eprintln!("{err}");
+            ::std::process::exit(1);
+        }
+    };
+    let harness = match harness.discover(cases) {
+        Ok(harness) => harness,
+        Err(err) => {
+            eprintln!("{err}");
+            ::std::process::exit(libtest2_harness::ERROR_EXIT_CODE)
+        }
+    };
+    match harness.run() {
+        Ok(true) => ::std::process::exit(0),
+        Ok(false) => ::std::process::exit(libtest2_harness::ERROR_EXIT_CODE),
+        Err(err) => {
+            eprintln!("{err}");
+            ::std::process::exit(libtest2_harness::ERROR_EXIT_CODE)
+        }
+    }
+}
+
 #[doc = include_str!("../README.md")]
 #[cfg(doctest)]
 pub struct ReadmeDoctests;
