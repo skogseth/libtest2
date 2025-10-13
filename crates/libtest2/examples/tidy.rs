@@ -1,6 +1,6 @@
+use libtest2::FnCase;
 use libtest2::RunError;
 use libtest2::RunResult;
-use libtest2::Trial;
 
 fn main() -> std::io::Result<()> {
     let harness = ::libtest2_harness::Harness::new();
@@ -23,8 +23,8 @@ fn main() -> std::io::Result<()> {
 
 /// Creates one test for each `.rs` file in the current directory or
 /// sub-directories of the current directory.
-fn collect_tests() -> std::io::Result<Vec<Trial>> {
-    fn visit_dir(path: &std::path::Path, tests: &mut Vec<Trial>) -> std::io::Result<()> {
+fn collect_tests() -> std::io::Result<Vec<FnCase>> {
+    fn visit_dir(path: &std::path::Path, tests: &mut Vec<FnCase>) -> std::io::Result<()> {
         let current_dir = std::env::current_dir()?;
         for entry in std::fs::read_dir(path)? {
             let entry = entry?;
@@ -44,7 +44,7 @@ fn collect_tests() -> std::io::Result<Vec<Trial>> {
                     .to_string_lossy()
                     .into_owned();
 
-                    let test = Trial::test(name, move |_| check_file(&path));
+                    let test = FnCase::test(name, move |_| check_file(&path));
                     tests.push(test);
                 }
             } else if file_type.is_dir() {
