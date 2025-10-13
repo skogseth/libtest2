@@ -7,12 +7,15 @@ fn test_cmd() -> snapbox::cmd::Command {
     let (bin, current_dir) = BIN.get_or_init(|| {
         let package_root = crate::util::new_test(
             r#"
-libtest2::main!(passes, panics);
+#[libtest2::main]
+fn main() {}
 
+#[libtest2::test]
 fn passes(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 
+#[libtest2::test]
 fn panics(_context: &libtest2::TestContext) -> libtest2::RunResult {
     panic!("uh oh")
 }

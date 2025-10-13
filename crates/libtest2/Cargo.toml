@@ -29,7 +29,9 @@ color = ["libtest2-harness/color"]
 threads = ["libtest2-harness/threads"]
 
 [dependencies]
+distributed-list = { version = "0.0.2", path = "../distributed_list" }
 libtest2-harness = { version = "0.0.3", path = "../libtest2-harness" }
+libtest2-proc-macro = { version = "0.0.3", path = "../libtest2-proc-macro" }
 
 [dev-dependencies]
 dunce = "1.0.4"

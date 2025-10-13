@@ -259,9 +259,11 @@ dependencies = [
 name = "libtest2"
 version = "0.0.3"
 dependencies = [
+ "distributed-list",
  "dunce",
  "escargot",
  "libtest2-harness",
+ "libtest2-proc-macro",
  "once_cell_polyfill",
  "pathdiff",
  "snapbox",
