@@ -49,13 +49,13 @@ use libtest2_harness::TestKind;
 pub struct Trial {
     name: String,
     #[allow(clippy::type_complexity)]
-    runner: Box<dyn Fn(&TestContext) -> Result<(), RunError> + Send + Sync>,
+    runner: Box<dyn Fn(&TestContext) -> RunResult + Send + Sync>,
 }
 
 impl Trial {
     pub fn test(
         name: impl Into<String>,
-        runner: impl Fn(&TestContext) -> Result<(), RunError> + Send + Sync + 'static,
+        runner: impl Fn(&TestContext) -> RunResult + Send + Sync + 'static,
     ) -> Self {
         Self {
             name: name.into(),
@@ -78,7 +78,7 @@ impl Case for Trial {
         false
     }
 
-    fn run(&self, context: &TestContext) -> Result<(), RunError> {
+    fn run(&self, context: &TestContext) -> RunResult {
         (self.runner)(context)
     }
 }
