@@ -38,15 +38,13 @@ pub mod _private {
 }
 
 pub use _private::main;
-pub use libtest2_harness::Harness;
 pub use libtest2_harness::RunError;
 pub use libtest2_harness::RunResult;
 pub use libtest2_harness::TestContext;
-pub use libtest2_harness::TestKind;
-pub use libtest2_harness::ERROR_EXIT_CODE;
 
 use libtest2_harness::Case;
 use libtest2_harness::Source;
+use libtest2_harness::TestKind;
 
 pub struct Trial {
     name: String,
