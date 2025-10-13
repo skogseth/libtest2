@@ -12,18 +12,17 @@
 //! harness = false
 //! ```
 //!
-//! And in `tests/mytest.rs` you would call [`libtest2_main`], passing it each of your tests:
+//! And in `tests/mytest.rs` you would call [`main!`], passing it each of your tests:
 //!
 //! ```no_run
 //! # use libtest2::RunError;
 //! # use libtest2::RunResult;
 //! # use libtest2::TestContext;
-//! # use libtest2::libtest2_main;
 //! fn check_toph(_context: &TestContext) -> RunResult {
 //!     Ok(())
 //! }
 //!
-//! libtest2_main!(check_toph);
+//! libtest2::main!(check_toph);
 //! ```
 //!
 
@@ -38,7 +37,7 @@ pub mod _private {
     pub use crate::_main as main;
 }
 
-pub use _private::main as libtest2_main;
+pub use _private::main;
 pub use libtest2_harness::Harness;
 pub use libtest2_harness::RunError;
 pub use libtest2_harness::RunResult;

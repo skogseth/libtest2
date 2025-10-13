@@ -2,7 +2,7 @@ use libtest2::RunError;
 use libtest2::RunResult;
 use libtest2::TestContext;
 
-libtest2::libtest2_main!(
+libtest2::main!(
     check_toph,
     check_katara,
     check_sokka,
