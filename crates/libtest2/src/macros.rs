@@ -4,7 +4,7 @@ macro_rules! _main {
     ( $( $test:path ),* $(,)*) => {
         fn main() {
             $crate::main([
-                $($crate::Trial::test(::std::stringify!($test), $test)),*
+                $($crate::FnCase::test(::std::stringify!($test), $test)),*
         ]);
         }
     }

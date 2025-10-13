@@ -5,13 +5,13 @@ use libtest2_harness::TestKind;
 use crate::RunResult;
 use crate::TestContext;
 
-pub struct Trial {
+pub struct FnCase {
     name: String,
     #[allow(clippy::type_complexity)]
     runner: Box<dyn Fn(&TestContext) -> RunResult + Send + Sync>,
 }
 
-impl Trial {
+impl FnCase {
     pub fn test(
         name: impl Into<String>,
         runner: impl Fn(&TestContext) -> RunResult + Send + Sync + 'static,
@@ -23,7 +23,7 @@ impl Trial {
     }
 }
 
-impl Case for Trial {
+impl Case for FnCase {
     fn name(&self) -> &str {
         &self.name
     }

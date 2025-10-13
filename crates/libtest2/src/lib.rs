@@ -30,8 +30,8 @@
 //#![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 
+mod case;
 mod macros;
-mod trial;
 
 #[doc(hidden)]
 pub mod _private {
@@ -39,11 +39,11 @@ pub mod _private {
 }
 
 pub use _private::main;
+pub use case::main;
+pub use case::FnCase;
 pub use libtest2_harness::RunError;
 pub use libtest2_harness::RunResult;
 pub use libtest2_harness::TestContext;
-pub use trial::main;
-pub use trial::Trial;
 
 #[doc = include_str!("../README.md")]
 #[cfg(doctest)]
