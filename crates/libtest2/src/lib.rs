@@ -31,6 +31,14 @@
 //#![warn(clippy::print_stderr)]
 #![warn(clippy::print_stdout)]
 
+mod macros;
+
+#[doc(hidden)]
+pub mod _private {
+    pub use crate::_main as main;
+}
+
+pub use _private::main as libtest2_main;
 pub use libtest2_harness::Harness;
 pub use libtest2_harness::RunError;
 pub use libtest2_harness::RunResult;
@@ -75,47 +83,6 @@ impl Case for Trial {
 
     fn run(&self, context: &TestContext) -> Result<(), RunError> {
         (self.runner)(context)
-    }
-}
-
-/// Expands to the test harness
-#[macro_export]
-macro_rules! libtest2_main {
-    ( $( $test:path ),* $(,)*) => {
-        fn main() {
-            let harness = $crate::Harness::new();
-            let harness = match harness.with_env() {
-                Ok(harness) => harness,
-                Err(err) => {
-                    eprintln!("{err}");
-                    ::std::process::exit(1);
-                }
-            };
-            let harness = match harness.parse() {
-                Ok(harness) => harness,
-                Err(err) => {
-                    eprintln!("{err}");
-                    ::std::process::exit(1);
-                }
-            };
-            let harness = match harness.discover([
-                $($crate::Trial::test(::std::stringify!($test), $test)),*
-            ]) {
-                Ok(harness) => harness,
-                Err(err) => {
-                    eprintln!("{err}");
-                    ::std::process::exit($crate::ERROR_EXIT_CODE)
-                }
-            };
-            match harness.run() {
-                Ok(true) => ::std::process::exit(0),
-                Ok(false) => ::std::process::exit($crate::ERROR_EXIT_CODE),
-                Err(err) => {
-                    eprintln!("{err}");
-                    ::std::process::exit($crate::ERROR_EXIT_CODE)
-                }
-            }
-        }
     }
 }
 
