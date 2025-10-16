@@ -5,6 +5,28 @@ use libtest2_harness::TestKind;
 use crate::RunResult;
 use crate::TestContext;
 
+#[derive(Copy, Clone)]
+pub struct DynCase(pub &'static dyn Case);
+
+impl Case for DynCase {
+    fn name(&self) -> &str {
+        self.0.name()
+    }
+    fn kind(&self) -> TestKind {
+        self.0.kind()
+    }
+    fn source(&self) -> Option<&Source> {
+        self.0.source()
+    }
+    fn exclusive(&self, context: &TestContext) -> bool {
+        self.0.exclusive(context)
+    }
+
+    fn run(&self, context: &TestContext) -> RunResult {
+        self.0.run(context)
+    }
+}
+
 pub struct FnCase {
     name: String,
     #[allow(clippy::type_complexity)]
@@ -58,6 +80,8 @@ pub fn main(cases: impl IntoIterator<Item = impl Case + 'static>) {
             ::std::process::exit(1);
         }
     };
+    let mut cases = cases.into_iter().collect::<Vec<_>>();
+    cases.sort_by_key(|c| c.name().to_owned());
     let harness = match harness.discover(cases) {
         Ok(harness) => harness,
         Err(err) => {

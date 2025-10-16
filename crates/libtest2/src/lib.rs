@@ -12,19 +12,21 @@
 //! harness = false
 //! ```
 //!
-//! And in `tests/mytest.rs` you would call [`main!`], passing it each of your tests:
+//! And in `tests/mytest.rs` you would wrap `main` with [`#[main]`]:
 //!
 //! ```no_run
 //! # use libtest2::RunError;
 //! # use libtest2::RunResult;
 //! # use libtest2::TestContext;
+//! #[libtest2::test]
 //! fn check_toph(_context: &TestContext) -> RunResult {
 //!     Ok(())
 //! }
 //!
-//! libtest2::main!(check_toph);
+//! #[libtest2::main]
+//! fn main() {
+//! }
 //! ```
-//!
 
 #![cfg_attr(docsrs, feature(doc_cfg))]
 //#![warn(clippy::print_stderr)]
@@ -35,15 +37,24 @@ mod macros;
 
 #[doc(hidden)]
 pub mod _private {
-    pub use crate::_main as main;
+    pub use distributed_list::push;
+    pub use distributed_list::DistributedList;
+    pub use libtest2_harness::Case;
+    pub use libtest2_harness::Source;
+    pub use libtest2_harness::TestKind;
+
+    pub use crate::_main_parse as main_parse;
+    pub use crate::_test_parse as test_parse;
+    pub use crate::case::DynCase;
 }
 
-pub use _private::main;
 pub use case::main;
 pub use case::FnCase;
 pub use libtest2_harness::RunError;
 pub use libtest2_harness::RunResult;
 pub use libtest2_harness::TestContext;
+pub use libtest2_proc_macro::main;
+pub use libtest2_proc_macro::test;
 
 #[doc = include_str!("../README.md")]
 #[cfg(doctest)]

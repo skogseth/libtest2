@@ -7,16 +7,20 @@ fn test_cmd() -> snapbox::cmd::Command {
     let (bin, current_dir) = BIN.get_or_init(|| {
         let package_root = crate::util::new_test(
             r#"
-libtest2::main!(foo, bar, barro);
+#[libtest2::main]
+fn main() {}
 
+#[libtest2::test]
 fn foo(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 
+#[libtest2::test]
 fn bar(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 
+#[libtest2::test]
 fn barro(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }

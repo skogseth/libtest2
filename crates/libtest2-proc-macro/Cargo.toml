@@ -1,5 +1,5 @@
 [package]
-name = "libtest2"
+name = "libtest2-proc-macro"
 version = "0.0.3"
 description = "An experimental replacement for libtest"
 categories = ["development-tools::testing"]
@@ -23,22 +23,11 @@ pre-release-replacements = [
   {file="CHANGELOG.md", search="<!-- next-url -->", replace="<!-- next-url -->\n[Unreleased]: https://github.com/epage/pytest-rs/compare/{{tag_name}}...HEAD", exactly=1},
 ]
 
+[lib]
+proc-macro = true
+
 [features]
-default = ["color", "threads"]
-color = ["libtest2-harness/color"]
-threads = ["libtest2-harness/threads"]
-
-[dependencies]
-distributed-list = { version = "0.0.2", path = "../distributed_list" }
-libtest2-harness = { version = "0.0.3", path = "../libtest2-harness" }
-libtest2-proc-macro = { version = "0.0.3", path = "../libtest2-proc-macro" }
-
-[dev-dependencies]
-dunce = "1.0.4"
-escargot = "0.5.8"
-once_cell_polyfill = "1.56.0"
-pathdiff = "0.2.1"
-snapbox = { version = "0.6.0", features = ["json"] }
+default = []
 
 [lints]
 workspace = true

@@ -1,9 +1,9 @@
 [package]
-name = "libtest2"
-version = "0.0.3"
-description = "An experimental replacement for libtest"
-categories = ["development-tools::testing"]
-keywords = ["libtest"]
+name = "distributed-list"
+version = "0.0.2"
+description = "Register and iterate through static elements"
+categories = []
+keywords = ["linkage", "ctor"]
 repository.workspace = true
 license.workspace = true
 edition.workspace = true
@@ -24,21 +24,12 @@ pre-release-replacements = [
 ]
 
 [features]
-default = ["color", "threads"]
-color = ["libtest2-harness/color"]
-threads = ["libtest2-harness/threads"]
+default = []
 
 [dependencies]
-distributed-list = { version = "0.0.2", path = "../distributed_list" }
-libtest2-harness = { version = "0.0.3", path = "../libtest2-harness" }
-libtest2-proc-macro = { version = "0.0.3", path = "../libtest2-proc-macro" }
+ctor = { version = "0.6.0", default-features = false, features = [] }
 
 [dev-dependencies]
-dunce = "1.0.4"
-escargot = "0.5.8"
-once_cell_polyfill = "1.56.0"
-pathdiff = "0.2.1"
-snapbox = { version = "0.6.0", features = ["json"] }
 
 [lints]
 workspace = true

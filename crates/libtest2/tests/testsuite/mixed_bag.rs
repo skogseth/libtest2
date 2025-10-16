@@ -7,40 +7,49 @@ fn test_cmd() -> snapbox::cmd::Command {
     let (bin, current_dir) = BIN.get_or_init(|| {
         let package_root = crate::util::new_test(
             r#"
-libtest2::main!(cat, dog, fox, bunny, frog, owl, fly, bear);
+#[libtest2::main]
+fn main() {}
 
+#[libtest2::test]
 fn cat(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 
+#[libtest2::test]
 fn dog(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Err(libtest2::RunError::fail("was not a good boy"))
 }
 
+#[libtest2::test]
 fn fox(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 
+#[libtest2::test]
 fn bunny(context: &libtest2::TestContext) -> libtest2::RunResult {
     context.ignore_for("fails")?;
     Err(libtest2::RunError::fail("jumped too high"))
 }
 
+#[libtest2::test]
 fn frog(context: &libtest2::TestContext) -> libtest2::RunResult {
     context.ignore_for("slow")?;
     Ok(())
 }
 
+#[libtest2::test]
 fn owl(context: &libtest2::TestContext) -> libtest2::RunResult {
     context.ignore_for("fails")?;
     Err(libtest2::RunError::fail("broke neck"))
 }
 
+#[libtest2::test]
 fn fly(context: &libtest2::TestContext) -> libtest2::RunResult {
     context.ignore_for("fails")?;
     Ok(())
 }
 
+#[libtest2::test]
 fn bear(context: &libtest2::TestContext) -> libtest2::RunResult {
     context.ignore_for("fails")?;
     Err(libtest2::RunError::fail("no honey"))
@@ -227,28 +236,28 @@ fn list() {
         &["--list"],
         0,
         str![[r#"
+bear: test
+bunny: test
 cat: test
 dog: test
+fly: test
 fox: test
-bunny: test
 frog: test
 owl: test
-fly: test
-bear: test
 
 8 tests
 
 
 "#]],
         str![[r#"
+bear: test
+bunny: test
 cat: test
 dog: test
+fly: test
 fox: test
-bunny: test
 frog: test
 owl: test
-fly: test
-bear: test
 
 8 tests
 
@@ -263,28 +272,28 @@ fn list_ignored() {
         &["--list", "--ignored"],
         0,
         str![[r#"
+bear: test
+bunny: test
 cat: test
 dog: test
+fly: test
 fox: test
-bunny: test
 frog: test
 owl: test
-fly: test
-bear: test
 
 8 tests
 
 
 "#]],
         str![[r#"
+bear: test
+bunny: test
 cat: test
 dog: test
+fly: test
 fox: test
-bunny: test
 frog: test
 owl: test
-fly: test
-bear: test
 
 8 tests
 
@@ -299,16 +308,16 @@ fn list_with_filter() {
         &["--list", "a"],
         0,
         str![[r#"
-cat: test
 bear: test
+cat: test
 
 2 tests
 
 
 "#]],
         str![[r#"
-cat: test
 bear: test
+cat: test
 
 2 tests
 
@@ -323,8 +332,8 @@ fn list_with_specified_order() {
         &["--list", "--exact", "owl", "fox", "bunny", "frog"],
         0,
         str![[r#"
-fox: test
 bunny: test
+fox: test
 frog: test
 owl: test
 
@@ -333,8 +342,8 @@ owl: test
 
 "#]],
         str![[r#"
-fox: test
 bunny: test
+fox: test
 frog: test
 owl: test
 
@@ -718,6 +727,17 @@ fn list_json() {
   {
     "elapsed_s": "[..]",
     "event": "discover_case",
+    "name": "bear"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover_case",
+    "name": "bunny",
+    "selected": false
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover_case",
     "name": "cat"
   },
   {
@@ -729,13 +749,13 @@ fn list_json() {
   {
     "elapsed_s": "[..]",
     "event": "discover_case",
-    "name": "fox",
+    "name": "fly",
     "selected": false
   },
   {
     "elapsed_s": "[..]",
     "event": "discover_case",
-    "name": "bunny",
+    "name": "fox",
     "selected": false
   },
   {
@@ -749,17 +769,6 @@ fn list_json() {
     "event": "discover_case",
     "name": "owl",
     "selected": false
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "discover_case",
-    "name": "fly",
-    "selected": false
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "discover_case",
-    "name": "bear"
   },
   {
     "elapsed_s": "[..]",
@@ -778,6 +787,17 @@ fn list_json() {
   {
     "elapsed_s": "[..]",
     "event": "discover_case",
+    "name": "bear"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover_case",
+    "name": "bunny",
+    "selected": false
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover_case",
     "name": "cat"
   },
   {
@@ -789,13 +809,13 @@ fn list_json() {
   {
     "elapsed_s": "[..]",
     "event": "discover_case",
-    "name": "fox",
+    "name": "fly",
     "selected": false
   },
   {
     "elapsed_s": "[..]",
     "event": "discover_case",
-    "name": "bunny",
+    "name": "fox",
     "selected": false
   },
   {
@@ -809,17 +829,6 @@ fn list_json() {
     "event": "discover_case",
     "name": "owl",
     "selected": false
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "discover_case",
-    "name": "fly",
-    "selected": false
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "discover_case",
-    "name": "bear"
   },
   {
     "elapsed_s": "[..]",
@@ -846,6 +855,17 @@ fn test_json() {
   {
     "elapsed_s": "[..]",
     "event": "discover_case",
+    "name": "bear"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover_case",
+    "name": "bunny",
+    "selected": false
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover_case",
     "name": "cat"
   },
   {
@@ -857,13 +877,13 @@ fn test_json() {
   {
     "elapsed_s": "[..]",
     "event": "discover_case",
-    "name": "fox",
+    "name": "fly",
     "selected": false
   },
   {
     "elapsed_s": "[..]",
     "event": "discover_case",
-    "name": "bunny",
+    "name": "fox",
     "selected": false
   },
   {
@@ -877,17 +897,6 @@ fn test_json() {
     "event": "discover_case",
     "name": "owl",
     "selected": false
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "discover_case",
-    "name": "fly",
-    "selected": false
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "discover_case",
-    "name": "bear"
   },
   {
     "elapsed_s": "[..]",
@@ -1120,6 +1129,16 @@ fn fail_fast_json() {
   {
     "elapsed_s": "[..]",
     "event": "discover_case",
+    "name": "bear"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover_case",
+    "name": "bunny"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover_case",
     "name": "cat"
   },
   {
@@ -1130,12 +1149,12 @@ fn fail_fast_json() {
   {
     "elapsed_s": "[..]",
     "event": "discover_case",
-    "name": "fox"
+    "name": "fly"
   },
   {
     "elapsed_s": "[..]",
     "event": "discover_case",
-    "name": "bunny"
+    "name": "fox"
   },
   {
     "elapsed_s": "[..]",
@@ -1146,16 +1165,6 @@ fn fail_fast_json() {
     "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "owl"
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "discover_case",
-    "name": "fly"
-  },
-  {
-    "elapsed_s": "[..]",
-    "event": "discover_case",
-    "name": "bear"
   },
   {
     "elapsed_s": "[..]",

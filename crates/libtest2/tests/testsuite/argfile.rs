@@ -7,20 +7,25 @@ fn test_cmd() -> snapbox::cmd::Command {
     let (bin, current_dir) = BIN.get_or_init(|| {
         let package_root = crate::util::new_test(
             r#"
-libtest2::main!(one, two, three, one_two);
+#[libtest2::main]
+fn main() {}
 
+#[libtest2::test]
 fn one(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 
+#[libtest2::test]
 fn two(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 
+#[libtest2::test]
 fn three(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
 
+#[libtest2::test]
 fn one_two(_context: &libtest2::TestContext) -> libtest2::RunResult {
     Ok(())
 }
@@ -95,9 +100,9 @@ fn list() {
         0,
         str![[r#"
 one: test
-two: test
-three: test
 one_two: test
+three: test
+two: test
 
 4 tests
 
@@ -105,7 +110,7 @@ one_two: test
 "#]],
         str![[r#"
 one: test
-two: test
+one_two: test
 ...
 
 4 tests
