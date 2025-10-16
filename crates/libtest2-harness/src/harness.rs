@@ -438,7 +438,7 @@ fn run_case(case: &dyn Case, context: &TestContext) -> std::io::Result<bool> {
     context.notifier().notify(
         notify::event::CaseStart {
             name: case.name().to_owned(),
-            elapsed_s: Some(context.elapased_s()),
+            elapsed_s: Some(context.elapsed_s()),
         }
         .into(),
     )?;
@@ -472,7 +472,7 @@ fn run_case(case: &dyn Case, context: &TestContext) -> std::io::Result<bool> {
                 name: case.name().to_owned(),
                 kind,
                 message,
-                elapsed_s: Some(context.elapased_s()),
+                elapsed_s: Some(context.elapsed_s()),
             }
             .into(),
         )?;
@@ -481,7 +481,7 @@ fn run_case(case: &dyn Case, context: &TestContext) -> std::io::Result<bool> {
     context.notifier().notify(
         notify::event::CaseComplete {
             name: case.name().to_owned(),
-            elapsed_s: Some(context.elapased_s()),
+            elapsed_s: Some(context.elapsed_s()),
         }
         .into(),
     )?;

@@ -33,7 +33,7 @@ impl TestContext {
         self.notifier().notify(event)
     }
 
-    pub fn elapased_s(&self) -> notify::Elapsed {
+    pub fn elapsed_s(&self) -> notify::Elapsed {
         notify::Elapsed(self.start.elapsed())
     }
 
