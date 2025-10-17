@@ -147,6 +147,8 @@ struct TrialCase {
 }
 
 impl libtest2_harness::Case for TrialCase {
+    type Input = ();
+
     fn name(&self) -> &str {
         &self.inner.name
     }
@@ -156,13 +158,13 @@ impl libtest2_harness::Case for TrialCase {
     fn source(&self) -> Option<&libtest2_harness::Source> {
         None
     }
-    fn exclusive(&self, _: &libtest2_harness::TestContext) -> bool {
+    fn exclusive(&self, _: &libtest2_harness::TestContext<()>) -> bool {
         false
     }
 
     fn run(
         &self,
-        context: &libtest2_harness::TestContext,
+        context: &libtest2_harness::TestContext<()>,
     ) -> Result<(), libtest2_harness::RunError> {
         (self.inner.runner)(RunContext { inner: context }).map_err(|e| e.inner)
     }
@@ -190,7 +192,7 @@ impl RunError {
 }
 
 pub struct RunContext<'t> {
-    inner: &'t libtest2_harness::TestContext,
+    inner: &'t libtest2_harness::TestContext<()>,
 }
 
 impl<'t> RunContext<'t> {

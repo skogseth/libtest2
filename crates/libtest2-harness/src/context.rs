@@ -1,14 +1,15 @@
 pub(crate) use crate::*;
 
-pub struct TestContext {
+pub struct TestContext<T> {
     pub(crate) start: std::time::Instant,
     pub(crate) mode: RunMode,
     pub(crate) run_ignored: bool,
     pub(crate) notifier: notify::ArcNotifier,
     pub(crate) test_name: String,
+    pub(crate) value: T,
 }
 
-impl TestContext {
+impl<T> TestContext<T> {
     pub fn ignore(&self) -> Result<(), RunError> {
         if self.run_ignored {
             Ok(())
@@ -45,13 +46,17 @@ impl TestContext {
         &self.notifier
     }
 
-    pub(crate) fn clone(&self) -> Self {
+    pub(crate) fn clone(&self) -> Self
+    where
+        T: Clone,
+    {
         Self {
             start: self.start,
             mode: self.mode,
             run_ignored: self.run_ignored,
             notifier: self.notifier.clone(),
             test_name: self.test_name.clone(),
+            value: self.value.clone(),
         }
     }
 }

@@ -15,13 +15,15 @@ macro_rules! _main_parse {
 #[macro_export]
 #[allow(clippy::crate_in_macro_def)] // accessing item defined by `_main_parse`
 macro_rules! _test_parse {
-    (#[test] fn $name:ident $($item:tt)*) => {
+    (#[test $t:ty] fn $name:ident $($item:tt)*) => {
         #[allow(non_camel_case_types)]
         struct $name;
 
         impl $crate::_private::Case for $name {
+            type Input = $t;
+
             fn name(&self) -> &str {
-                $crate::_private::push!(crate::TESTS, _: $crate::_private::DynCase = $crate::_private::DynCase(&$name));
+                $crate::_private::push!(crate::TESTS, _: $crate::_private::DynCase<$t> = $crate::_private::DynCase(&$name));
 
                 stringify!($name)
             }
@@ -31,11 +33,11 @@ macro_rules! _test_parse {
             fn source(&self) -> Option<&$crate::_private::Source> {
                 None
             }
-            fn exclusive(&self, _: &$crate::TestContext) -> bool {
+            fn exclusive(&self, _: &$crate::TestContext<$t>) -> bool {
                 false
             }
 
-            fn run(&self, context: &$crate::TestContext) -> $crate::RunResult {
+            fn run(&self, context: &$crate::TestContext<$t>) -> $crate::RunResult {
                 fn run $($item)*
 
                 run(context)

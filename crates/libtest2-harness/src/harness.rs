@@ -89,10 +89,10 @@ impl HarnessState for StateParsed {}
 impl sealed::_HarnessState_is_Sealed for StateParsed {}
 
 impl Harness<StateParsed> {
-    pub fn discover(
+    pub fn discover<T: 'static>(
         self,
-        cases: impl IntoIterator<Item = impl Case + 'static>,
-    ) -> std::io::Result<Harness<StateDiscovered>> {
+        cases: impl IntoIterator<Item = impl Case<Input = T> + 'static>,
+    ) -> std::io::Result<Harness<StateDiscovered<T>>> {
         self.state.notifier.notify(
             notify::event::DiscoverStart {
                 elapsed_s: Some(notify::Elapsed(self.state.start.elapsed())),
@@ -113,7 +113,7 @@ impl Harness<StateParsed> {
                 .into(),
             )?;
             if selected {
-                selected_cases.push(Box::new(case) as Box<dyn Case>);
+                selected_cases.push(Box::new(case) as Box<dyn Case<Input = T>>);
             }
         }
 
@@ -141,16 +141,16 @@ impl Harness<StateParsed> {
     }
 }
 
-pub struct StateDiscovered {
+pub struct StateDiscovered<T> {
     start: std::time::Instant,
     opts: libtest_lexarg::TestOpts,
     notifier: notify::ArcNotifier,
-    cases: Vec<Box<dyn Case>>,
+    cases: Vec<Box<dyn Case<Input = T>>>,
 }
-impl HarnessState for StateDiscovered {}
-impl sealed::_HarnessState_is_Sealed for StateDiscovered {}
+impl<T> HarnessState for StateDiscovered<T> {}
+impl<T> sealed::_HarnessState_is_Sealed for StateDiscovered<T> {}
 
-impl Harness<StateDiscovered> {
+impl Harness<StateDiscovered<()>> {
     pub fn run(self) -> std::io::Result<bool> {
         if self.state.opts.list {
             Ok(true)
@@ -160,6 +160,23 @@ impl Harness<StateDiscovered> {
                 &self.state.opts,
                 self.state.cases,
                 self.state.notifier,
+                (),
+            )
+        }
+    }
+}
+
+impl<T: Send + Clone + 'static> Harness<StateDiscovered<T>> {
+    pub fn run_with_value(self, value: T) -> std::io::Result<bool> {
+        if self.state.opts.list {
+            Ok(true)
+        } else {
+            run(
+                &self.state.start,
+                &self.state.opts,
+                self.state.cases,
+                self.state.notifier,
+                value,
             )
         }
     }
@@ -270,7 +287,10 @@ fn notifier(opts: &libtest_lexarg::TestOpts) -> notify::ArcNotifier {
     }
 }
 
-fn case_priority(case: &dyn Case, opts: &libtest_lexarg::TestOpts) -> Option<usize> {
+fn case_priority<T: 'static>(
+    case: &dyn Case<Input = T>,
+    opts: &libtest_lexarg::TestOpts,
+) -> Option<usize> {
     let filtered_out =
         !opts.skip.is_empty() && opts.skip.iter().any(|sf| matches_filter(case, sf, opts));
     if filtered_out {
@@ -284,7 +304,11 @@ fn case_priority(case: &dyn Case, opts: &libtest_lexarg::TestOpts) -> Option<usi
     }
 }
 
-fn matches_filter(case: &dyn Case, filter: &str, opts: &libtest_lexarg::TestOpts) -> bool {
+fn matches_filter<T: 'static>(
+    case: &dyn Case<Input = T>,
+    filter: &str,
+    opts: &libtest_lexarg::TestOpts,
+) -> bool {
     let test_name = case.name();
 
     match opts.filter_exact {
@@ -293,11 +317,12 @@ fn matches_filter(case: &dyn Case, filter: &str, opts: &libtest_lexarg::TestOpts
     }
 }
 
-fn run(
+fn run<T: Send + Clone + 'static>(
     start: &std::time::Instant,
     opts: &libtest_lexarg::TestOpts,
-    cases: Vec<Box<dyn Case>>,
+    cases: Vec<Box<dyn Case<Input = T>>>,
     notifier: notify::ArcNotifier,
+    value: T,
 ) -> std::io::Result<bool> {
     notifier.notify(
         notify::event::RunStart {
@@ -341,6 +366,7 @@ fn run(
         run_ignored,
         notifier,
         test_name: String::new(),
+        value,
     };
 
     let mut success = true;
@@ -434,7 +460,10 @@ fn run(
     Ok(success)
 }
 
-fn run_case(case: &dyn Case, context: &TestContext) -> std::io::Result<bool> {
+fn run_case<T: 'static>(
+    case: &dyn Case<Input = T>,
+    context: &TestContext<T>,
+) -> std::io::Result<bool> {
     context.notifier().notify(
         notify::event::CaseStart {
             name: case.name().to_owned(),

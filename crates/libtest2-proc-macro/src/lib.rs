@@ -89,6 +89,11 @@ fn generate(
 
     inner.extend(item);
 
+    inner.extend(TokenStream::from_iter([
+        TokenTree::Punct(Punct::new(',', Spacing::Joint)),
+        TokenTree::Ident(Ident::new("i32", Span::call_site())),
+    ]));
+
     let mut invoke = crate_path.unwrap_or_else(|| {
         TokenStream::from_iter([
             TokenTree::Punct(Punct::new(':', Spacing::Joint)),

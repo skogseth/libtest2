@@ -6,9 +6,11 @@ use crate::RunResult;
 use crate::TestContext;
 
 #[derive(Copy, Clone)]
-pub struct DynCase(pub &'static dyn Case);
+pub struct DynCase<T: 'static>(pub &'static dyn Case<Input = T>);
 
-impl Case for DynCase {
+impl<T> Case for DynCase<T> {
+    type Input = T;
+
     fn name(&self) -> &str {
         self.0.name()
     }
@@ -18,25 +20,25 @@ impl Case for DynCase {
     fn source(&self) -> Option<&Source> {
         self.0.source()
     }
-    fn exclusive(&self, context: &TestContext) -> bool {
+    fn exclusive(&self, context: &TestContext<T>) -> bool {
         self.0.exclusive(context)
     }
 
-    fn run(&self, context: &TestContext) -> RunResult {
+    fn run(&self, context: &TestContext<T>) -> RunResult {
         self.0.run(context)
     }
 }
 
-pub struct FnCase {
+pub struct FnCase<T> {
     name: String,
     #[allow(clippy::type_complexity)]
-    runner: Box<dyn Fn(&TestContext) -> RunResult + Send + Sync>,
+    runner: Box<dyn Fn(&TestContext<T>) -> RunResult + Send + Sync>,
 }
 
-impl FnCase {
+impl<T> FnCase<T> {
     pub fn test(
         name: impl Into<String>,
-        runner: impl Fn(&TestContext) -> RunResult + Send + Sync + 'static,
+        runner: impl Fn(&TestContext<T>) -> RunResult + Send + Sync + 'static,
     ) -> Self {
         Self {
             name: name.into(),
@@ -45,7 +47,9 @@ impl FnCase {
     }
 }
 
-impl Case for FnCase {
+impl<T: 'static> Case for FnCase<T> {
+    type Input = T;
+
     fn name(&self) -> &str {
         &self.name
     }
@@ -55,16 +59,19 @@ impl Case for FnCase {
     fn source(&self) -> Option<&Source> {
         None
     }
-    fn exclusive(&self, _: &TestContext) -> bool {
+    fn exclusive(&self, _: &TestContext<T>) -> bool {
         false
     }
 
-    fn run(&self, context: &TestContext) -> RunResult {
+    fn run(&self, context: &TestContext<T>) -> RunResult {
         (self.runner)(context)
     }
 }
 
-pub fn main(cases: impl IntoIterator<Item = impl Case + 'static>) {
+pub fn main<T: Send + Clone + 'static>(
+    cases: impl IntoIterator<Item = impl Case<Input = T> + 'static>,
+    value: T,
+) {
     let harness = libtest2_harness::Harness::new();
     let harness = match harness.with_env() {
         Ok(harness) => harness,
@@ -89,7 +96,7 @@ pub fn main(cases: impl IntoIterator<Item = impl Case + 'static>) {
             ::std::process::exit(libtest2_harness::ERROR_EXIT_CODE)
         }
     };
-    match harness.run() {
+    match harness.run_with_value(value.clone()) {
         Ok(true) => ::std::process::exit(0),
         Ok(false) => ::std::process::exit(libtest2_harness::ERROR_EXIT_CODE),
         Err(err) => {
