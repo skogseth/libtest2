@@ -45,7 +45,7 @@ pub mod _private {
 
     pub use crate::_main_parse as main_parse;
     pub use crate::_test_parse as test_parse;
-    pub use crate::case::DynCase;
+    pub use crate::case::TestDef;
 }
 
 pub use case::main;

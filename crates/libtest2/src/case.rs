@@ -6,24 +6,28 @@ use crate::RunResult;
 use crate::TestContext;
 
 #[derive(Copy, Clone)]
-pub struct DynCase(pub &'static dyn Case);
+pub struct TestDef {
+    pub name: &'static str,
+    pub kind: TestKind,
+    pub exclusive: bool,
+    pub function: fn(&TestContext) -> RunResult,
+}
 
-impl Case for DynCase {
+impl Case for TestDef {
     fn name(&self) -> &str {
-        self.0.name()
+        self.name
     }
     fn kind(&self) -> TestKind {
-        self.0.kind()
+        self.kind
     }
     fn source(&self) -> Option<&Source> {
-        self.0.source()
+        None
     }
-    fn exclusive(&self, context: &TestContext) -> bool {
-        self.0.exclusive(context)
+    fn exclusive(&self, _context: &TestContext) -> bool {
+        self.exclusive
     }
-
     fn run(&self, context: &TestContext) -> RunResult {
-        self.0.run(context)
+        (self.function)(context)
     }
 }
 
