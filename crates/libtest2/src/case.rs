@@ -6,14 +6,18 @@ use crate::RunResult;
 use crate::TestContext;
 
 #[derive(Copy, Clone)]
-pub struct TestDef {
+pub struct TestDef<F = fn(&TestContext) -> RunResult> {
     pub name: &'static str,
     pub kind: TestKind,
     pub exclusive: bool,
-    pub function: fn(&TestContext) -> RunResult,
+    pub function: F,
 }
 
-impl Case for TestDef {
+impl<F> Case for TestDef<F>
+where
+    F: Fn(&TestContext) -> RunResult,
+    F: Send + Sync + 'static,
+{
     fn name(&self) -> &str {
         self.name
     }
