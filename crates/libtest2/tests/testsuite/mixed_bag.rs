@@ -50,20 +50,20 @@ fn fly(context: &libtest2::TestContext) -> libtest2::RunResult {
 }
 
 #[libtest2::test]
+#[ignore = "fails"]
 fn bear(context: &libtest2::TestContext) -> libtest2::RunResult {
-    context.ignore_for("fails")?;
     Err(libtest2::RunError::fail("no honey"))
 }
 
 #[libtest2::test]
+#[ignore]
 fn sheep(context: &libtest2::TestContext) -> libtest2::RunResult {
-    context.ignore()?;
     Err(libtest2::RunError::fail("got lost blindly following the flock"))
 }
 
 #[libtest2::test]
+#[ignore = "slow"]
 fn horse(context: &libtest2::TestContext) -> libtest2::RunResult {
-    context.ignore_for("slow")?;
     Ok(())
 }
 "#,
