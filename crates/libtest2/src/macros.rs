@@ -14,7 +14,7 @@ macro_rules! _main_parse {
 }
 
 #[macro_export]
-#[allow(clippy::crate_in_macro_def)] // accessing item defined by `_main_parse`/`_parse_ignore`, and recursively calling the macro itself
+#[allow(clippy::crate_in_macro_def)] // accessing item defined by `_main_parse`/`_parse_ignore`/`_run_test`, and recursively calling the macro itself
 macro_rules! _test_parse {
     // Entry point
     (#[test] $(#[$($attr:tt)+])* fn $name:ident $($item:tt)*) => {
@@ -28,20 +28,22 @@ macro_rules! _test_parse {
     // Recursively handle attributes:
 
     // Edge condition (no more attributes to parse)
-    (continue: name=$name:ident body=[$($item:tt)*] attrs=[] $(ignore=$ignore:tt)?) => {
+    (continue: name=$name:ident body=[$($item:tt)*] attrs=[] $(ignore=$ignore:tt)? $(should_panic=$should_panic:tt)?) => {
         $crate::_private::test_parse!(break:
             name=$name
             body=[$($item)*]
             $(ignore=$ignore)?
+            $(should_panic=$should_panic)?
         );
     };
     // Process `#[ignore]`/`#[ignore = ".."]` (NOTE: This will only match if an ignore macro has not already been parsed)
-    (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[ignore $(= $reason:literal)?] $(#[$($attr:tt)+])*]) => {
+    (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[ignore $(= $reason:literal)?] $(#[$($attr:tt)+])*] $(should_panic=$should_panic:tt)?) => {
         $crate::_private::test_parse!(continue:
             name=$name
             body=[$($item)*]
             attrs=[$(#[$($attr)*])*]
             ignore=[$($reason)?]
+            $(should_panic=$should_panic)?
         );
     };
     // Ignore subsequent calls to `#[ignore]`/`#[ignore = ".."]`
@@ -53,19 +55,51 @@ macro_rules! _test_parse {
             ignore=$ignore
         );
     };
+    // Process `#[should_panic]`/`#[should_panic = ".."]` (NOTE: This will only match if a should_panic macro has not already been parsed)
+    (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[should_panic $(= $expected:literal)?] $(#[$($attr:tt)+])*] $(ignore=$ignore:tt)?) => {
+        $crate::_private::test_parse!(continue:
+            name=$name
+            body=[$($item)*]
+            attrs=[$(#[$($attr)*])*]
+            $(ignore=$ignore)?
+            should_panic=[$($expected)?]
+        );
+    };
+    // Process `#[should_panic(expected = "..")]` (NOTE: Same as branch above)
+    (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[should_panic(expected = $expected:literal)] $(#[$($attr:tt)+])*] $(ignore=$ignore:tt)?) => {
+        $crate::_private::test_parse!(continue:
+            name=$name
+            body=[$($item)*]
+            attrs=[$(#[$($attr)*])*]
+            $(ignore=$ignore)?
+            should_panic=[$expected]
+        );
+    };
+    // Emit an error for subsequent calls to `#[should_panic]`/`#[should_panic = ".."]`/`#[should_panic(expected = "..")]` (but continue parsing)
+    (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[should_panic $($unused:tt)*] $(#[$($attr:tt)+])*] $(ignore=$ignore:tt)? should_panic=$should_panic:tt) => {
+        compile_error!("annotating a test with multiple 'should_panic' attributes is not allowed");
+        $crate::_private::test_parse!(continue:
+            name=$name
+            body=[$($item)*]
+            attrs=[$(#[$($attr)*])*]
+            $(ignore=$ignore)?
+            should_panic=$should_panic
+        );
+    };
     // Emit error on unknown attributes (but continue parsing)
-    (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[$($unknown_attr:tt)+] $(#[$($attr:tt)+])*] $(ignore=$ignore:tt)?) => {
+    (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[$($unknown_attr:tt)+] $(#[$($attr:tt)+])*] $(ignore=$ignore:tt)? $(should_panic=$should_panic:tt)?) => {
         compile_error!(concat!("unknown attribute '", stringify!($($unknown_attr)+), "'"));
         $crate::_private::test_parse!(continue:
             name=$name
             body=[$($item)*]
             attrs=[$(#[$($attr)*])*]
             $(ignore=$ignore)?
+            $(should_panic=$should_panic)?
         );
     };
 
     // End result
-    (break: name=$name:ident body=[$($item:tt)*] $(ignore=$ignore:tt)?) => {
+    (break: name=$name:ident body=[$($item:tt)*] $(ignore=$ignore:tt)? $(should_panic=$should_panic:tt)?) => {
         #[allow(non_camel_case_types)]
         struct $name;
 
@@ -91,7 +125,7 @@ macro_rules! _test_parse {
                 $crate::_private::parse_ignore!(context, $($ignore)?);
 
                 use $crate::IntoRunResult;
-                let result = run(context);
+                let result = $crate::_private::run_test!(context, $($should_panic)?);
                 IntoRunResult::into_run_result(result)
             }
         }
@@ -107,4 +141,17 @@ macro_rules! _parse_ignore {
         $context.ignore()?
     };
     ($context:expr $(,)?) => {};
+}
+
+#[macro_export]
+macro_rules! _run_test {
+    ($context:expr, [$expected:literal]) => {
+        $crate::panic::assert_panic_contains(|| run($context), $expected)
+    };
+    ($context:expr, []) => {
+        $crate::panic::assert_panic(|| run($context))
+    };
+    ($context:expr $(,)?) => {{
+        run($context)
+    }};
 }
