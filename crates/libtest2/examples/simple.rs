@@ -8,24 +8,17 @@ fn main() {}
 // Tests
 
 #[libtest2::test]
-fn check_toph(_context: &TestContext) -> RunResult {
-    Ok(())
-}
+fn check_toph(_context: &TestContext) {}
 #[libtest2::test]
-fn check_katara(_context: &TestContext) -> RunResult {
-    Ok(())
-}
+fn check_katara(_context: &TestContext) {}
 #[libtest2::test]
 fn check_sokka(_context: &TestContext) -> RunResult {
     Err(RunError::fail("Sokka tripped and fell :("))
 }
 #[libtest2::test]
 #[ignore = "slow"]
-fn long_computation(_context: &TestContext) -> RunResult {
+fn long_computation(_context: &TestContext) {
     std::thread::sleep(std::time::Duration::from_secs(1));
-    Ok(())
 }
 #[libtest2::test]
-fn compile_fail_dummy(_context: &TestContext) -> RunResult {
-    Ok(())
-}
+fn compile_fail_dummy(_context: &TestContext) {}

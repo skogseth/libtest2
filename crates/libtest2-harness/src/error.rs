@@ -64,3 +64,19 @@ impl std::fmt::Display for Message {
 }
 
 impl std::error::Error for Message {}
+
+pub trait IntoRunResult {
+    fn into_run_result(self) -> RunResult;
+}
+
+impl IntoRunResult for () {
+    fn into_run_result(self) -> RunResult {
+        Ok(())
+    }
+}
+
+impl IntoRunResult for RunResult {
+    fn into_run_result(self) -> RunResult {
+        self
+    }
+}

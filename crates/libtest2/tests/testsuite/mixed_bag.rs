@@ -11,8 +11,7 @@ fn test_cmd() -> snapbox::cmd::Command {
 fn main() {}
 
 #[libtest2::test]
-fn cat(_context: &libtest2::TestContext) -> libtest2::RunResult {
-    Ok(())
+fn cat(_context: &libtest2::TestContext) {
 }
 
 #[libtest2::test]
@@ -21,8 +20,7 @@ fn dog(_context: &libtest2::TestContext) -> libtest2::RunResult {
 }
 
 #[libtest2::test]
-fn fox(_context: &libtest2::TestContext) -> libtest2::RunResult {
-    Ok(())
+fn fox(_context: &libtest2::TestContext) {
 }
 
 #[libtest2::test]
@@ -63,8 +61,7 @@ fn sheep(context: &libtest2::TestContext) -> libtest2::RunResult {
 
 #[libtest2::test]
 #[ignore = "slow"]
-fn horse(context: &libtest2::TestContext) -> libtest2::RunResult {
-    Ok(())
+fn horse(context: &libtest2::TestContext) {
 }
 "#,
             false,

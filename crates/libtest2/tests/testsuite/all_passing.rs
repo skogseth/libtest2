@@ -11,18 +11,15 @@ fn test_cmd() -> snapbox::cmd::Command {
 fn main() {}
 
 #[libtest2::test]
-fn foo(_context: &libtest2::TestContext) -> libtest2::RunResult {
-    Ok(())
+fn foo(_context: &libtest2::TestContext) {
 }
 
 #[libtest2::test]
-fn bar(_context: &libtest2::TestContext) -> libtest2::RunResult {
-    Ok(())
+fn bar(_context: &libtest2::TestContext) {
 }
 
 #[libtest2::test]
-fn barro(_context: &libtest2::TestContext) -> libtest2::RunResult {
-    Ok(())
+fn barro(_context: &libtest2::TestContext) {
 }
 "#,
             false,

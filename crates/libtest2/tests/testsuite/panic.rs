@@ -11,12 +11,11 @@ fn test_cmd() -> snapbox::cmd::Command {
 fn main() {}
 
 #[libtest2::test]
-fn passes(_context: &libtest2::TestContext) -> libtest2::RunResult {
-    Ok(())
+fn passes(_context: &libtest2::TestContext) {
 }
 
 #[libtest2::test]
-fn panics(_context: &libtest2::TestContext) -> libtest2::RunResult {
+fn panics(_context: &libtest2::TestContext) {
     panic!("uh oh")
 }
 "#,
