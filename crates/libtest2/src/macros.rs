@@ -22,41 +22,49 @@ macro_rules! _test_parse {
             body=[$($item)*]
             unparsed_attrs=[$(#[$($attr)*])*]
             parsed_attrs=[]
+            ignore=[]
         }
     };
 
     // Recursively handle attributes
-    (name=$name:ident body=[$($item:tt)*] unparsed_attrs=[] parsed_attrs=[$(#[$($parsed_attr:tt)*])*] $(ignore=[$(reason:expr)?])?) => {
+    (name=$name:ident body=[$($item:tt)*] unparsed_attrs=[] parsed_attrs=[$(#[$($parsed_attr:tt)*])*] ignore=[$($state:expr)?]) => {
         $crate::_private::test_parse! {
             name=$name
             body=[$($item)*]
             attrs=[$(#[$($parsed_attr)*])*]
+            ignore=[$($state)?]
         }
     };
-    (name=$name:ident body=[$($item:tt)*] unparsed_attrs=[#[ignore $(= $reason:expr)?] $(#[$($unparsed_attr:tt)*])*] parsed_attrs=[$(#[$($parsed_attr:tt)*])*] $(ignore=[$(reason:expr)?])?) => {
-        $(
-            const _: &str = $reason;
-            compile_error!("found ignore with reason");
-        )?
-        compile_error!("found ignore!");
+    (name=$name:ident body=[$($item:tt)*] unparsed_attrs=[#[ignore] $(#[$($unparsed_attr:tt)*])*] parsed_attrs=[$(#[$($parsed_attr:tt)*])*] ignore=[$($state:expr)?]) => {
         $crate::_private::test_parse! {
             name=$name
             body=[$($item)*]
             unparsed_attrs=[$(#[$($unparsed_attr)*])*]
             parsed_attrs=[#[$(#[$($parsed_attr)*])*]]
+            ignore=[()]
         }
     };
-    (name=$name:ident body=[$($item:tt)*] unparsed_attrs=[#[$($attr:tt)+] $(#[$($unparsed_attr:tt)*])*] parsed_attrs=[$(#[$($parsed_attr:tt)*])*] $(ignore=[$(reason:expr)?])?) => {
+    (name=$name:ident body=[$($item:tt)*] unparsed_attrs=[#[ignore = $reason:expr] $(#[$($unparsed_attr:tt)*])*] parsed_attrs=[$(#[$($parsed_attr:tt)*])*] ignore=[$($state:expr)?]) => {
+        $crate::_private::test_parse! {
+            name=$name
+            body=[$($item)*]
+            unparsed_attrs=[$(#[$($unparsed_attr)*])*]
+            parsed_attrs=[#[$(#[$($parsed_attr)*])*]]
+            ignore=[$reason]
+        }
+    };
+    (name=$name:ident body=[$($item:tt)*] unparsed_attrs=[#[$($attr:tt)+] $(#[$($unparsed_attr:tt)*])*] parsed_attrs=[$(#[$($parsed_attr:tt)*])*] ignore=[$($state:expr)?]) => {
         $crate::_private::test_parse! {
             name=$name
             body=[$($item)*]
             unparsed_attrs=[$(#[$($unparsed_attr)*])*]
             parsed_attrs=[#[$($attr)* $(#[$($parsed_attr)*])*]]
+            ignore=[$($state)?]
         }
     };
 
     // End result
-    (name=$name:ident body=[$($item:tt)*] attrs=[$(#[$($attr:tt)*])*] $(ignore=[$(reason:expr)?])?) => {
+    (name=$name:ident body=[$($item:tt)*] attrs=[$(#[$($attr:tt)*])*] ignore=[]) => {
         #[allow(non_camel_case_types)]
         struct $name;
 
@@ -79,6 +87,67 @@ macro_rules! _test_parse {
             fn run(&self, context: &$crate::TestContext) -> $crate::RunResult {
                 // $(#[$($attr)*])*
                 fn run $($item)*
+
+                run(context)
+            }
+        }
+    };
+    (name=$name:ident body=[$($item:tt)*] attrs=[$(#[$($attr:tt)*])*] ignore=[$reason:literal]) => {
+        #[allow(non_camel_case_types)]
+        struct $name;
+
+        impl $crate::_private::Case for $name {
+            fn name(&self) -> &str {
+                $crate::_private::push!(crate::TESTS, _: $crate::_private::DynCase = $crate::_private::DynCase(&$name));
+
+                stringify!($name)
+            }
+            fn kind(&self) -> $crate::_private::TestKind {
+                Default::default()
+            }
+            fn source(&self) -> Option<&$crate::_private::Source> {
+                None
+            }
+            fn exclusive(&self, _: &$crate::TestContext) -> bool {
+                false
+            }
+
+            fn run(&self, context: &$crate::TestContext) -> $crate::RunResult {
+                // $(#[$($attr)*])*
+                fn run $($item)*
+
+                let reason: &'static str = $reason;
+                context.ignore_for(reason)?;
+
+                run(context)
+            }
+        }
+    };
+    (name=$name:ident body=[$($item:tt)*] attrs=[$(#[$($attr:tt)*])*] ignore=[$unused:expr]) => {
+        #[allow(non_camel_case_types)]
+        struct $name;
+
+        impl $crate::_private::Case for $name {
+            fn name(&self) -> &str {
+                $crate::_private::push!(crate::TESTS, _: $crate::_private::DynCase = $crate::_private::DynCase(&$name));
+
+                stringify!($name)
+            }
+            fn kind(&self) -> $crate::_private::TestKind {
+                Default::default()
+            }
+            fn source(&self) -> Option<&$crate::_private::Source> {
+                None
+            }
+            fn exclusive(&self, _: &$crate::TestContext) -> bool {
+                false
+            }
+
+            fn run(&self, context: &$crate::TestContext) -> $crate::RunResult {
+                // $(#[$($attr)*])*
+                fn run $($item)*
+
+                context.ignore()?;
 
                 run(context)
             }
