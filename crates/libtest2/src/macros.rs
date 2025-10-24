@@ -13,22 +13,37 @@ macro_rules! _main_parse {
 }
 
 #[macro_export]
-macro_rules! _parse_ignore {
-    (ignore) => {
-        ::std::option::Option::<&'static str>::None
-    };
-    (ignore = $reason:expr) => {
-        ::std::option::Option::<&'static str>::Some($reason)
-    };
-    ($($attr:tt)*) => {
-        compile_error!(concat!("unknown attribute '", stringify!($($attr)*), "'"));
-    };
-}
-
-#[macro_export]
 #[allow(clippy::crate_in_macro_def)] // accessing item defined by `_main_parse`
 macro_rules! _test_parse {
+    // Entry point
     (#[test] $(#[$($attr:tt)*])* fn $name:ident $($item:tt)*) => {
+        $crate::_private::test_parse! {
+            name=$name
+            body=[$($item)*]
+            unparsed_attrs=[$(#[$($attr)*])*]
+            parsed_attrs=[]
+        }
+    };
+
+    // Recursively handle attributes
+    (name=$name:ident body=[$($item:tt)*] unparsed_attrs=[] parsed_attrs=[$(#[$($parsed_attr:tt)*])*] $(ignore=[$(reason:expr)?])?) => {
+        $crate::_private::test_parse! {
+            name=$name
+            body=[$($item)*]
+            attrs=[$(#[$($parsed_attr)*])*]
+        }
+    };
+    (name=$name:ident body=[$($item:tt)*] unparsed_attrs=[#[$($attr:tt)+] $(#[$($unparsed_attr:tt)*])*] parsed_attrs=[$(#[$($parsed_attr:tt)*])*] $(ignore=[$(reason:expr)?])?) => {
+        $crate::_private::test_parse! {
+            name=$name
+            body=[$($item)*]
+            unparsed_attrs=[$(#[$($unparsed_attr)*])*]
+            parsed_attrs=[#[$($attr)* $(#[$($parsed_attr)*])*]]
+        }
+    };
+
+    // End result
+    (name=$name:ident body=[$($item:tt)*] attrs=[$(#[$($attr:tt)*])*] $(ignore=[$(reason:expr)?])?) => {
         #[allow(non_camel_case_types)]
         struct $name;
 
@@ -49,14 +64,8 @@ macro_rules! _test_parse {
             }
 
             fn run(&self, context: &$crate::TestContext) -> $crate::RunResult {
+                // $(#[$($attr)*])*
                 fn run $($item)*
-
-                $(
-                    match $crate::_private::parse_ignore!($($attr)*) {
-                        ::std::option::Option::None => context.ignore()?,
-                        ::std::option::Option::Some(reason) => context.ignore_for(reason)?,
-                    }
-                )*
 
                 run(context)
             }
