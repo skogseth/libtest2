@@ -33,6 +33,19 @@ macro_rules! _test_parse {
             attrs=[$(#[$($parsed_attr)*])*]
         }
     };
+    (name=$name:ident body=[$($item:tt)*] unparsed_attrs=[#[ignore $(= $reason:expr)?] $(#[$($unparsed_attr:tt)*])*] parsed_attrs=[$(#[$($parsed_attr:tt)*])*] $(ignore=[$(reason:expr)?])?) => {
+        $(
+            const _: &str = $reason;
+            compile_error!("found ignore with reason");
+        )?
+        compile_error!("found ignore!");
+        $crate::_private::test_parse! {
+            name=$name
+            body=[$($item)*]
+            unparsed_attrs=[$(#[$($unparsed_attr)*])*]
+            parsed_attrs=[#[$(#[$($parsed_attr)*])*]]
+        }
+    };
     (name=$name:ident body=[$($item:tt)*] unparsed_attrs=[#[$($attr:tt)+] $(#[$($unparsed_attr:tt)*])*] parsed_attrs=[$(#[$($parsed_attr:tt)*])*] $(ignore=[$(reason:expr)?])?) => {
         $crate::_private::test_parse! {
             name=$name
