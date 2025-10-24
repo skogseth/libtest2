@@ -14,22 +14,27 @@ macro_rules! _main_parse {
 
 #[macro_export]
 macro_rules! _parse_attr {
-    // Handles known attributes (unknown attributes are ignored)
-    ($context:expr => ignore) => { $context.ignore()? };
-    ($context:expr => ignore = $reason:expr) => { $context.ignore_for(reason)? };
-    ($context:expr => $($attr:tt)*) => {};
-
     // Removes known attributes (unknown attributes are passed through without change)
-    (remove => ignore) => {};
-    (remove => ignore = $reason:expr) => {};
-    (remove => $($attr:tt)*) => { $($attr)* };
+    // (remove => ignore) => {};
+    // (remove => ignore = $reason:expr) => {};
+    // (remove => $attr:meta) => { $($attr)* };
 
+    // Handles known attributes (unknown attributes are ignored)
+    ($context:expr => ignore) => {
+        $context.ignore()?
+    };
+    ($context:expr => ignore = $reason:expr) => {
+        $context.ignore_for(reason)?
+    };
+    ($context:expr => $attr:meta) => {
+        compile_error!("unknown attribute: {}", stringify!($attr));
+    };
 }
 
 #[macro_export]
 #[allow(clippy::crate_in_macro_def)] // accessing item defined by `_main_parse`
 macro_rules! _test_parse {
-    (#[test] $(#[$($attr:tt)*])* fn $name:ident $($item:tt)*) => {
+    (#[test] $(#[$attr:meta])* fn $name:ident $($item:tt)*) => {
         #[allow(non_camel_case_types)]
         struct $name;
 
@@ -50,12 +55,12 @@ macro_rules! _test_parse {
             }
 
             fn run(&self, context: &$crate::TestContext) -> $crate::RunResult {
-                // $(#[$crate::_private::parse_attr! { remove => $($attr)* }])*
-                // $(#[$($attr)*])*
+                // $($crate::_private::parse_attr!(remove => $attr))*
+                // $(#[$attr])*
                 fn run $($item)*
 
                 $(
-                    $crate::_private::parse_attr!(context => $($attr)*);
+                    $crate::_private::parse_attr!(context => $attr);
                 )*
 
                 run(context)
