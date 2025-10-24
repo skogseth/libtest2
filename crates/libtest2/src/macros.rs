@@ -12,13 +12,28 @@ macro_rules! _main_parse {
     };
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum Attribute {
+    Ignore(Option<&'static str>),
+    ShouldPanic(Option<&'static str>),
+}
+
 #[macro_export]
-macro_rules! _parse_ignore {
+macro_rules! _parse_attr {
     (ignore) => {
-        ::std::option::Option::<&'static str>::None
+        $crate::_private::Attribute::Ignore(None)
     };
     (ignore = $reason:expr) => {
-        ::std::option::Option::<&'static str>::Some($reason)
+        $crate::_private::Attribute::Ignore(Some($reason))
+    };
+    (should_panic) => {
+        $crate::_private::Attribute::ShouldPanic(None)
+    };
+    (should_panic = $expected:expr) => {
+        $crate::_private::Attribute::ShouldPanic(Some($expected))
+    };
+    (should_panic(expected = $expected:expr)) => {
+        $crate::_private::Attribute::ShouldPanic(Some($expected))
     };
     ($($attr:tt)*) => {
         compile_error!(concat!("unknown attribute '", stringify!($($attr)*), "'"));
@@ -51,14 +66,53 @@ macro_rules! _test_parse {
             fn run(&self, context: &$crate::TestContext) -> $crate::RunResult {
                 fn run $($item)*
 
+                let mut should_panic = false;
+                let mut panic_message: Option<&'static str> = None;
+
                 $(
-                    match $crate::_private::parse_ignore!($($attr)*) {
-                        ::std::option::Option::None => context.ignore()?,
-                        ::std::option::Option::Some(reason) => context.ignore_for(reason)?,
+                    match $crate::_private::parse_attr!($($attr)*) {
+                        $crate::_private::Attribute::Ignore(None) => {
+                            context.ignore()?;
+                        }
+                        $crate::_private::Attribute::Ignore(Some(reason))  => {
+                            context.ignore_for(reason)?;
+                        }
+                        $crate::_private::Attribute::ShouldPanic(maybe_message) => {
+                            should_panic = true;
+                            panic_message = maybe_message;
+                        }
                     }
                 )*
 
-                run(context)
+                if should_panic {
+                    match (::std::panic::catch_unwind(|| run(context)), panic_message) {
+                        (Ok(_), _) => Err($crate::RunError::fail("expected panic")),
+                        (Err(_), None) => Ok(()),
+                        (Err(e), Some(expected)) => {
+                            // The `panic` information is just an `Any` object representing the
+                            // value the panic was invoked with. For most panics (which use
+                            // `panic!` like `println!`), this is either `&str` or `String`.
+                            let payload = e
+                                .downcast_ref::<String>()
+                                .map(|s| s.as_str())
+                                .or_else(|| e.downcast_ref::<&str>().copied());
+
+                            match payload {
+                                Some(found) if found == expected => Ok(()),
+                                Some(found) => {
+                                    let error_msg = format!("unexpected panic message '{found}' (expected '{expected}')");
+                                    Err($crate::RunError::fail(error_msg))
+                                }
+                                None => {
+                                    let error_msg = format!("unexpected panic message <<not a string>> (expected '{expected}')");
+                                    Err($crate::RunError::fail(error_msg))
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    run(context)
+                }
             }
         }
     };

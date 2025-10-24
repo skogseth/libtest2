@@ -44,9 +44,10 @@ pub mod _private {
     pub use libtest2_harness::TestKind;
 
     pub use crate::_main_parse as main_parse;
-    pub use crate::_parse_ignore as parse_ignore;
+    pub use crate::_parse_attr as parse_attr;
     pub use crate::_test_parse as test_parse;
     pub use crate::case::DynCase;
+    pub use crate::macros::Attribute;
 }
 
 pub use case::main;
