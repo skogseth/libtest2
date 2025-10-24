@@ -12,7 +12,6 @@ macro_rules! _main_parse {
     };
 }
 
-#[derive(Debug, Clone, Copy)]
 pub enum Attribute {
     Ignore(Option<&'static str>),
     ShouldPanic(Option<&'static str>),
@@ -66,29 +65,35 @@ macro_rules! _test_parse {
             fn run(&self, context: &$crate::TestContext) -> $crate::RunResult {
                 fn run $($item)*
 
-                let mut should_panic = false;
-                let mut panic_message: Option<&'static str> = None;
+                const ATTRS: (::core::option::Option<::core::option::Option<&'static str>>, ::core::option::Option<::core::option::Option<&'static str>>)  = const {
+                    let mut ignore: ::core::option::Option<::core::option::Option<&'static str>> = ::core::option::Option::None;
+                    let mut should_panic: ::core::option::Option<::core::option::Option<&'static str>> = ::core::option::Option::None;
 
-                $(
-                    match $crate::_private::parse_attr!($($attr)*) {
-                        $crate::_private::Attribute::Ignore(None) => {
-                            context.ignore()?;
+                    $(
+                        match $crate::_private::parse_attr!($($attr)*) {
+                            $crate::_private::Attribute::Ignore(maybe_reason) => {
+                                ignore = ::core::option::Option::Some(maybe_reason);
+                            }
+                            $crate::_private::Attribute::ShouldPanic(maybe_message) => {
+                                should_panic = ::core::option::Option::Some(maybe_message);
+                            }
                         }
-                        $crate::_private::Attribute::Ignore(Some(reason))  => {
-                            context.ignore_for(reason)?;
-                        }
-                        $crate::_private::Attribute::ShouldPanic(maybe_message) => {
-                            should_panic = true;
-                            panic_message = maybe_message;
-                        }
-                    }
-                )*
+                    )*
 
-                if should_panic {
+                    (ignore, should_panic)
+                };
+
+                match ATTRS.0 {
+                    ::core::option::Option::Some(::core::option::Option::Some(reason)) => context.ignore_for(reason)?,
+                    ::core::option::Option::Some(::core::option::Option::None) => context.ignore()?,
+                    ::core::option::Option::None => {}
+                }
+
+                if let ::core::option::Option::Some(panic_message) = ATTRS.1 {
                     match (::std::panic::catch_unwind(|| run(context)), panic_message) {
                         (Ok(_), _) => Err($crate::RunError::fail("expected panic")),
-                        (Err(_), None) => Ok(()),
-                        (Err(e), Some(expected)) => {
+                        (Err(_), ::core::option::Option::None) => Ok(()),
+                        (Err(e), ::core::option::Option::Some(expected)) => {
                             // The `panic` information is just an `Any` object representing the
                             // value the panic was invoked with. For most panics (which use
                             // `panic!` like `println!`), this is either `&str` or `String`.
@@ -98,12 +103,12 @@ macro_rules! _test_parse {
                                 .or_else(|| e.downcast_ref::<&str>().copied());
 
                             match payload {
-                                Some(found) if found == expected => Ok(()),
-                                Some(found) => {
+                                ::core::option::Option::Some(found) if found == expected => Ok(()),
+                                ::core::option::Option::Some(found) => {
                                     let error_msg = format!("unexpected panic message '{found}' (expected '{expected}')");
                                     Err($crate::RunError::fail(error_msg))
                                 }
-                                None => {
+                                ::core::option::Option::None => {
                                     let error_msg = format!("unexpected panic message <<not a string>> (expected '{expected}')");
                                     Err($crate::RunError::fail(error_msg))
                                 }
