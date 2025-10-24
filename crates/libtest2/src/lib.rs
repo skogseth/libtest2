@@ -51,6 +51,8 @@
 mod case;
 mod macros;
 
+pub mod panic;
+
 #[doc(hidden)]
 pub mod _private {
     pub use distributed_list::push;
