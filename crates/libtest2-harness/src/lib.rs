@@ -6,6 +6,7 @@
 
 mod case;
 mod context;
+mod error;
 mod harness;
 mod notify;
 
@@ -13,6 +14,7 @@ pub mod cli;
 
 pub use case::*;
 pub use context::*;
+pub use error::*;
 pub use harness::*;
 pub use notify::RunMode;
 
