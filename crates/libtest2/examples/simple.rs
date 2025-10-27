@@ -20,9 +20,8 @@ fn check_sokka(_context: &TestContext) -> RunResult {
     Err(RunError::fail("Sokka tripped and fell :("))
 }
 #[libtest2::test]
-fn long_computation(context: &TestContext) -> RunResult {
-    context.ignore_for("slow")?;
-
+#[ignore = "slow"]
+fn long_computation(_context: &TestContext) -> RunResult {
     std::thread::sleep(std::time::Duration::from_secs(1));
     Ok(())
 }
