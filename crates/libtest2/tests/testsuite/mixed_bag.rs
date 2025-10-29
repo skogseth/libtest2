@@ -65,8 +65,8 @@ fn horse(context: &libtest2::TestContext) {
 }
 
 #[libtest2::test]
-fn custom_error(context: &libtest2::TestContext) -> libtest2::RunResult {
-    Err(libtest2::RunError::from(std::io::Error::new(std::io::ErrorKind::Other, "I failed")))
+fn custom_error(context: &libtest2::TestContext) -> std::io::Result<()> {
+    Err(std::io::Error::new(std::io::ErrorKind::Other, "I failed"))
 }
 
 "#,

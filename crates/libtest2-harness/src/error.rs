@@ -80,3 +80,12 @@ impl IntoRunResult for RunResult {
         self
     }
 }
+
+impl<E> IntoRunResult for Result<(), E>
+where
+    E: std::error::Error + Send + Sync + 'static,
+{
+    fn into_run_result(self) -> RunResult {
+        self.map_err(RunError::with_cause)
+    }
+}
