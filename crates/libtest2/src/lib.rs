@@ -27,6 +27,19 @@
 //! fn main() {
 //! }
 //! ```
+//!
+//! # Known limitations and differences to the official test harness
+//!
+//! `libtest2` aims to be fully compatible with stable, non-deprecated parts of `libtest`
+//! but there are differences for now.
+//!
+//! Some of the notable differences:
+//!
+//! - Output capture and `--no-capture`: simply not supported. The official
+//!   `libtest` uses internal `std` functions to temporarily redirect output.
+//!   `libtest` cannot use those, see also [libtest2#12](https://github.com/assert-rs/libtest2/issues/12)
+//! - `--format=json` (unstable): our schema is part of an experiment to see what should be
+//!   stabilized for `libtest`, see also [libtest2#42](https://github.com/assert-rs/libtest2/issues/42)
 
 #![cfg_attr(docsrs, feature(doc_cfg))]
 //#![warn(clippy::print_stderr)]
