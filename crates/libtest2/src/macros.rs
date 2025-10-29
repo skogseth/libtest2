@@ -1,8 +1,9 @@
 #[macro_export]
 macro_rules! _main_parse {
-    (#[main] fn main $($item:tt)*) => {
+    (#[main] $(#[$meta:meta])* fn main $($item:tt)*) => {
         static TESTS: $crate::_private::DistributedList<$crate::_private::DynCase> = $crate::_private::DistributedList::root();
 
+        $(#[$meta])*
         fn main() {
             fn inner $($item)*
 
