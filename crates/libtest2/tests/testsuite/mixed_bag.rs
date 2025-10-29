@@ -63,6 +63,12 @@ fn sheep(context: &libtest2::TestContext) -> libtest2::RunResult {
 #[ignore = "slow"]
 fn horse(context: &libtest2::TestContext) {
 }
+
+#[libtest2::test]
+fn custom_error(context: &libtest2::TestContext) -> libtest2::RunResult {
+    Err(libtest2::RunError::from(std::io::Error::new(std::io::ErrorKind::Other, "I failed")))
+}
+
 "#,
             false,
         );
@@ -93,46 +99,55 @@ fn normal() {
         101,
         str![[r#"
 
-running 10 tests
-test bear  ... ignored
-test bunny ... ignored
-test cat   ... ok
-test dog   ... FAILED
-test fly   ... ignored
-test fox   ... ok
-test frog  ... ignored
-test horse ... ignored
-test owl   ... ignored
-test sheep ... ignored
+running 11 tests
+test bear         ... ignored
+test bunny        ... ignored
+test cat          ... ok
+test custom_error ... FAILED
+test dog          ... FAILED
+test fly          ... ignored
+test fox          ... ok
+test frog         ... ignored
+test horse        ... ignored
+test owl          ... ignored
+test sheep        ... ignored
 
 failures:
+
+---- custom_error ----
+I failed
 
 ---- dog ----
 was not a good boy
 
 
 failures:
+    custom_error
     dog
 
-test result: FAILED. 2 passed; 1 failed; 7 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 2 passed; 2 failed; 7 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
         str![[r#"
 
-running 10 tests
+running 11 tests
 ...
 
 failures:
+
+---- custom_error ----
+I failed
 
 ---- dog ----
 was not a good boy
 
 
 failures:
+    custom_error
     dog
 
-test result: FAILED. 2 passed; 1 failed; 7 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 2 passed; 2 failed; 7 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
@@ -146,46 +161,55 @@ fn test_mode() {
         101,
         str![[r#"
 
-running 10 tests
-test bear  ... ignored
-test bunny ... ignored
-test cat   ... ok
-test dog   ... FAILED
-test fly   ... ignored
-test fox   ... ok
-test frog  ... ignored
-test horse ... ignored
-test owl   ... ignored
-test sheep ... ignored
+running 11 tests
+test bear         ... ignored
+test bunny        ... ignored
+test cat          ... ok
+test custom_error ... FAILED
+test dog          ... FAILED
+test fly          ... ignored
+test fox          ... ok
+test frog         ... ignored
+test horse        ... ignored
+test owl          ... ignored
+test sheep        ... ignored
 
 failures:
+
+---- custom_error ----
+I failed
 
 ---- dog ----
 was not a good boy
 
 
 failures:
+    custom_error
     dog
 
-test result: FAILED. 2 passed; 1 failed; 7 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 2 passed; 2 failed; 7 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
         str![[r#"
 
-running 10 tests
+running 11 tests
 ...
 
 failures:
+
+---- custom_error ----
+I failed
 
 ---- dog ----
 was not a good boy
 
 
 failures:
+    custom_error
     dog
 
-test result: FAILED. 2 passed; 1 failed; 7 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 2 passed; 2 failed; 7 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
@@ -199,46 +223,55 @@ fn bench_mode() {
         101,
         str![[r#"
 
-running 10 tests
-test bear  ... ignored
-test bunny ... ignored
-test cat   ... ok
-test dog   ... FAILED
-test fly   ... ignored
-test fox   ... ok
-test frog  ... ignored
-test horse ... ignored
-test owl   ... ignored
-test sheep ... ignored
+running 11 tests
+test bear         ... ignored
+test bunny        ... ignored
+test cat          ... ok
+test custom_error ... FAILED
+test dog          ... FAILED
+test fly          ... ignored
+test fox          ... ok
+test frog         ... ignored
+test horse        ... ignored
+test owl          ... ignored
+test sheep        ... ignored
 
 failures:
+
+---- custom_error ----
+I failed
 
 ---- dog ----
 was not a good boy
 
 
 failures:
+    custom_error
     dog
 
-test result: FAILED. 2 passed; 1 failed; 7 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 2 passed; 2 failed; 7 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
         str![[r#"
 
-running 10 tests
+running 11 tests
 ...
 
 failures:
+
+---- custom_error ----
+I failed
 
 ---- dog ----
 was not a good boy
 
 
 failures:
+    custom_error
     dog
 
-test result: FAILED. 2 passed; 1 failed; 7 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 2 passed; 2 failed; 7 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
@@ -254,6 +287,7 @@ fn list() {
 bear: test
 bunny: test
 cat: test
+custom_error: test
 dog: test
 fly: test
 fox: test
@@ -262,7 +296,7 @@ horse: test
 owl: test
 sheep: test
 
-10 tests
+11 tests
 
 
 "#]],
@@ -270,6 +304,7 @@ sheep: test
 bear: test
 bunny: test
 cat: test
+custom_error: test
 dog: test
 fly: test
 fox: test
@@ -278,7 +313,7 @@ horse: test
 owl: test
 sheep: test
 
-10 tests
+11 tests
 
 
 "#]],
@@ -294,6 +329,7 @@ fn list_ignored() {
 bear: test
 bunny: test
 cat: test
+custom_error: test
 dog: test
 fly: test
 fox: test
@@ -302,7 +338,7 @@ horse: test
 owl: test
 sheep: test
 
-10 tests
+11 tests
 
 
 "#]],
@@ -310,6 +346,7 @@ sheep: test
 bear: test
 bunny: test
 cat: test
+custom_error: test
 dog: test
 fly: test
 fox: test
@@ -318,7 +355,7 @@ horse: test
 owl: test
 sheep: test
 
-10 tests
+11 tests
 
 
 "#]],
@@ -388,7 +425,7 @@ running 2 tests
 test bear ... ignored
 test cat  ... ok
 
-test result: ok. 1 passed; 0 failed; 1 ignored; 8 filtered out; finished in [..]s
+test result: ok. 1 passed; 0 failed; 1 ignored; 9 filtered out; finished in [..]s
 
 
 "#]],
@@ -397,7 +434,7 @@ test result: ok. 1 passed; 0 failed; 1 ignored; 8 filtered out; finished in [..]
 running 2 tests
 ...
 
-test result: ok. 1 passed; 0 failed; 1 ignored; 8 filtered out; finished in [..]s
+test result: ok. 1 passed; 0 failed; 1 ignored; 9 filtered out; finished in [..]s
 
 
 "#]],
@@ -415,7 +452,7 @@ running 2 tests
 test bear ... ignored
 test cat  ... ok
 
-test result: ok. 1 passed; 0 failed; 1 ignored; 8 filtered out; finished in [..]s
+test result: ok. 1 passed; 0 failed; 1 ignored; 9 filtered out; finished in [..]s
 
 
 "#]],
@@ -424,7 +461,7 @@ test result: ok. 1 passed; 0 failed; 1 ignored; 8 filtered out; finished in [..]
 running 2 tests
 ...
 
-test result: ok. 1 passed; 0 failed; 1 ignored; 8 filtered out; finished in [..]s
+test result: ok. 1 passed; 0 failed; 1 ignored; 9 filtered out; finished in [..]s
 
 
 "#]],
@@ -438,14 +475,18 @@ fn filter_o_test_include_ignored() {
         101,
         str![[r#"
 
-running 5 tests
-test dog   ... FAILED
-test fox   ... ok
-test frog  ... ok
-test horse ... ok
-test owl   ... FAILED
+running 6 tests
+test custom_error ... FAILED
+test dog          ... FAILED
+test fox          ... ok
+test frog         ... ok
+test horse        ... ok
+test owl          ... FAILED
 
 failures:
+
+---- custom_error ----
+I failed
 
 ---- dog ----
 was not a good boy
@@ -455,19 +496,23 @@ broke neck
 
 
 failures:
+    custom_error
     dog
     owl
 
-test result: FAILED. 3 passed; 2 failed; 0 ignored; 5 filtered out; finished in [..]s
+test result: FAILED. 3 passed; 3 failed; 0 ignored; 5 filtered out; finished in [..]s
 
 
 "#]],
         str![[r#"
 
-running 5 tests
+running 6 tests
 ...
 
 failures:
+
+---- custom_error ----
+I failed
 
 ---- dog ----
 was not a good boy
@@ -477,10 +522,11 @@ broke neck
 
 
 failures:
+    custom_error
     dog
     owl
 
-test result: FAILED. 3 passed; 2 failed; 0 ignored; 5 filtered out; finished in [..]s
+test result: FAILED. 3 passed; 3 failed; 0 ignored; 5 filtered out; finished in [..]s
 
 
 "#]],
@@ -494,14 +540,18 @@ fn filter_o_test_ignored() {
         101,
         str![[r#"
 
-running 5 tests
-test dog   ... FAILED
-test fox   ... ok
-test frog  ... ok
-test horse ... ok
-test owl   ... FAILED
+running 6 tests
+test custom_error ... FAILED
+test dog          ... FAILED
+test fox          ... ok
+test frog         ... ok
+test horse        ... ok
+test owl          ... FAILED
 
 failures:
+
+---- custom_error ----
+I failed
 
 ---- dog ----
 was not a good boy
@@ -511,19 +561,23 @@ broke neck
 
 
 failures:
+    custom_error
     dog
     owl
 
-test result: FAILED. 3 passed; 2 failed; 0 ignored; 5 filtered out; finished in [..]s
+test result: FAILED. 3 passed; 3 failed; 0 ignored; 5 filtered out; finished in [..]s
 
 
 "#]],
         str![[r#"
 
-running 5 tests
+running 6 tests
 ...
 
 failures:
+
+---- custom_error ----
+I failed
 
 ---- dog ----
 was not a good boy
@@ -533,10 +587,11 @@ broke neck
 
 
 failures:
+    custom_error
     dog
     owl
 
-test result: FAILED. 3 passed; 2 failed; 0 ignored; 5 filtered out; finished in [..]s
+test result: FAILED. 3 passed; 3 failed; 0 ignored; 5 filtered out; finished in [..]s
 
 
 "#]],
@@ -550,17 +605,18 @@ fn normal_include_ignored() {
         101,
         str![[r#"
 
-running 10 tests
-test bear  ... FAILED
-test bunny ... FAILED
-test cat   ... ok
-test dog   ... FAILED
-test fly   ... ok
-test fox   ... ok
-test frog  ... ok
-test horse ... ok
-test owl   ... FAILED
-test sheep ... FAILED
+running 11 tests
+test bear         ... FAILED
+test bunny        ... FAILED
+test cat          ... ok
+test custom_error ... FAILED
+test dog          ... FAILED
+test fly          ... ok
+test fox          ... ok
+test frog         ... ok
+test horse        ... ok
+test owl          ... FAILED
+test sheep        ... FAILED
 
 failures:
 
@@ -569,6 +625,9 @@ no honey
 
 ---- bunny ----
 jumped too high
+
+---- custom_error ----
+I failed
 
 ---- dog ----
 was not a good boy
@@ -583,17 +642,18 @@ got lost blindly following the flock
 failures:
     bear
     bunny
+    custom_error
     dog
     owl
     sheep
 
-test result: FAILED. 5 passed; 5 failed; 0 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 5 passed; 6 failed; 0 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
         str![[r#"
 
-running 10 tests
+running 11 tests
 ...
 
 failures:
@@ -604,6 +664,9 @@ no honey
 ---- bunny ----
 jumped too high
 
+---- custom_error ----
+I failed
+
 ---- dog ----
 was not a good boy
 
@@ -617,11 +680,12 @@ got lost blindly following the flock
 failures:
     bear
     bunny
+    custom_error
     dog
     owl
     sheep
 
-test result: FAILED. 5 passed; 5 failed; 0 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 5 passed; 6 failed; 0 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
@@ -635,17 +699,18 @@ fn normal_ignored() {
         101,
         str![[r#"
 
-running 10 tests
-test bear  ... FAILED
-test bunny ... FAILED
-test cat   ... ok
-test dog   ... FAILED
-test fly   ... ok
-test fox   ... ok
-test frog  ... ok
-test horse ... ok
-test owl   ... FAILED
-test sheep ... FAILED
+running 11 tests
+test bear         ... FAILED
+test bunny        ... FAILED
+test cat          ... ok
+test custom_error ... FAILED
+test dog          ... FAILED
+test fly          ... ok
+test fox          ... ok
+test frog         ... ok
+test horse        ... ok
+test owl          ... FAILED
+test sheep        ... FAILED
 
 failures:
 
@@ -654,6 +719,9 @@ no honey
 
 ---- bunny ----
 jumped too high
+
+---- custom_error ----
+I failed
 
 ---- dog ----
 was not a good boy
@@ -668,17 +736,18 @@ got lost blindly following the flock
 failures:
     bear
     bunny
+    custom_error
     dog
     owl
     sheep
 
-test result: FAILED. 5 passed; 5 failed; 0 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 5 passed; 6 failed; 0 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
         str![[r#"
 
-running 10 tests
+running 11 tests
 ...
 
 failures:
@@ -689,6 +758,9 @@ no honey
 ---- bunny ----
 jumped too high
 
+---- custom_error ----
+I failed
+
 ---- dog ----
 was not a good boy
 
@@ -702,11 +774,12 @@ got lost blindly following the flock
 failures:
     bear
     bunny
+    custom_error
     dog
     owl
     sheep
 
-test result: FAILED. 5 passed; 5 failed; 0 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 5 passed; 6 failed; 0 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
@@ -720,39 +793,48 @@ fn lots_of_flags() {
         101,
         str![[r#"
 
-running 3 tests
-test fox   ... ok
-test horse ... ok
-test owl   ... FAILED
+running 4 tests
+test custom_error ... FAILED
+test fox          ... ok
+test horse        ... ok
+test owl          ... FAILED
 
 failures:
+
+---- custom_error ----
+I failed
 
 ---- owl ----
 broke neck
 
 
 failures:
+    custom_error
     owl
 
-test result: FAILED. 2 passed; 1 failed; 0 ignored; 7 filtered out; finished in [..]s
+test result: FAILED. 2 passed; 2 failed; 0 ignored; 7 filtered out; finished in [..]s
 
 
 "#]],
         str![[r#"
 
-running 3 tests
+running 4 tests
 ...
 
 failures:
+
+---- custom_error ----
+I failed
 
 ---- owl ----
 broke neck
 
 
 failures:
+    custom_error
     owl
 
-test result: FAILED. 2 passed; 1 failed; 0 ignored; 7 filtered out; finished in [..]s
+test result: FAILED. 2 passed; 2 failed; 0 ignored; 7 filtered out; finished in [..]s
 
 
 "#]],
@@ -785,6 +867,12 @@ fn list_json() {
     "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "cat"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover_case",
+    "name": "custom_error",
+    "selected": false
   },
   {
     "elapsed_s": "[..]",
@@ -857,6 +945,12 @@ fn list_json() {
     "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "cat"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover_case",
+    "name": "custom_error",
+    "selected": false
   },
   {
     "elapsed_s": "[..]",
@@ -941,6 +1035,12 @@ fn test_json() {
   {
     "elapsed_s": "[..]",
     "event": "discover_case",
+    "name": "custom_error",
+    "selected": false
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover_case",
     "name": "dog",
     "selected": false
   },
@@ -1125,6 +1225,12 @@ fn test_json() {
     "event": "discover_case",
     "name": "sheep",
     "selected": false
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover_case",
+    "name": "custom_error",
+    "selected": false
   }
 ]
 "#]]
@@ -1141,35 +1247,43 @@ fn terse_output() {
         101,
         str![[r#"
 
-running 10 tests
-ii.Fi.iiii
+running 11 tests
+ii.FFi.iiii
 failures:
+
+---- custom_error ----
+I failed
 
 ---- dog ----
 was not a good boy
 
 
 failures:
+    custom_error
     dog
 
-test result: FAILED. 2 passed; 1 failed; 7 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 2 passed; 2 failed; 7 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
         str![[r#"
 
-running 10 tests
+running 11 tests
 ...
 failures:
+
+---- custom_error ----
+I failed
 
 ---- dog ----
 was not a good boy
 
 
 failures:
+    custom_error
     dog
 
-test result: FAILED. 2 passed; 1 failed; 7 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 2 passed; 2 failed; 7 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
@@ -1183,20 +1297,20 @@ fn fail_fast() {
         101,
         str![[r#"
 
-running 10 tests
-test bear  ... ignored
-test bunny ... ignored
-test cat   ... ok
-test dog   ... FAILED
+running 11 tests
+test bear         ... ignored
+test bunny        ... ignored
+test cat          ... ok
+test custom_error ... FAILED
 
 failures:
 
----- dog ----
-was not a good boy
+---- custom_error ----
+I failed
 
 
 failures:
-    dog
+    custom_error
 
 test result: FAILED. 1 passed; 1 failed; 2 ignored; 0 filtered out; finished in [..]s
 
@@ -1234,6 +1348,11 @@ fn fail_fast_json() {
     "elapsed_s": "[..]",
     "event": "discover_case",
     "name": "cat"
+  },
+  {
+    "elapsed_s": "[..]",
+    "event": "discover_case",
+    "name": "custom_error"
   },
   {
     "elapsed_s": "[..]",
@@ -1325,19 +1444,19 @@ fn fail_fast_json() {
   {
     "elapsed_s": "[..]",
     "event": "case_start",
-    "name": "dog"
+    "name": "custom_error"
   },
   {
     "elapsed_s": "[..]",
     "event": "case_message",
     "kind": "error",
-    "message": "was not a good boy",
-    "name": "dog"
+    "message": "I failed",
+    "name": "custom_error"
   },
   {
     "elapsed_s": "[..]",
     "event": "case_complete",
-    "name": "dog"
+    "name": "custom_error"
   },
   {
     "elapsed_s": "[..]",
