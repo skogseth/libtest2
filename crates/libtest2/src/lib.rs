@@ -37,6 +37,7 @@
 //!
 //! - `#[test]` does not support all `Termination` types as return values,
 //!   only what [`IntoRunResult`] supports.
+//! - `#[ignore]` must come after the `#[test]` macro
 //! - Output capture and `--no-capture`: simply not supported. The official
 //!   `libtest` uses internal `std` functions to temporarily redirect output.
 //!   `libtest` cannot use those, see also [libtest2#12](https://github.com/assert-rs/libtest2/issues/12)
