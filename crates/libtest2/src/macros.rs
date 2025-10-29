@@ -58,7 +58,9 @@ macro_rules! _test_parse {
                     }
                 )*
 
-                run(context)
+                use $crate::IntoRunResult;
+                let result = run(context);
+                IntoRunResult::into_run_result(result)
             }
         }
     };
