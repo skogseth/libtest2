@@ -60,6 +60,7 @@ fn sheep(context: &libtest2::TestContext) -> libtest2::RunResult {
 }
 
 #[libtest2::test]
+#[cfg(all())]
 #[ignore = "slow"]
 fn horse(context: &libtest2::TestContext) {
 }
@@ -69,6 +70,11 @@ fn custom_error(context: &libtest2::TestContext) -> std::io::Result<()> {
     Err(std::io::Error::new(std::io::ErrorKind::Other, "I failed"))
 }
 
+#[libtest2::test]
+#[cfg(any())]
+fn unicorn(context: &libtest2::TestContext) {
+    panic!("I don't exist");
+}
 "#,
             false,
         );
