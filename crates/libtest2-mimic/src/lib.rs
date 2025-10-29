@@ -189,6 +189,15 @@ impl RunError {
     }
 }
 
+impl<E> From<E> for RunError
+where
+    E: std::error::Error + Send + Sync + 'static,
+{
+    fn from(error: E) -> Self {
+        Self::with_cause(error)
+    }
+}
+
 pub struct RunContext<'t> {
     inner: &'t libtest2_harness::TestContext,
 }
