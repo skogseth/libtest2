@@ -39,11 +39,16 @@ fn main() {
                 state.ignore()?;
                 Err(RunError::fail("got lost blindly following the flock"))
             }),
+            #[cfg(all())]
             Trial::test("horse", |state| {
                 state.ignore_for("slow")?;
                 Ok(())
             }),
             Trial::test("custom_error", |_| Err(RunError::from(std::io::Error::new(std::io::ErrorKind::Other, "I failed")))),
+            #[cfg(any())]
+            Trial::test("unicorn", |state| {
+                panic!("I don't exist");
+            }),
         ])
         .main();
 }
