@@ -59,7 +59,6 @@ pub mod panic;
 pub mod _private {
     pub use distributed_list::push;
     pub use distributed_list::DistributedList;
-    pub use libtest2_harness::Case;
     pub use libtest2_harness::Source;
     pub use libtest2_harness::TestKind;
 
@@ -72,6 +71,7 @@ pub mod _private {
 
 pub use case::main;
 pub use case::FnCase;
+pub use libtest2_harness::Case;
 pub use libtest2_harness::IntoRunResult;
 pub use libtest2_harness::RunError;
 pub use libtest2_harness::RunResult;
