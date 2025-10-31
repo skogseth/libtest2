@@ -18,6 +18,24 @@ fn passes(_context: &libtest2::TestContext) {
 fn panics(_context: &libtest2::TestContext) {
     panic!("uh oh")
 }
+
+#[libtest2::test]
+#[should_panic]
+fn intentionally_panics(_context: &libtest2::TestContext) {
+    panic!("of 1857")
+}
+
+#[libtest2::test]
+#[should_panic = "panic"]
+fn intentionally_panics_with_message(_context: &libtest2::TestContext) {
+    panic!("this panic is intentional")
+}
+
+#[libtest2::test]
+#[should_panic = "panic"]
+fn panics_with_the_wrong_message(_context: &libtest2::TestContext) {
+    panic!("don't freak out")
+}
 "#,
             false,
         );
@@ -48,26 +66,35 @@ fn normal() {
         101,
         str![[r#"
 
-running 2 tests
-test panics ... FAILED
-test passes ... ok
+running 5 tests
+test intentionally_panics              ... ok
+test intentionally_panics_with_message ... ok
+test panics                            ... FAILED
+test panics_with_the_wrong_message     ... FAILED
+test passes                            ... ok
 
 failures:
 
 ---- panics ----
 test panicked: uh oh
 
+---- panics_with_the_wrong_message ----
+panic did not contain expected string
+      panic message: "don't freak out"
+ expected substring: "panic"
+
 
 failures:
     panics
+    panics_with_the_wrong_message
 
-test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 3 passed; 2 failed; 0 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
         str![[r#"
 
-running 2 tests
+running 5 tests
 ...
 
 failures:
@@ -75,11 +102,17 @@ failures:
 ---- panics ----
 test panicked: uh oh
 
+---- panics_with_the_wrong_message ----
+panic did not contain expected string
+      panic message: "don't freak out"
+ expected substring: "panic"
+
 
 failures:
     panics
+    panics_with_the_wrong_message
 
-test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 3 passed; 2 failed; 0 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
