@@ -36,6 +36,13 @@ fn intentionally_panics_with_message(_context: &libtest2::TestContext) {
 fn panics_with_the_wrong_message(_context: &libtest2::TestContext) {
     panic!("don't freak out")
 }
+
+#[libtest2::test]
+#[should_panic = "disco"]
+#[should_panic = "very long and specific message"]
+fn passes_because_multiple_panics_are_ignore(_context: &libtest2::TestContext) {
+    panic!("at the disco")
+}
 "#,
             false,
         );
