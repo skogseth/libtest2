@@ -17,7 +17,7 @@ pub trait Case: Send + Sync + 'static {
 
 /// Type of the test according to the [rust book](https://doc.rust-lang.org/cargo/guide/tests.html)
 /// conventions.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Default)]
 pub enum TestKind {
     /// Unit-tests are expected to be in the `src` folder of the crate.
     UnitTest,
@@ -27,13 +27,8 @@ pub enum TestKind {
     DocTest,
     /// Tests for the sources that don't follow the project layout convention
     /// (e.g. tests in raw `main.rs` compiled by calling `rustc --test` directly).
+    #[default]
     Unknown,
-}
-
-impl Default for TestKind {
-    fn default() -> Self {
-        Self::Unknown
-    }
 }
 
 #[derive(Debug)]

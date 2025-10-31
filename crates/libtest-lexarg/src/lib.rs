@@ -42,49 +42,34 @@ pub struct TestOpts {
 }
 
 /// Whether ignored test should be run or not (see [`TestOpts::run_ignored`])
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Default)]
 pub enum RunIgnored {
     Yes,
+    #[default]
     No,
     /// Run only ignored tests
     Only,
 }
 
-impl Default for RunIgnored {
-    fn default() -> Self {
-        Self::No
-    }
-}
-
 /// Whether should console output be colored or not (see [`TestOpts::color`])
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Default)]
 pub enum ColorConfig {
+    #[default]
     AutoColor,
     AlwaysColor,
     NeverColor,
 }
 
-impl Default for ColorConfig {
-    fn default() -> Self {
-        Self::AutoColor
-    }
-}
-
 /// Format of the test results output (see [`TestOpts::format`])
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Default)]
 pub enum OutputFormat {
     /// Verbose output
+    #[default]
     Pretty,
     /// Quiet output
     Terse,
     /// JSON output
     Json,
-}
-
-impl Default for OutputFormat {
-    fn default() -> Self {
-        Self::Pretty
-    }
 }
 
 pub const UNSTABLE_OPTIONS: &str = "unstable-options";
