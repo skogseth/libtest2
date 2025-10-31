@@ -59,7 +59,7 @@ impl<'a> Parser<'a> {
     /// Returns [`Arg::Unexpected`] on failure
     ///
     /// Notes:
-    /// - `=` is always accepted as a [`Arg::Short("=")`].  If that isn't the case in your
+    /// - `=` is always accepted as a [`Arg::Short("=")`][Arg::Short].  If that isn't the case in your
     ///   application, you may want to special case the error for that.
     pub fn next_arg(&mut self) -> Option<Arg<'a>> {
         // Always reset
