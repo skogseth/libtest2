@@ -14,22 +14,48 @@ macro_rules! _main_parse {
 }
 
 #[macro_export]
-macro_rules! _parse_ignore {
-    (ignore) => {
-        ::std::option::Option::<&'static str>::None
-    };
-    (ignore = $reason:expr) => {
-        ::std::option::Option::<&'static str>::Some($reason)
-    };
-    ($($attr:tt)*) => {
-        compile_error!(concat!("unknown attribute '", stringify!($($attr)*), "'"));
-    };
-}
-
-#[macro_export]
 #[allow(clippy::crate_in_macro_def)] // accessing item defined by `_main_parse`
 macro_rules! _test_parse {
-    (#[test] $(#[$($attr:tt)*])* fn $name:ident $($item:tt)*) => {
+    // Entry point
+    (#[test] $(#[$($attr:tt)+])* fn $name:ident $($item:tt)*) => {
+        $crate::_private::test_parse!(continue:
+            name=$name
+            body=[$($item)*]
+            attrs=[$(#[$($attr)+])*]
+        );
+    };
+
+    // Recursively handle attributes:
+
+    // Edge condition (no more attributes to parse)
+    (continue: name=$name:ident body=[$($item:tt)*] attrs=[] $(ignore=$ignore:tt)?) => {
+        $crate::_private::test_parse!(break:
+            name=$name
+            body=[$($item)*]
+            $(ignore=$ignore)?
+        );
+    };
+    // Process `#[ignore]` macro (NOTE: This will only match if an `#[ignore]` macro has not already been parsed)
+    (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[ignore $(= $reason:literal)?] $(#[$($attr:tt)+])*]) => {
+        $crate::_private::test_parse!(continue:
+            name=$name
+            body=[$($item)*]
+            attrs=[$(#[$($attr)*])*]
+            ignore=[$($reason)?]
+        );
+    };
+    // Discard unknown attributes
+    (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[$($unknown_attr:tt)+] $(#[$($attr:tt)+])*] $(ignore=$ignore:tt)?) => {
+        $crate::_private::test_parse!(continue:
+            name=$name
+            body=[$($item)*]
+            attrs=[$(#[$($attr)*])*]
+            $(ignore=$ignore)?
+        );
+    };
+
+    // End result
+    (break: name=$name:ident body=[$($item:tt)*] $(ignore=$ignore:tt)? $(should_panic=$should_panic:tt)?) => {
         #[allow(non_camel_case_types)]
         struct $name;
 
@@ -53,16 +79,23 @@ macro_rules! _test_parse {
                 fn run $($item)*
 
                 $(
-                    match $crate::_private::parse_ignore!($($attr)*) {
-                        ::std::option::Option::None => context.ignore()?,
-                        ::std::option::Option::Some(reason) => context.ignore_for(reason)?,
-                    }
-                )*
+                    $crate::_private::parse_ignore!(context, $ignore)?;
+                )?
 
                 use $crate::IntoRunResult;
                 let result = run(context);
                 IntoRunResult::into_run_result(result)
             }
         }
+    };
+}
+
+#[macro_export]
+macro_rules! _parse_ignore {
+    ($context:expr, [$reason:literal]) => {
+        $context.ignore_for($reason)
+    };
+    ($context:expr, []) => {
+        $context.ignore()
     };
 }
