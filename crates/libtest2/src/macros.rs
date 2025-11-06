@@ -47,12 +47,13 @@ macro_rules! _test_parse {
         );
     };
     // Ignore subsequent calls to `#[ignore]`/`#[ignore = ".."]`
-    (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[ignore $(= $reason:literal)?] $(#[$($attr:tt)+])*] ignore=$ignore:tt) => {
+    (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[ignore $(= $reason:literal)?] $(#[$($attr:tt)+])*] ignore=$ignore:tt $(should_panic=$should_panic:tt)?) => {
         $crate::_private::test_parse!(continue:
             name=$name
             body=[$($item)*]
             attrs=[$(#[$($attr)*])*]
             ignore=$ignore
+            $(should_panic=$should_panic)?
         );
     };
     // Process `#[should_panic]`/`#[should_panic = ".."]` (NOTE: This will only match if a should_panic macro has not already been parsed)
