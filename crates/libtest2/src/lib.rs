@@ -38,6 +38,8 @@
 //! - `#[test]` does not support all `Termination` types as return values,
 //!   only what [`IntoRunResult`] supports.
 //! - `#[ignore]` must come after the `#[test]` macro
+//! - `#[should_ignore]` must come after the `#[test]` macro.
+//!   The error output if the test fails to panic is also different from `libtest`.
 //! - Output capture and `--no-capture`: simply not supported. The official
 //!   `libtest` uses internal `std` functions to temporarily redirect output.
 //!   `libtest` cannot use those, see also [libtest2#12](https://github.com/assert-rs/libtest2/issues/12)
@@ -51,6 +53,8 @@
 mod case;
 mod macros;
 
+pub mod panic;
+
 #[doc(hidden)]
 pub mod _private {
     pub use distributed_list::push;
@@ -61,6 +65,7 @@ pub mod _private {
 
     pub use crate::_main_parse as main_parse;
     pub use crate::_parse_ignore as parse_ignore;
+    pub use crate::_run_test as run_test;
     pub use crate::_test_parse as test_parse;
     pub use crate::case::DynCase;
 }
