@@ -32,6 +32,14 @@ fn intentionally_panics_with_message(_context: &libtest2::TestContext) {
 fn panics_with_the_wrong_message(_context: &libtest2::TestContext) {
     panic!("with the wrong message")
 }
+
+#[libtest2::test]
+#[ignore]
+#[should_panic]
+#[ignore = "this attribute should just be skipped"]
+fn intentionally_panics_but_is_usually_ignored(_context: &libtest2::TestContext) {
+    panic!("whatever")
+}
 "#,
             false,
         );
@@ -62,11 +70,12 @@ fn normal() {
         101,
         str![[r#"
 
-running 4 tests
-test accidentally_panics               ... FAILED
-test intentionally_panics              ... ok
-test intentionally_panics_with_message ... ok
-test panics_with_the_wrong_message     ... FAILED
+running 5 tests
+test accidentally_panics                         ... FAILED
+test intentionally_panics                        ... ok
+test intentionally_panics_but_is_usually_ignored ... ignored
+test intentionally_panics_with_message           ... ok
+test panics_with_the_wrong_message               ... FAILED
 
 failures:
 
@@ -83,13 +92,13 @@ failures:
     accidentally_panics
     panics_with_the_wrong_message
 
-test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 2 passed; 2 failed; 1 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
         str![[r#"
 
-running 4 tests
+running 5 tests
 ...
 
 failures:
@@ -107,7 +116,67 @@ failures:
     accidentally_panics
     panics_with_the_wrong_message
 
-test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 filtered out; finished in [..]s
+test result: FAILED. 2 passed; 2 failed; 1 ignored; 0 filtered out; finished in [..]s
+
+
+"#]],
+    );
+}
+
+#[test]
+fn include_ignored_normal() {
+    check(
+        &["--include-ignored"],
+        101,
+        str![[r#"
+
+running 5 tests
+test accidentally_panics                         ... FAILED
+test intentionally_panics                        ... ok
+test intentionally_panics_but_is_usually_ignored ... ok
+test intentionally_panics_with_message           ... ok
+test panics_with_the_wrong_message               ... FAILED
+
+failures:
+
+---- accidentally_panics ----
+test panicked: uh oh
+
+---- panics_with_the_wrong_message ----
+panic did not contain expected string
+      panic message: "with the wrong message"
+ expected substring: "in a controlled manner"
+
+
+failures:
+    accidentally_panics
+    panics_with_the_wrong_message
+
+test result: FAILED. 3 passed; 2 failed; 0 ignored; 0 filtered out; finished in [..]s
+
+
+"#]],
+        str![[r#"
+
+running 5 tests
+...
+
+failures:
+
+---- accidentally_panics ----
+test panicked: uh oh
+
+---- panics_with_the_wrong_message ----
+panic did not contain expected string
+      panic message: "with the wrong message"
+ expected substring: "in a controlled manner"
+
+
+failures:
+    accidentally_panics
+    panics_with_the_wrong_message
+
+test result: FAILED. 3 passed; 2 failed; 0 ignored; 0 filtered out; finished in [..]s
 
 
 "#]],
