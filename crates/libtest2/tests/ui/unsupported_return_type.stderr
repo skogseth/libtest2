@@ -1,0 +1,14 @@
+error[E0277]: the trait bound `i32: IntoRunResult` is not satisfied
+ --> tests/ui/unsupported_return_type.rs:4:1
+  |
+4 | #[libtest2::test]
+  | ^^^^^^^^^^^^^^^^^
+  | |
+  | the trait `IntoRunResult` is not implemented for `i32`
+  | required by a bound introduced by this call
+  |
+  = help: the following other types implement trait `IntoRunResult`:
+            ()
+            Result<(), E>
+            Result<(), RunError>
+  = note: this error originates in the macro `$crate::_private::test_parse` which comes from the expansion of the attribute macro `libtest2::test` (in Nightly builds, run with -Z macro-backtrace for more info)

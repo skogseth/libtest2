@@ -1,0 +1,23 @@
+error: annotating a test with multiple 'should_panic' attributes is not allowed
+ --> tests/ui/should_panic_multiple_attributes.rs:4:1
+  |
+4 | #[libtest2::test]
+  | ^^^^^^^^^^^^^^^^^
+  |
+  = note: this error originates in the macro `$crate::_private::test_parse` which comes from the expansion of the attribute macro `libtest2::test` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: annotating a test with multiple 'should_panic' attributes is not allowed
+ --> tests/ui/should_panic_multiple_attributes.rs:9:1
+  |
+9 | #[libtest2::test]
+  | ^^^^^^^^^^^^^^^^^
+  |
+  = note: this error originates in the macro `$crate::_private::test_parse` which comes from the expansion of the attribute macro `libtest2::test` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: annotating a test with multiple 'should_panic' attributes is not allowed
+  --> tests/ui/should_panic_multiple_attributes.rs:14:1
+   |
+14 | #[libtest2::test]
+   | ^^^^^^^^^^^^^^^^^
+   |
+   = note: this error originates in the macro `$crate::_private::test_parse` which comes from the expansion of the attribute macro `libtest2::test` (in Nightly builds, run with -Z macro-backtrace for more info)

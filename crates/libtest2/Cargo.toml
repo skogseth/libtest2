@@ -39,6 +39,7 @@ escargot = "0.5.8"
 once_cell_polyfill = "1.56.0"
 pathdiff = "0.2.1"
 snapbox = { version = "0.6.0", features = ["json"] }
+trybuild = "1.0.111"
 
 [lints]
 workspace = true
