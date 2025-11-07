@@ -1,4 +1,5 @@
 #[macro_export]
+#[doc(hidden)]
 macro_rules! _main_parse {
     (#[main] $(#[$meta:meta])* fn main $($item:tt)*) => {
         static TESTS: $crate::_private::DistributedList<$crate::_private::DynCase> = $crate::_private::DistributedList::root();
@@ -14,6 +15,7 @@ macro_rules! _main_parse {
 }
 
 #[macro_export]
+#[doc(hidden)]
 #[allow(clippy::crate_in_macro_def)] // accessing item defined by `_main_parse`/`_parse_ignore`/`_run_test`, and recursively calling the macro itself
 macro_rules! _test_parse {
     // Entry point
@@ -133,6 +135,7 @@ macro_rules! _test_parse {
 }
 
 #[macro_export]
+#[doc(hidden)]
 macro_rules! _parse_ignore {
     ($context:expr, [$reason:literal] $(,)?) => {
         $context.ignore_for($reason)?
@@ -144,6 +147,7 @@ macro_rules! _parse_ignore {
 }
 
 #[macro_export]
+#[doc(hidden)]
 macro_rules! _run_test {
     ($context:expr, [$expected:literal]) => {
         $crate::panic::assert_panic_contains(|| run($context), $expected)
