@@ -1,0 +1,17 @@
+error[E0308]: mismatched types
+ --> tests/ui/unsupported_parameter.rs:4:1
+  |
+4 | #[libtest2::test]
+  | ^^^^^^^^^^^^^^^^^
+  | |
+  | expected `i32`, found `&TestContext`
+  | arguments to this function are incorrect
+  |
+note: function defined here
+ --> tests/ui/unsupported_parameter.rs:4:1
+  |
+4 | #[libtest2::test]
+  | ^^^^^^^^^^^^^^^^^
+5 | fn takes_integer(_: i32) {}
+  |                  ------
+  = note: this error originates in the macro `$crate::_private::test_parse` which comes from the expansion of the attribute macro `libtest2::test` (in Nightly builds, run with -Z macro-backtrace for more info)
