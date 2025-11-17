@@ -1,4 +1,4 @@
-error: unknown attribute 'should_panic(expect = "something")'
+error: invalid attribute `#[should_panic(expect = "something")]` (expected `#[should_panic]`, `#[should_panic = ".."]`, or `#[should_panic(expected = "..")]`)
  --> tests/ui/should_panic_attribute_typo.rs:4:1
   |
 4 | #[libtest2::test]

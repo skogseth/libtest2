@@ -38,6 +38,7 @@ macro_rules! _test_parse {
             $(should_panic=$should_panic)?
         );
     };
+
     // Process `#[ignore]`/`#[ignore = ".."]` (NOTE: This will only match if an ignore macro has not already been parsed)
     (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[ignore $(= $reason:literal)?] $(#[$($attr:tt)+])*] $(should_panic=$should_panic:tt)?) => {
         $crate::_private::test_parse!(continue:
@@ -58,6 +59,7 @@ macro_rules! _test_parse {
             $(should_panic=$should_panic)?
         );
     };
+
     // Process `#[should_panic]`/`#[should_panic = ".."]` (NOTE: This will only match if a should_panic macro has not already been parsed)
     (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[should_panic $(= $expected:literal)?] $(#[$($attr:tt)+])*] $(ignore=$ignore:tt)?) => {
         $crate::_private::test_parse!(continue:
@@ -78,6 +80,22 @@ macro_rules! _test_parse {
             should_panic=[$expected]
         );
     };
+    // Emit an error for incorrect syntax with the should_panic macro (but continue parsing)
+    (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[should_panic $($tokens:tt)*] $(#[$($attr:tt)+])*] $(ignore=$ignore:tt)?) => {
+        compile_error!(
+            concat!(
+                r##"invalid attribute `#[should_panic"##,
+                stringify!($($tokens)*),
+                r##"]` (expected `#[should_panic]`, `#[should_panic = ".."]`, or `#[should_panic(expected = "..")]`)"##,
+            )
+        );
+        $crate::_private::test_parse!(continue:
+            name=$name
+            body=[$($item)*]
+            attrs=[$(#[$($attr)*])*]
+            $(ignore=$ignore)?
+        );
+    };
     // Emit an error for subsequent calls to `#[should_panic]`/`#[should_panic = ".."]`/`#[should_panic(expected = "..")]` (but continue parsing)
     (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[should_panic $($unused:tt)*] $(#[$($attr:tt)+])*] $(ignore=$ignore:tt)? should_panic=$should_panic:tt) => {
         compile_error!("annotating a test with multiple 'should_panic' attributes is not allowed");
@@ -89,6 +107,7 @@ macro_rules! _test_parse {
             should_panic=$should_panic
         );
     };
+
     // Emit error on unknown attributes (but continue parsing)
     (continue: name=$name:ident body=[$($item:tt)*] attrs=[#[$($unknown_attr:tt)+] $(#[$($attr:tt)+])*] $(ignore=$ignore:tt)? $(should_panic=$should_panic:tt)?) => {
         compile_error!(concat!("unknown attribute '", stringify!($($unknown_attr)+), "'"));
