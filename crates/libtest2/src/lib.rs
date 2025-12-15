@@ -66,6 +66,7 @@ pub mod _private {
     pub use crate::_main_parse as main_parse;
     pub use crate::_parse_ignore as parse_ignore;
     pub use crate::_run_test as run_test;
+    pub use crate::_test_expr as test_expr;
     pub use crate::_test_parse as test_parse;
     pub use crate::case::DynCase;
 }
