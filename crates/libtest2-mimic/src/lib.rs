@@ -131,6 +131,9 @@ pub struct Trial {
 }
 
 impl Trial {
+    /// Define a test case
+    ///
+    /// `name` must be unique across the entire test run.
     pub fn test(
         name: impl Into<String>,
         runner: impl Fn(RunContext<'_>) -> Result<(), RunError> + Send + Sync + 'static,
