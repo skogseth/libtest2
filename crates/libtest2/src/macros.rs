@@ -110,7 +110,9 @@ macro_rules! _test_parse {
             fn name(&self) -> &str {
                 $crate::_private::push!(crate::TESTS, _: $crate::_private::DynCase = $crate::_private::DynCase(&$name));
 
-                stringify!($name)
+                const FULL_PATH: &str = concat!(std::module_path!(), "::", stringify!($name));
+                let i = FULL_PATH.find("::").expect("we have inserted this in the line above so it must be there");
+                &FULL_PATH[(i+2)..]
             }
             fn kind(&self) -> $crate::_private::TestKind {
                 Default::default()
