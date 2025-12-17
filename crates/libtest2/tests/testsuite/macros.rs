@@ -16,6 +16,28 @@ mod some_module {
     #[libtest2::test]
     fn foo(_context: &libtest2::TestContext) {}
 }
+
+#[libtest2::test]
+fn takes_context(_context: &libtest2::TestContext) {}
+
+#[libtest2::test]
+fn no_parameters() {}
+
+#[libtest2::test]
+fn takes_context_return_result(_context: &libtest2::TestContext) -> libtest2::RunResult {
+    Ok(())
+}
+
+#[libtest2::test]
+fn no_parameters_return_result() -> libtest2::RunResult {
+    Ok(())
+}
+
+#[libtest2::test]
+fn ignored_context(_: &libtest2::TestContext) {}
+
+#[libtest2::test]
+fn context_as_pattern(libtest2::TestContext { .. }: &libtest2::TestContext) {}
 "#,
             false,
         );
@@ -29,11 +51,17 @@ mod some_module {
 fn check() {
     let data = str![[r#"
 
-running 2 tests
-test foo              ... ok
-test some_module::foo ... ok
+running 8 tests
+test context_as_pattern          ... ok
+test foo                         ... ok
+test ignored_context             ... ok
+test no_parameters               ... ok
+test no_parameters_return_result ... ok
+test some_module::foo            ... ok
+test takes_context               ... ok
+test takes_context_return_result ... ok
 
-test result: ok. 2 passed; 0 failed; 0 ignored; 0 filtered out; finished in [..]s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 filtered out; finished in [..]s
 
 
 "#]];

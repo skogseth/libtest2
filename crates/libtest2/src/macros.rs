@@ -102,7 +102,7 @@ macro_rules! _test_parse {
     };
 
     // End result
-    (break: name=$name:ident body=[$($item:tt)*] $(ignore=$ignore:tt)? $(should_panic=$should_panic:tt)?) => {
+    (break: name=$name:ident body=[($($params:tt)*) $($item:tt)*] $(ignore=$ignore:tt)? $(should_panic=$should_panic:tt)?) => {
         #[allow(non_camel_case_types)]
         struct $name;
 
@@ -125,12 +125,12 @@ macro_rules! _test_parse {
             }
 
             fn run(&self, context: &$crate::TestContext) -> $crate::RunResult {
-                fn run $($item)*
+                fn run($($params)*) $($item)*
 
                 $crate::_private::parse_ignore!(context, $($ignore)?);
 
                 use $crate::IntoRunResult;
-                let result = $crate::_private::run_test!(context, $($should_panic)?);
+                let result = $crate::_private::run_test!($crate::_private::test_expr!(context, [$($params)*]), $($should_panic)?);
                 IntoRunResult::into_run_result(result)
             }
         }
@@ -151,14 +151,25 @@ macro_rules! _parse_ignore {
 
 #[macro_export]
 #[doc(hidden)]
-macro_rules! _run_test {
-    ($context:expr, [$expected:literal]) => {
-        $crate::panic::assert_panic_contains(|| run($context), $expected)
-    };
+macro_rules! _test_expr {
     ($context:expr, []) => {
-        $crate::panic::assert_panic(|| run($context))
+        run()
     };
-    ($context:expr $(,)?) => {{
+    ($context:expr, [$($params:tt)+]) => {
         run($context)
+    };
+}
+
+#[macro_export]
+#[doc(hidden)]
+macro_rules! _run_test {
+    ($test:expr, [$expected:literal]) => {
+        $crate::panic::assert_panic_contains(|| $test, $expected)
+    };
+    ($test:expr, []) => {
+        $crate::panic::assert_panic(|| $test)
+    };
+    ($test:expr $(,)?) => {{
+        $test
     }};
 }
