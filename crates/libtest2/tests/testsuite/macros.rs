@@ -30,10 +30,10 @@ fn check() {
     let data = str![[r#"
 
 running 2 tests
-test foo ... ok
-test foo ... ok
+test foo              ... ok
+test some_module::foo ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 filtered out; finished in [..]s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 filtered out; finished in [..]s
 
 
 "#]];
