@@ -6,6 +6,8 @@ pub trait Case: Send + Sync + 'static {
     /// By convention this follows the rules for rust paths; i.e., it should be a series of
     /// identifiers separated by double colons. This way if some test runner wants to arrange the
     /// tests hierarchically it may.
+    ///
+    /// Must be unique across the entire test run.
     fn name(&self) -> &str;
     fn kind(&self) -> TestKind;
     fn source(&self) -> Option<&Source>;

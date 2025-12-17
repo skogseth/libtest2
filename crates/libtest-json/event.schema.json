@@ -139,6 +139,7 @@
       "type": "object",
       "properties": {
         "name": {
+          "description": "An identifier that is unique across the entire run",
           "type": "string"
         },
         "mode": {
@@ -197,6 +198,7 @@
       "type": "object",
       "properties": {
         "name": {
+          "description": "An identifier that is unique across the entire run",
           "type": "string"
         },
         "elapsed_s": {
@@ -225,6 +227,7 @@
       "type": "object",
       "properties": {
         "name": {
+          "description": "An identifier that is unique across the entire run",
           "type": "string"
         },
         "kind": {
@@ -256,6 +259,7 @@
       "type": "object",
       "properties": {
         "name": {
+          "description": "An identifier that is unique across the entire run",
           "type": "string"
         },
         "elapsed_s": {

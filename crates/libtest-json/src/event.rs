@@ -123,6 +123,7 @@ impl DiscoverStart {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
 pub struct DiscoverCase {
+    /// An identifier that is unique across the entire run
     pub name: String,
     #[cfg_attr(
         feature = "serde",
@@ -265,6 +266,7 @@ impl RunStart {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
 pub struct CaseStart {
+    /// An identifier that is unique across the entire run
     pub name: String,
     #[cfg_attr(
         feature = "serde",
@@ -308,6 +310,7 @@ impl CaseStart {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
 pub struct CaseMessage {
+    /// An identifier that is unique across the entire run
     pub name: String,
     pub kind: MessageKind,
     #[cfg_attr(
@@ -369,6 +372,7 @@ impl CaseMessage {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
 pub struct CaseComplete {
+    /// An identifier that is unique across the entire run
     pub name: String,
     #[cfg_attr(
         feature = "serde",
