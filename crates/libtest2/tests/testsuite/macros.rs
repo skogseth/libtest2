@@ -15,6 +15,16 @@ fn foo(_context: &libtest2::TestContext) {}
 mod some_module {
     #[libtest2::test]
     fn foo(_context: &libtest2::TestContext) {}
+
+    #[libtest2::test]
+    fn can_call_foo(context: &libtest2::TestContext) {
+        foo(context);
+    }
+    
+    // #[libtest2::test]
+    // fn can_call_super_foo(context: &libtest2::TestContext) {
+    //     super::foo(context);
+    // }
 }
 
 #[libtest2::test]
